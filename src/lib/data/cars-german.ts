@@ -1,0 +1,79 @@
+import { c } from "../carBuilder";
+import type { Car } from "../cars";
+
+export const mercedes: Car[] = [
+  c({ brand: "Mercedes-Benz", model: "A-Class", year: 2023, cats: ["daily"], body: "Hatchback", price: 34000, engine: "1.3L Turbo I4", fuel: "Petrol", hp: 163, trans: "Dual-clutch", zto100: 8.2, top: 225, torque: 250, drive: "FWD", weight: 1370, img: 13324313 }),
+  c({ brand: "Mercedes-Benz", model: "C-Class", year: 2023, cats: ["daily", "luxury"], body: "Sedan", price: 47000, engine: "2.0L Turbo I4", fuel: "Petrol", hp: 255, trans: "Automatic", zto100: 6.0, top: 250, torque: 400, drive: "RWD", weight: 1650 }),
+  c({ brand: "Mercedes-Benz", model: "E-Class", year: 2023, cats: ["luxury", "daily"], body: "Sedan", price: 58000, engine: "2.0L Turbo I4", fuel: "Petrol", hp: 255, trans: "Automatic", zto100: 6.4, top: 250, torque: 400, drive: "RWD", weight: 1750 }),
+  c({ brand: "Mercedes-Benz", model: "GLE", year: 2023, cats: ["suv", "luxury"], body: "SUV", price: 60000, engine: "3.0L Turbo I6", fuel: "Hybrid", hp: 375, trans: "Automatic", zto100: 5.7, top: 250, torque: 500, drive: "AWD", weight: 2260 }),
+  c({ brand: "Mercedes-Benz", model: "GLC", year: 2023, cats: ["suv", "daily"], body: "SUV", price: 48000, engine: "2.0L Turbo I4", fuel: "Petrol", hp: 255, trans: "Automatic", zto100: 6.2, top: 240, torque: 400, drive: "AWD", weight: 1925 }),
+  c({ brand: "Mercedes-Benz", model: "GLA", year: 2023, cats: ["suv", "daily"], body: "SUV", price: 38000, engine: "2.0L Turbo I4", fuel: "Petrol", hp: 221, trans: "Dual-clutch", zto100: 7.0, top: 220, torque: 350, drive: "AWD", weight: 1600 }),
+  c({ brand: "Mercedes-Benz", model: "EQS", year: 2023, cats: ["electric", "luxury"], body: "Sedan", price: 105000, engine: "Dual-Motor Electric", fuel: "Electric", hp: 516, trans: "Automatic", zto100: 4.3, top: 210, torque: 858, drive: "AWD", weight: 2585 }),
+  c({ brand: "Mercedes-Benz", model: "EQE", year: 2023, cats: ["electric", "luxury"], body: "Sedan", price: 75000, engine: "Dual-Motor Electric", fuel: "Electric", hp: 402, trans: "Automatic", zto100: 4.6, top: 210, torque: 765, drive: "AWD", weight: 2475 }),
+  c({ brand: "Mercedes-Benz", model: "EQB", year: 2023, cats: ["electric", "suv"], body: "SUV", price: 55000, engine: "Dual-Motor Electric", fuel: "Electric", hp: 288, trans: "Automatic", zto100: 6.2, top: 160, torque: 520, drive: "AWD", weight: 2075 }),
+  c({ brand: "Mercedes-Benz", model: "SL", year: 2023, cats: ["luxury", "sports"], body: "Convertible", price: 140000, engine: "4.0L Twin-Turbo V8", fuel: "Petrol", hp: 469, trans: "Automatic", zto100: 3.9, top: 295, torque: 700, drive: "AWD", weight: 1970 }),
+  c({ brand: "Mercedes-Benz", model: "CLS", year: 2022, cats: ["luxury", "daily"], body: "Sedan", price: 72000, engine: "3.0L Turbo I6", fuel: "Hybrid", hp: 367, trans: "Automatic", zto100: 4.8, top: 250, torque: 500, drive: "AWD", weight: 1945 }),
+  c({ brand: "Mercedes-Benz", model: "GLS", year: 2023, cats: ["suv", "luxury"], body: "SUV", price: 80000, engine: "4.0L Twin-Turbo V8", fuel: "Petrol", hp: 483, trans: "Automatic", zto100: 5.2, top: 250, torque: 700, drive: "AWD", weight: 2515 }),
+  c({ brand: "Mercedes-Benz", model: "AMG GT 63", year: 2023, cats: ["sports", "luxury"], body: "Sedan", price: 160000, engine: "4.0L Twin-Turbo V8", fuel: "Petrol", hp: 639, trans: "Automatic", zto100: 3.2, top: 315, torque: 900, drive: "AWD", weight: 2125, img: 16511358 }),
+  c({ brand: "Mercedes-AMG", model: "C63", year: 2023, cats: ["sports", "daily"], body: "Sedan", price: 78000, engine: "2.0L Turbo I4 Hybrid", fuel: "Hybrid", hp: 680, trans: "Automatic", zto100: 3.4, top: 280, torque: 1020, drive: "AWD", weight: 2030 }),
+  c({ brand: "Mercedes-AMG", model: "E63 S", year: 2023, cats: ["sports", "luxury"], body: "Sedan", price: 110000, engine: "4.0L Twin-Turbo V8", fuel: "Petrol", hp: 603, trans: "Automatic", zto100: 3.4, top: 300, torque: 850, drive: "AWD", weight: 2010 }),
+  c({ brand: "Mercedes-AMG", model: "GT R Pro", year: 2020, cats: ["sports", "supercar"], body: "Coupe", price: 200000, engine: "4.0L Twin-Turbo V8", fuel: "Petrol", hp: 577, trans: "Dual-clutch", zto100: 3.6, top: 318, torque: 700, drive: "RWD", weight: 1575 }),
+  c({ brand: "Mercedes-AMG", model: "G63", year: 2023, cats: ["suv", "offroad", "luxury"], body: "SUV", price: 180000, engine: "4.0L Twin-Turbo V8", fuel: "Petrol", hp: 577, trans: "Automatic", zto100: 4.5, top: 240, torque: 850, drive: "AWD", weight: 2560 }),
+  c({ brand: "Maybach", model: "S 680", year: 2023, cats: ["luxury"], body: "Sedan", price: 230000, engine: "6.0L Twin-Turbo V12", fuel: "Petrol", hp: 621, trans: "Automatic", zto100: 4.6, top: 250, torque: 900, drive: "AWD", weight: 2350, img: 11770448 }),
+];
+
+export const bmw: Car[] = [
+  c({ brand: "BMW", model: "1 Series", year: 2023, cats: ["daily"], body: "Hatchback", price: 37000, engine: "2.0L Turbo I4", fuel: "Petrol", hp: 178, trans: "Automatic", zto100: 7.5, top: 231, torque: 280, drive: "FWD", weight: 1480, img: 29580174 }),
+  c({ brand: "BMW", model: "3 Series", year: 2023, cats: ["daily", "luxury"], body: "Sedan", price: 45000, engine: "2.0L Turbo I4", fuel: "Petrol", hp: 255, trans: "Automatic", zto100: 5.8, top: 250, torque: 400, drive: "AWD", weight: 1600 }),
+  c({ brand: "BMW", model: "4 Series", year: 2023, cats: ["daily", "sports"], body: "Coupe", price: 51000, engine: "2.0L Turbo I4", fuel: "Petrol", hp: 255, trans: "Automatic", zto100: 5.8, top: 250, torque: 400, drive: "RWD", weight: 1630 }),
+  c({ brand: "BMW", model: "5 Series", year: 2023, cats: ["luxury", "daily"], body: "Sedan", price: 59000, engine: "2.0L Turbo I4", fuel: "Petrol", hp: 255, trans: "Automatic", zto100: 5.9, top: 250, torque: 400, drive: "RWD", weight: 1780 }),
+  c({ brand: "BMW", model: "6 Series GT", year: 2021, cats: ["luxury"], body: "Sedan", price: 77000, engine: "3.0L Turbo I6", fuel: "Petrol", hp: 335, trans: "Automatic", zto100: 5.5, top: 250, torque: 500, drive: "AWD", weight: 1905 }),
+  c({ brand: "BMW", model: "8 Series", year: 2023, cats: ["luxury", "sports"], body: "Coupe", price: 88000, engine: "4.4L Twin-Turbo V8", fuel: "Petrol", hp: 523, trans: "Automatic", zto100: 3.7, top: 250, torque: 750, drive: "AWD", weight: 1950 }),
+  c({ brand: "BMW", model: "X1", year: 2023, cats: ["suv", "daily"], body: "SUV", price: 40000, engine: "2.0L Turbo I4", fuel: "Petrol", hp: 241, trans: "Dual-clutch", zto100: 6.4, top: 223, torque: 400, drive: "AWD", weight: 1650 }),
+  c({ brand: "BMW", model: "X3", year: 2023, cats: ["suv", "daily"], body: "SUV", price: 48000, engine: "2.0L Turbo I4", fuel: "Petrol", hp: 248, trans: "Automatic", zto100: 6.4, top: 235, torque: 350, drive: "AWD", weight: 1780 }),
+  c({ brand: "BMW", model: "X5", year: 2023, cats: ["suv", "luxury"], body: "SUV", price: 63000, engine: "3.0L Turbo I6", fuel: "Hybrid", hp: 375, trans: "Automatic", zto100: 5.6, top: 250, torque: 520, drive: "AWD", weight: 2240 }),
+  c({ brand: "BMW", model: "X6", year: 2023, cats: ["suv", "sports"], body: "SUV", price: 70000, engine: "3.0L Turbo I6", fuel: "Petrol", hp: 375, trans: "Automatic", zto100: 5.4, top: 250, torque: 520, drive: "AWD", weight: 2220 }),
+  c({ brand: "BMW", model: "X7", year: 2023, cats: ["suv", "luxury"], body: "SUV", price: 79000, engine: "3.0L Turbo I6", fuel: "Petrol", hp: 375, trans: "Automatic", zto100: 5.8, top: 250, torque: 520, drive: "AWD", weight: 2450 }),
+  c({ brand: "BMW", model: "i4", year: 2023, cats: ["electric", "daily"], body: "Sedan", price: 52000, engine: "Single-Motor Electric", fuel: "Electric", hp: 335, trans: "Automatic", zto100: 5.7, top: 190, torque: 430, drive: "RWD", weight: 2050 }),
+  c({ brand: "BMW", model: "iX", year: 2023, cats: ["electric", "suv"], body: "SUV", price: 85000, engine: "Dual-Motor Electric", fuel: "Electric", hp: 516, trans: "Automatic", zto100: 4.6, top: 200, torque: 765, drive: "AWD", weight: 2510 }),
+  c({ brand: "BMW", model: "i7", year: 2023, cats: ["electric", "luxury"], body: "Sedan", price: 120000, engine: "Dual-Motor Electric", fuel: "Electric", hp: 536, trans: "Automatic", zto100: 4.7, top: 250, torque: 745, drive: "AWD", weight: 2640 }),
+  c({ brand: "BMW", model: "M2", year: 2023, cats: ["sports"], body: "Coupe", price: 63000, engine: "3.0L Twin-Turbo I6", fuel: "Petrol", hp: 453, trans: "Manual", zto100: 4.1, top: 250, torque: 550, drive: "RWD", weight: 1725 }),
+  c({ brand: "BMW", model: "M5", year: 2023, cats: ["sports", "luxury"], body: "Sedan", price: 108000, engine: "4.4L Twin-Turbo V8", fuel: "Petrol", hp: 617, trans: "Automatic", zto100: 3.4, top: 305, torque: 750, drive: "AWD", weight: 1985 }),
+  c({ brand: "BMW", model: "M8 Competition", year: 2023, cats: ["sports", "supercar"], body: "Coupe", price: 140000, engine: "4.4L Twin-Turbo V8", fuel: "Petrol", hp: 625, trans: "Automatic", zto100: 3.2, top: 305, torque: 750, drive: "AWD", weight: 1885 }),
+  c({ brand: "BMW", model: "X5 M", year: 2023, cats: ["suv", "sports"], body: "SUV", price: 115000, engine: "4.4L Twin-Turbo V8", fuel: "Petrol", hp: 617, trans: "Automatic", zto100: 3.9, top: 290, torque: 750, drive: "AWD", weight: 2380 }),
+  c({ brand: "BMW", model: "Z4", year: 2023, cats: ["sports"], body: "Convertible", price: 54000, engine: "3.0L Turbo I6", fuel: "Petrol", hp: 382, trans: "Automatic", zto100: 3.9, top: 250, torque: 500, drive: "RWD", weight: 1540 }),
+];
+
+export const audi: Car[] = [
+  c({ brand: "Audi", model: "A3", year: 2023, cats: ["daily"], body: "Hatchback", price: 36000, engine: "1.5L Turbo I4", fuel: "Petrol", hp: 150, trans: "Automatic", zto100: 8.4, top: 224, torque: 250, drive: "FWD", weight: 1365, img: 30687976 }),
+  c({ brand: "Audi", model: "A4", year: 2023, cats: ["daily", "luxury"], body: "Sedan", price: 42000, engine: "2.0L Turbo I4", fuel: "Petrol", hp: 204, trans: "Dual-clutch", zto100: 7.1, top: 240, torque: 320, drive: "FWD", weight: 1550 }),
+  c({ brand: "Audi", model: "A5", year: 2023, cats: ["daily", "sports"], body: "Coupe", price: 46000, engine: "2.0L Turbo I4", fuel: "Petrol", hp: 261, trans: "Dual-clutch", zto100: 5.8, top: 250, torque: 370, drive: "AWD", weight: 1630 }),
+  c({ brand: "Audi", model: "A6", year: 2023, cats: ["luxury", "daily"], body: "Sedan", price: 56000, engine: "3.0L Turbo V6", fuel: "Petrol", hp: 335, trans: "Automatic", zto100: 5.1, top: 250, torque: 500, drive: "AWD", weight: 1840 }),
+  c({ brand: "Audi", model: "A7", year: 2023, cats: ["luxury", "sports"], body: "Sedan", price: 70000, engine: "3.0L Turbo V6", fuel: "Hybrid", hp: 335, trans: "Dual-clutch", zto100: 5.2, top: 250, torque: 500, drive: "AWD", weight: 1945 }),
+  c({ brand: "Audi", model: "A8", year: 2023, cats: ["luxury"], body: "Sedan", price: 90000, engine: "3.0L Turbo V6", fuel: "Hybrid", hp: 335, trans: "Automatic", zto100: 5.6, top: 250, torque: 500, drive: "AWD", weight: 2020 }),
+  c({ brand: "Audi", model: "Q3", year: 2023, cats: ["suv", "daily"], body: "SUV", price: 36000, engine: "2.0L Turbo I4", fuel: "Petrol", hp: 228, trans: "Automatic", zto100: 7.3, top: 224, torque: 320, drive: "AWD", weight: 1665 }),
+  c({ brand: "Audi", model: "Q5", year: 2023, cats: ["suv", "daily"], body: "SUV", price: 46000, engine: "2.0L Turbo I4", fuel: "Petrol", hp: 261, trans: "Dual-clutch", zto100: 5.9, top: 240, torque: 370, drive: "AWD", weight: 1825 }),
+  c({ brand: "Audi", model: "Q7", year: 2023, cats: ["suv", "luxury"], body: "SUV", price: 58000, engine: "3.0L Turbo V6", fuel: "Petrol", hp: 335, trans: "Automatic", zto100: 5.6, top: 250, torque: 500, drive: "AWD", weight: 2130 }),
+  c({ brand: "Audi", model: "Q8", year: 2023, cats: ["suv", "luxury"], body: "SUV", price: 72000, engine: "3.0L Turbo V6", fuel: "Petrol", hp: 335, trans: "Automatic", zto100: 5.9, top: 250, torque: 500, drive: "AWD", weight: 2165 }),
+  c({ brand: "Audi", model: "e-tron GT", year: 2023, cats: ["electric", "sports"], body: "Sedan", price: 105000, engine: "Dual-Motor Electric", fuel: "Electric", hp: 522, trans: "Automatic", zto100: 4.1, top: 245, torque: 640, drive: "AWD", weight: 2650 }),
+  c({ brand: "Audi", model: "Q4 e-tron", year: 2023, cats: ["electric", "suv"], body: "SUV", price: 50000, engine: "Dual-Motor Electric", fuel: "Electric", hp: 295, trans: "Automatic", zto100: 6.2, top: 180, torque: 460, drive: "AWD", weight: 2090 }),
+  c({ brand: "Audi", model: "S3", year: 2023, cats: ["sports", "daily"], body: "Sedan", price: 47000, engine: "2.0L Turbo I4", fuel: "Petrol", hp: 306, trans: "Dual-clutch", zto100: 4.8, top: 250, torque: 400, drive: "AWD", weight: 1555 }),
+  c({ brand: "Audi", model: "S4", year: 2023, cats: ["sports", "luxury"], body: "Sedan", price: 58000, engine: "3.0L Turbo V6", fuel: "Petrol", hp: 349, trans: "Automatic", zto100: 4.7, top: 250, torque: 500, drive: "AWD", weight: 1750 }),
+  c({ brand: "Audi", model: "RS5", year: 2023, cats: ["sports"], body: "Coupe", price: 77000, engine: "2.9L Twin-Turbo V6", fuel: "Petrol", hp: 444, trans: "Automatic", zto100: 3.9, top: 280, torque: 600, drive: "AWD", weight: 1770 }),
+  c({ brand: "Audi", model: "RS7 Sportback", year: 2023, cats: ["sports", "luxury"], body: "Sedan", price: 118000, engine: "4.0L Twin-Turbo V8", fuel: "Petrol", hp: 591, trans: "Automatic", zto100: 3.6, top: 305, torque: 800, drive: "AWD", weight: 2065 }),
+  c({ brand: "Audi", model: "RS e-tron GT", year: 2023, cats: ["electric", "sports"], body: "Sedan", price: 145000, engine: "Dual-Motor Electric", fuel: "Electric", hp: 637, trans: "Automatic", zto100: 3.3, top: 250, torque: 830, drive: "AWD", weight: 2750 }),
+];
+
+export const volkswagen: Car[] = [
+  c({ brand: "Volkswagen", model: "Golf R", year: 2023, cats: ["sports", "daily"], body: "Hatchback", price: 45000, engine: "2.0L Turbo I4", fuel: "Petrol", hp: 315, trans: "Dual-clutch", zto100: 4.7, top: 250, torque: 420, drive: "AWD", weight: 1520, img: 7412624 }),
+  c({ brand: "Volkswagen", model: "Passat", year: 2023, cats: ["daily"], body: "Sedan", price: 31000, engine: "2.0L Turbo I4", fuel: "Petrol", hp: 190, trans: "Automatic", zto100: 7.6, top: 232, torque: 320, drive: "FWD", weight: 1560 }),
+  c({ brand: "Volkswagen", model: "Tiguan", year: 2023, cats: ["suv", "daily"], body: "SUV", price: 28000, engine: "2.0L Turbo I4", fuel: "Petrol", hp: 184, trans: "Automatic", zto100: 8.7, top: 210, torque: 300, drive: "FWD", weight: 1640 }),
+  c({ brand: "Volkswagen", model: "Touareg", year: 2023, cats: ["suv", "luxury"], body: "SUV", price: 58000, engine: "3.0L Turbo V6", fuel: "Petrol", hp: 340, trans: "Automatic", zto100: 5.9, top: 250, torque: 450, drive: "AWD", weight: 2160 }),
+  c({ brand: "Volkswagen", model: "Arteon", year: 2023, cats: ["daily", "luxury"], body: "Sedan", price: 42000, engine: "2.0L Turbo I4", fuel: "Petrol", hp: 300, trans: "Dual-clutch", zto100: 5.6, top: 250, torque: 400, drive: "AWD", weight: 1610 }),
+  c({ brand: "Volkswagen", model: "ID.3", year: 2023, cats: ["electric", "daily"], body: "Hatchback", price: 44000, engine: "Single-Motor Electric", fuel: "Electric", hp: 204, trans: "Automatic", zto100: 7.3, top: 160, torque: 310, drive: "RWD", weight: 1800 }),
+  c({ brand: "Volkswagen", model: "ID.4", year: 2023, cats: ["electric", "suv"], body: "SUV", price: 38000, engine: "Single-Motor Electric", fuel: "Electric", hp: 201, trans: "Automatic", zto100: 8.5, top: 160, torque: 310, drive: "RWD", weight: 2110 }),
+  c({ brand: "Volkswagen", model: "Beetle", year: 1975, cats: ["classic"], body: "Coupe", price: 25000, engine: "1.6L NA Flat-4", fuel: "Petrol", hp: 60, trans: "Manual", zto100: 16.0, top: 130, torque: 110, drive: "RWD", weight: 850, img: 12340993 }),
+  c({ brand: "Volkswagen", model: "Type 2 Bus", year: 1967, cats: ["classic"], body: "Van", price: 45000, engine: "1.5L NA Flat-4", fuel: "Petrol", hp: 44, trans: "Manual", zto100: 0, top: 105, torque: 100, drive: "RWD", weight: 1120 }),
+];
+
+export const german = [...mercedes, ...bmw, ...audi, ...volkswagen];

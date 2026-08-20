@@ -1,0 +1,302 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Archivo", ui-sans-serif, system-ui, sans-serif;
+
+  --color-ink: #08090c;
+  --color-ink-2: #0c0d12;
+  --color-charcoal: #101218;
+  --color-graphite: #16181f;
+  --color-graphite-2: #1f2129;
+  --color-steel: #2b2e37;
+  --color-line: #262933;
+
+  --color-accent: #e3262e;
+  --color-accent-soft: #ff4a52;
+
+  --color-blue: #3b82f6;
+
+  --color-mist: #a7a9b2;
+  --color-fog: #707480;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    background-color: var(--color-ink);
+    background-image: radial-gradient(120% 80% at 50% -10%, rgba(59, 130, 246, 0.03) 0%, transparent 55%);
+    background-attachment: fixed;
+    color: #f5f5f5;
+    font-family: var(--font-sans);
+    overflow-x: hidden;
+    letter-spacing: -0.01em;
+  }
+
+  ::selection {
+    background: rgba(227, 38, 46, 0.35);
+    color: #fff;
+  }
+
+  /* Visible, consistent keyboard focus states */
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  /* Thin custom scrollbar for premium feel */
+  ::-webkit-scrollbar {
+    width: 9px;
+    height: 9px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--color-ink);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-steel);
+    border-radius: 999px;
+    border: 2px solid var(--color-ink);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #3a3d47;
+  }
+}
+
+@layer utilities {
+  /* ---- Premium interaction tokens (purely cosmetic) ---- */
+  .shadow-premium {
+    box-shadow:
+      0 1px 0 0 rgba(255, 255, 255, 0.03) inset,
+      0 20px 50px -24px rgba(0, 0, 0, 0.9),
+      0 4px 16px -8px rgba(0, 0, 0, 0.6);
+  }
+  .shadow-glow-red {
+    box-shadow: 0 0 0 1px rgba(227, 38, 46, 0.25), 0 10px 40px -12px rgba(227, 38, 46, 0.5);
+  }
+  /* Subtle glassmorphism — used sparingly on overlays (nav, badges, bars) */
+  .glass {
+    background: rgba(16, 18, 24, 0.62);
+    backdrop-filter: blur(16px) saturate(140%);
+    -webkit-backdrop-filter: blur(16px) saturate(140%);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+  }
+  /* Fine top edge highlight for cards/tiles — subtle metallic touch */
+  .edge-light {
+    box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.045) inset;
+  }
+  .hairline {
+    border: 1px solid var(--color-line);
+  }
+}
+
+@layer utilities {
+  /* Reveal-on-scroll */
+  .reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity, transform;
+  }
+  .reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Display font */
+  .font-display {
+    font-family: var(--font-display);
+  }
+
+  .tracking-mega {
+    letter-spacing: 0.24em;
+  }
+
+  /* Metallic text */
+  .text-metallic {
+    background: linear-gradient(180deg, #ffffff 0%, #d7d7da 45%, #8e8e93 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .text-metallic-dim {
+    background: linear-gradient(180deg, #c9c9cd 0%, #828286 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* Subtle red accent gradient (used sparingly) */
+  .text-accent-grad {
+    background: linear-gradient(180deg, #ff5a60 0%, #e3262e 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* Light reflection sweep across hero car */
+  @keyframes sheen {
+    0% {
+      transform: translateX(-140%) skewX(-14deg);
+    }
+    60%,
+    100% {
+      transform: translateX(240%) skewX(-14deg);
+    }
+  }
+  .sheen {
+    animation: sheen 4.2s cubic-bezier(0.4, 0, 0.2, 1) 1.1s both;
+  }
+
+  /* Hero camera drift */
+  @keyframes drift {
+    0% {
+      transform: scale(1.08) translate3d(0, 0, 0);
+    }
+    100% {
+      transform: scale(1.16) translate3d(-1.2%, -0.6%, 0);
+    }
+  }
+  .camera-drift {
+    animation: drift 14s ease-out forwards;
+  }
+
+  /* Scroll cue bounce */
+  @keyframes scrollcue {
+    0%,
+    100% {
+      transform: translateY(0);
+      opacity: 0.6;
+    }
+    50% {
+      transform: translateY(8px);
+      opacity: 1;
+    }
+  }
+  .scroll-cue {
+    animation: scrollcue 2.2s ease-in-out infinite;
+  }
+
+  /* Nav link underline */
+  .nav-link {
+    position: relative;
+  }
+  .nav-link::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -6px;
+    height: 1px;
+    width: 100%;
+    background: #e3262e;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .nav-link:hover::after {
+    transform: scaleX(1);
+  }
+
+  /* Hero entrance fade-up */
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(26px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .hero-in {
+    opacity: 0;
+    animation: fade-up 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  @keyframes card-in {
+    from {
+      opacity: 0;
+      transform: translateY(18px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .card-in {
+    opacity: 0;
+    animation: card-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  /* Find My Car — custom range slider */
+  .carvibes-range {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 2px;
+    background: var(--color-line);
+    border-radius: 0;
+    outline: none;
+  }
+  .carvibes-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: #e3262e;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .carvibes-range::-webkit-slider-thumb:hover {
+    transform: scale(1.15);
+    box-shadow: 0 0 20px -4px rgba(227, 38, 46, 0.8);
+  }
+  .carvibes-range::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    background: #e3262e;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+
+  /* Calculating spinner */
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  .carvibes-spinner {
+    animation: spin 1.1s linear infinite;
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .reveal {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+    .camera-drift,
+    .sheen,
+    .scroll-cue,
+    .hero-in,
+    .card-in {
+      animation: none;
+    }
+    .hero-in,
+    .card-in {
+      opacity: 1;
+    }
+  }
+}
