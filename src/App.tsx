@@ -56,13 +56,23 @@ function Homepage({
   const carId = carMatch ? carMatch[1] : undefined;
   const storyId = storyMatch ? storyMatch[1] : undefined;
 
+  // Legacy V2 routes that still receive traffic from search results but no
+  // longer have a dedicated page: they render the single-page V2 app (HTTP 200)
+  // instead of the 404 screen. Genuinely unknown paths still 404.
+  const staticRouteMatch = path.match(
+    /^\/(explore|find-my-car|brands|compare|news|contact|favorites|search|privacy-policy|terms)(\/.*)?$/
+  );
+
   const detailCar = carId ? cars.find((c) => c.id === carId) : undefined;
   const activeStory = storyId ? storyById(storyId) : undefined;
 
   const notFound =
     (carId !== undefined && detailCar === undefined) ||
     (storyId !== undefined && activeStory === undefined) ||
-    (path !== "/" && carMatch === null && storyMatch === null);
+    (path !== "/" &&
+      carMatch === null &&
+      storyMatch === null &&
+      staticRouteMatch === null);
 
   // Reveal-on-scroll must re-run when we swap the 404 screen back to the
   // homepage (the `.reveal` elements are freshly mounted in that case).
