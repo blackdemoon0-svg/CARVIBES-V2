@@ -922,28 +922,7 @@
       "status": 404
     },
     {
-      "src": "^/news(/.*)?$",
-      "headers": {
-        "X-Robots-Tag": "noindex"
-      },
-      "status": 404
-    },
-    {
       "src": "^/rankings(/.*)?$",
-      "headers": {
-        "X-Robots-Tag": "noindex"
-      },
-      "status": 404
-    },
-    {
-      "src": "^/brands(/.*)?$",
-      "headers": {
-        "X-Robots-Tag": "noindex"
-      },
-      "status": 404
-    },
-    {
-      "src": "^/(explore|favorites|find-my-car|compare|search|contact|privacy-policy|terms)(/.*)?$",
       "headers": {
         "X-Robots-Tag": "noindex"
       },
