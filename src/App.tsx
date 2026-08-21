@@ -32,6 +32,19 @@ import FindMyCar from "./components/findmycar/FindMyCar";
 import NotFound from "./components/NotFound";
 import type { Story } from "./lib/stories";
 import type { Car } from "./lib/cars";
+import {
+  BrandsPage,
+  ComparePage,
+  ContactPage,
+  ExplorePage,
+  FavoritesPage,
+  FindMyCarPage,
+  NewsPage,
+  PrivacyPage,
+  SearchPage,
+  TermsPage,
+  type ShellProps,
+} from "./pages/RoutePages";
 
 function Homepage({
   lang,
@@ -56,23 +69,12 @@ function Homepage({
   const carId = carMatch ? carMatch[1] : undefined;
   const storyId = storyMatch ? storyMatch[1] : undefined;
 
-  // Legacy V2 routes that still receive traffic from search results but no
-  // longer have a dedicated page: they render the single-page V2 app (HTTP 200)
-  // instead of the 404 screen. Genuinely unknown paths still 404.
-  const staticRouteMatch = path.match(
-    /^\/(explore|find-my-car|brands|compare|news|contact|favorites|search|privacy-policy|terms)(\/.*)?$/
-  );
-
   const detailCar = carId ? cars.find((c) => c.id === carId) : undefined;
   const activeStory = storyId ? storyById(storyId) : undefined;
 
   const notFound =
     (carId !== undefined && detailCar === undefined) ||
-    (storyId !== undefined && activeStory === undefined) ||
-    (path !== "/" &&
-      carMatch === null &&
-      storyMatch === null &&
-      staticRouteMatch === null);
+    (storyId !== undefined && activeStory === undefined);
 
   // Reveal-on-scroll must re-run when we swap the 404 screen back to the
   // homepage (the `.reveal` elements are freshly mounted in that case).
@@ -184,6 +186,117 @@ function Homepage({
   );
 }
 
+function RoutedApp({
+  lang,
+  onLangChange,
+}: {
+  lang: Lang;
+  onLangChange: (l: Lang) => void;
+}) {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [compareOpen, setCompareOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+
+  const openCar = useCallback(
+    (car: Car) => navigate(`/car/${car.id}`),
+    [navigate]
+  );
+  const openStory = useCallback(
+    (story: Story) => navigate(`/story/${story.id}`),
+    [navigate]
+  );
+  const handleCompareCar = useCallback((car: Car) => {
+    addToCompare(car.id);
+    navigate("/compare");
+  }, [navigate]);
+
+  const shell: ShellProps = {
+    lang,
+    onLangChange,
+    onCompare: () => setCompareOpen(true),
+    onSearch: () => setSearchOpen(true),
+    onOpenCar: openCar,
+    onOpenStory: openStory,
+    onCompareCar: handleCompareCar,
+  };
+
+  const isHomeFamily =
+    location.pathname === "/" ||
+    location.pathname.startsWith("/car/") ||
+    location.pathname.startsWith("/story/");
+  usePageMeta({
+    notFound: false,
+    path: location.pathname,
+    skip: isHomeFamily,
+  });
+
+  return (
+    <>
+      <Routes>
+        <Route
+          path="/"
+          element={<Homepage lang={lang} onLangChange={onLangChange} />}
+        />
+        <Route
+          path="/car/:id"
+          element={<Homepage lang={lang} onLangChange={onLangChange} />}
+        />
+        <Route
+          path="/story/:id"
+          element={<Homepage lang={lang} onLangChange={onLangChange} />}
+        />
+        <Route path="/explore" element={<ExplorePage {...shell} />} />
+        <Route path="/news" element={<NewsPage {...shell} />} />
+        <Route path="/favorites" element={<FavoritesPage {...shell} />} />
+        <Route
+          path="/find-my-car"
+          element={<FindMyCarPage lang={lang} onOpenCar={openCar} />}
+        />
+        <Route path="/compare" element={<ComparePage lang={lang} />} />
+        <Route
+          path="/search"
+          element={
+            <SearchPage
+              lang={lang}
+              onOpenCar={openCar}
+              onOpenStory={openStory}
+            />
+          }
+        />
+        <Route path="/brands" element={<BrandsPage {...shell} />} />
+        <Route path="/contact" element={<ContactPage {...shell} />} />
+        <Route path="/privacy-policy" element={<PrivacyPage {...shell} />} />
+        <Route path="/terms" element={<TermsPage {...shell} />} />
+        <Route
+          path="*"
+          element={
+            <NotFoundPage />
+          }
+        />
+      </Routes>
+      {compareOpen && location.pathname !== "/compare" && (
+        <CompareModal lang={lang} onClose={() => setCompareOpen(false)} />
+      )}
+      {searchOpen && location.pathname !== "/search" && (
+        <GlobalSearch
+          lang={lang}
+          onClose={() => setSearchOpen(false)}
+          onOpenCar={openCar}
+          onOpenStory={openStory}
+        />
+      )}
+    </>
+  );
+}
+
+function NotFoundPage() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  usePageMeta({ notFound: true, path: location.pathname });
+  return <NotFound onHome={() => navigate("/", { replace: true })} />;
+}
+
 export default function App() {
   // Initialize synchronously to avoid a language-screen flash on returning visits.
   const [lang, setLang] = useState<Lang | null>(() => getStoredLang());
@@ -203,12 +316,7 @@ export default function App() {
       {lang === null ? (
         <LanguageScreen onSelect={handleSelect} />
       ) : (
-        <Routes>
-          <Route
-            path="*"
-            element={<Homepage lang={lang} onLangChange={handleLangChange} />}
-          />
-        </Routes>
+        <RoutedApp lang={lang} onLangChange={handleLangChange} />
       )}
     </BrowserRouter>
   );
