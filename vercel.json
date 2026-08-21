@@ -1,0 +1,961 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "routes": [
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "^/cars/audi-a3-2024/?$",
+      "headers": {
+        "Location": "/car/audi-a3"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/audi-a4-2024/?$",
+      "headers": {
+        "Location": "/car/audi-a4"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/audi-a6-2024/?$",
+      "headers": {
+        "Location": "/car/audi-a6"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/audi-a8-2024/?$",
+      "headers": {
+        "Location": "/car/audi-a8"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/audi-q5-2024/?$",
+      "headers": {
+        "Location": "/car/audi-q5"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/audi-q7-2024/?$",
+      "headers": {
+        "Location": "/car/audi-q7"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/audi-q8-2024/?$",
+      "headers": {
+        "Location": "/car/audi-q8"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/audi-e-tron-gt-2024/?$",
+      "headers": {
+        "Location": "/car/audi-e-tron-gt"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/audi-rs6-avant-2024/?$",
+      "headers": {
+        "Location": "/car/audi-rs6-avant"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/audi-rs7-sportback-2024/?$",
+      "headers": {
+        "Location": "/car/audi-rs7-sportback"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/audi-tt-rs-2023/?$",
+      "headers": {
+        "Location": "/car/audi-tt-rs"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/audi-r8-v10-performance-2024/?$",
+      "headers": {
+        "Location": "/car/audi-r8-v10"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/bmw-1-series-m135-2024/?$",
+      "headers": {
+        "Location": "/car/bmw-1-series"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/bmw-3-series-330i-2024/?$",
+      "headers": {
+        "Location": "/car/bmw-3-series"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/bmw-5-series-540i-2024/?$",
+      "headers": {
+        "Location": "/car/bmw-5-series"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/bmw-7-series-760i-2024/?$",
+      "headers": {
+        "Location": "/car/bmw-7-series"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/bmw-x3-xdrive30i-2024/?$",
+      "headers": {
+        "Location": "/car/bmw-x3"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/bmw-x5-xdrive40i-2024/?$",
+      "headers": {
+        "Location": "/car/bmw-x5"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/bmw-x7-xdrive40i-2024/?$",
+      "headers": {
+        "Location": "/car/bmw-x7"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/bmw-m3-competition-2024/?$",
+      "headers": {
+        "Location": "/car/bmw-m3-competition"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/bmw-m5-2024/?$",
+      "headers": {
+        "Location": "/car/bmw-m5"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/bmw-m8-competition-2024/?$",
+      "headers": {
+        "Location": "/car/bmw-m8-competition"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/bmw-i4-m50-2024/?$",
+      "headers": {
+        "Location": "/car/bmw-i4"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/bmw-ix-xdrive50-2024/?$",
+      "headers": {
+        "Location": "/car/bmw-ix"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/mercedes-benz-a-class-a250-2024/?$",
+      "headers": {
+        "Location": "/car/mercedes-benz-a-class"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/mercedes-benz-c-class-c300-2024/?$",
+      "headers": {
+        "Location": "/car/mercedes-benz-c-class"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/mercedes-benz-e-class-e350-2024/?$",
+      "headers": {
+        "Location": "/car/mercedes-benz-e-class"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/mercedes-benz-s-class-s500-2024/?$",
+      "headers": {
+        "Location": "/car/mercedes-s-class"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/mercedes-benz-glc-300-2024/?$",
+      "headers": {
+        "Location": "/car/mercedes-benz-glc"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/mercedes-benz-gle-450-2024/?$",
+      "headers": {
+        "Location": "/car/mercedes-benz-gle"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/mercedes-benz-gls-580-2024/?$",
+      "headers": {
+        "Location": "/car/mercedes-benz-gls"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/mercedes-benz-g-class-g63-amg-2024/?$",
+      "headers": {
+        "Location": "/car/mercedes-g63-amg"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/mercedes-benz-amg-gt-63-s-2024/?$",
+      "headers": {
+        "Location": "/car/mercedes-benz-amg-gt-63"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/mercedes-benz-eqs-580-2024/?$",
+      "headers": {
+        "Location": "/car/mercedes-benz-eqs"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/mercedes-benz-amg-c63-s-e-performance-2024/?$",
+      "headers": {
+        "Location": "/car/mercedes-amg-c63"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/porsche-911-carrera-2024/?$",
+      "headers": {
+        "Location": "/car/porsche-911-carrera"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/porsche-911-turbo-s-2024/?$",
+      "headers": {
+        "Location": "/car/porsche-911-turbo-s"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/porsche-718-cayman-2024/?$",
+      "headers": {
+        "Location": "/car/porsche-718-cayman"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/porsche-cayenne-2024/?$",
+      "headers": {
+        "Location": "/car/porsche-cayenne"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/porsche-taycan-2024/?$",
+      "headers": {
+        "Location": "/car/porsche-taycan"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/ferrari-296-gtb-2024/?$",
+      "headers": {
+        "Location": "/car/ferrari-296-gtb"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/ferrari-sf90-stradale-2024/?$",
+      "headers": {
+        "Location": "/car/ferrari-sf90-stradale"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/ferrari-roma-2024/?$",
+      "headers": {
+        "Location": "/car/ferrari-roma"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/lamborghini-huracan-evo-2024/?$",
+      "headers": {
+        "Location": "/car/lamborghini-huracan-evo"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/lamborghini-revuelto-2024/?$",
+      "headers": {
+        "Location": "/car/lamborghini-revuelto"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/lamborghini-urus-2024/?$",
+      "headers": {
+        "Location": "/car/lamborghini-urus"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/mclaren-artura-2024/?$",
+      "headers": {
+        "Location": "/car/mclaren-artura"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/mclaren-720s-2024/?$",
+      "headers": {
+        "Location": "/car/mclaren-720s"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/aston-martin-vantage-2024/?$",
+      "headers": {
+        "Location": "/car/aston-martin-vantage"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/aston-martin-dbx707-2024/?$",
+      "headers": {
+        "Location": "/car/aston-martin-dbx"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/bentley-continental-gt-2024/?$",
+      "headers": {
+        "Location": "/car/bentley-continental-gt"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/bentley-bentayga-2024/?$",
+      "headers": {
+        "Location": "/car/bentley-bentayga"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/rolls-royce-ghost-2024/?$",
+      "headers": {
+        "Location": "/car/rolls-royce-ghost"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/rolls-royce-cullinan-2024/?$",
+      "headers": {
+        "Location": "/car/rolls-royce-cullinan"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/bugatti-chiron-2023/?$",
+      "headers": {
+        "Location": "/car/bugatti-chiron-super-sport"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/koenigsegg-jesko-2024/?$",
+      "headers": {
+        "Location": "/car/koenigsegg-jesko"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/pagani-huayra-2023/?$",
+      "headers": {
+        "Location": "/car/pagani-huayra"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/toyota-corolla-2024/?$",
+      "headers": {
+        "Location": "/car/toyota-corolla"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/toyota-camry-2024/?$",
+      "headers": {
+        "Location": "/car/toyota-camry"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/toyota-rav4-2024/?$",
+      "headers": {
+        "Location": "/car/toyota-rav4"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/toyota-supra-2024/?$",
+      "headers": {
+        "Location": "/car/toyota-supra-a90"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/toyota-land-cruiser-2024/?$",
+      "headers": {
+        "Location": "/car/toyota-land-cruiser"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/toyota-gr86-2024/?$",
+      "headers": {
+        "Location": "/car/toyota-gr86"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/honda-civic-2024/?$",
+      "headers": {
+        "Location": "/car/honda-civic"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/honda-accord-2024/?$",
+      "headers": {
+        "Location": "/car/honda-accord"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/honda-cr-v-2024/?$",
+      "headers": {
+        "Location": "/car/honda-cr-v"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/honda-civic-type-r-2024/?$",
+      "headers": {
+        "Location": "/car/honda-civic-type-r"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/nissan-altima-2024/?$",
+      "headers": {
+        "Location": "/car/nissan-altima"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/nissan-rogue-2024/?$",
+      "headers": {
+        "Location": "/car/nissan-rogue"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/nissan-gt-r-2024/?$",
+      "headers": {
+        "Location": "/car/nissan-gtr-nismo"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/nissan-leaf-2024/?$",
+      "headers": {
+        "Location": "/car/nissan-leaf"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/mazda-mazda3-2024/?$",
+      "headers": {
+        "Location": "/car/mazda-3"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/mazda-cx-5-2024/?$",
+      "headers": {
+        "Location": "/car/mazda-cx-5"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/mazda-mx-5-miata-2024/?$",
+      "headers": {
+        "Location": "/car/mazda-mx5-miata"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/lexus-rx-350-2024/?$",
+      "headers": {
+        "Location": "/car/lexus-rx"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/lexus-lx-600-2024/?$",
+      "headers": {
+        "Location": "/car/lexus-lx"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/lexus-lc500-2024/?$",
+      "headers": {
+        "Location": "/car/lexus-lc-500"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/subaru-impreza-2024/?$",
+      "headers": {
+        "Location": "/car/subaru-impreza-wrx-sti"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/subaru-wrx-sti-2024/?$",
+      "headers": {
+        "Location": "/car/subaru-wrx-sti"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/subaru-outback-2024/?$",
+      "headers": {
+        "Location": "/car/subaru-outback"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/ford-focus-2023/?$",
+      "headers": {
+        "Location": "/car/ford-focus-rs"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/ford-mustang-gt-2024/?$",
+      "headers": {
+        "Location": "/car/ford-mustang-gt"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/ford-explorer-2024/?$",
+      "headers": {
+        "Location": "/car/ford-explorer"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/ford-f-150-raptor-2024/?$",
+      "headers": {
+        "Location": "/car/ford-f-150-raptor"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/ford-bronco-2024/?$",
+      "headers": {
+        "Location": "/car/ford-bronco"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/ford-mustang-mach-e-2024/?$",
+      "headers": {
+        "Location": "/car/ford-mustang-mach-e"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/chevrolet-corvette-stingray-2024/?$",
+      "headers": {
+        "Location": "/car/chevrolet-corvette-c8"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/chevrolet-camaro-ss-2024/?$",
+      "headers": {
+        "Location": "/car/chevrolet-camaro-ss"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/chevrolet-tahoe-2024/?$",
+      "headers": {
+        "Location": "/car/chevrolet-tahoe"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/dodge-charger-2023/?$",
+      "headers": {
+        "Location": "/car/dodge-charger-srt"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/dodge-challenger-hellcat-2023/?$",
+      "headers": {
+        "Location": "/car/dodge-challenger-hellcat"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/tesla-model-3-2024/?$",
+      "headers": {
+        "Location": "/car/tesla-model-3"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/tesla-model-y-2024/?$",
+      "headers": {
+        "Location": "/car/tesla-model-y"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/tesla-model-s-plaid-2024/?$",
+      "headers": {
+        "Location": "/car/tesla-model-s-plaid"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/tesla-cybertruck-2024/?$",
+      "headers": {
+        "Location": "/car/tesla-cybertruck"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/volkswagen-golf-gti-2024/?$",
+      "headers": {
+        "Location": "/car/volkswagen-golf-gti"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/volkswagen-tiguan-2024/?$",
+      "headers": {
+        "Location": "/car/volkswagen-tiguan"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/volkswagen-id-4-2024/?$",
+      "headers": {
+        "Location": "/car/volkswagen-id-4"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/volkswagen-passat-2023/?$",
+      "headers": {
+        "Location": "/car/volkswagen-passat"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/volvo-xc40-2024/?$",
+      "headers": {
+        "Location": "/car/volvo-xc40"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/volvo-xc90-2024/?$",
+      "headers": {
+        "Location": "/car/volvo-xc90"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/hyundai-elantra-2024/?$",
+      "headers": {
+        "Location": "/car/hyundai-elantra-n"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/hyundai-tucson-2024/?$",
+      "headers": {
+        "Location": "/car/hyundai-tucson"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/hyundai-ioniq-5-2024/?$",
+      "headers": {
+        "Location": "/car/hyundai-ioniq-5"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/hyundai-santa-fe-2024/?$",
+      "headers": {
+        "Location": "/car/hyundai-santa-fe"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/kia-sportage-2024/?$",
+      "headers": {
+        "Location": "/car/kia-sportage"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/kia-sorento-2024/?$",
+      "headers": {
+        "Location": "/car/kia-sorento"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/kia-ev6-gt-2024/?$",
+      "headers": {
+        "Location": "/car/kia-ev6-gt"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/kia-stinger-gt-2023/?$",
+      "headers": {
+        "Location": "/car/kia-stinger-gt"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/peugeot-208-2024/?$",
+      "headers": {
+        "Location": "/car/peugeot-208-gti"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/peugeot-3008-2024/?$",
+      "headers": {
+        "Location": "/car/peugeot-3008"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/renault-clio-2024/?$",
+      "headers": {
+        "Location": "/car/renault-clio"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/renault-megane-e-tech-2024/?$",
+      "headers": {
+        "Location": "/car/renault-megane-rs"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/land-rover-range-rover-2024/?$",
+      "headers": {
+        "Location": "/car/range-rover-autobiography"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/land-rover-defender-2024/?$",
+      "headers": {
+        "Location": "/car/land-rover-defender"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/land-rover-range-rover-sport-2024/?$",
+      "headers": {
+        "Location": "/car/land-rover-range-rover-sport"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/jeep-wrangler-2024/?$",
+      "headers": {
+        "Location": "/car/jeep-wrangler-rubicon"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/jeep-grand-cherokee-2024/?$",
+      "headers": {
+        "Location": "/car/jeep-grand-cherokee"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/maserati-ghibli-2023/?$",
+      "headers": {
+        "Location": "/car/maserati-ghibli"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/maserati-mc20-2024/?$",
+      "headers": {
+        "Location": "/car/maserati-mc20"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/alfa-romeo-giulia-quadrifoglio-2024/?$",
+      "headers": {
+        "Location": "/car/alfa-romeo-giulia-qv"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/alfa-romeo-stelvio-2024/?$",
+      "headers": {
+        "Location": "/car/alfa-romeo-stelvio-quadrifoglio"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/cadillac-escalade-2024/?$",
+      "headers": {
+        "Location": "/car/cadillac-escalade"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/cadillac-ct5-v-blackwing-2024/?$",
+      "headers": {
+        "Location": "/car/cadillac-ct5-v-blackwing"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/genesis-g70-2024/?$",
+      "headers": {
+        "Location": "/car/genesis-g70"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/genesis-g80-2024/?$",
+      "headers": {
+        "Location": "/car/genesis-g80"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/genesis-gv80-2024/?$",
+      "headers": {
+        "Location": "/car/genesis-gv80"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/byd-han-ev-2024/?$",
+      "headers": {
+        "Location": "/car/byd-han"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/byd-seal-2024/?$",
+      "headers": {
+        "Location": "/car/byd-seal"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/lotus-emira-2024/?$",
+      "headers": {
+        "Location": "/car/lotus-emira"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars(/.*)?$",
+      "headers": {
+        "X-Robots-Tag": "noindex"
+      },
+      "status": 404
+    },
+    {
+      "src": "^/news(/.*)?$",
+      "headers": {
+        "X-Robots-Tag": "noindex"
+      },
+      "status": 404
+    },
+    {
+      "src": "^/rankings(/.*)?$",
+      "headers": {
+        "X-Robots-Tag": "noindex"
+      },
+      "status": 404
+    },
+    {
+      "src": "^/brands(/.*)?$",
+      "headers": {
+        "X-Robots-Tag": "noindex"
+      },
+      "status": 404
+    },
+    {
+      "src": "^/(explore|favorites|find-my-car|compare|search|contact|privacy-policy|terms)(/.*)?$",
+      "headers": {
+        "X-Robots-Tag": "noindex"
+      },
+      "status": 404
+    },
+    {
+      "src": "^/api(/.*)?$",
+      "status": 404
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ]
+}
