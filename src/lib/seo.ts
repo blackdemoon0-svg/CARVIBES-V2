@@ -56,15 +56,60 @@ function setRobots(content: string | null) {
   }
 }
 
+const ROUTE_META: Record<string, { title: string; description: string }> = {
+  "/explore": {
+    title: "Explore cars — CarVibes",
+    description: "Browse and filter the CarVibes universe of cars.",
+  },
+  "/news": {
+    title: "Stories — CarVibes",
+    description: "Automotive stories, legends and hidden machines.",
+  },
+  "/favorites": {
+    title: "Favorites — CarVibes",
+    description: "Your saved cars and stories on CarVibes.",
+  },
+  "/find-my-car": {
+    title: "Find My Car — CarVibes",
+    description: "Answer a few questions and match with your perfect car.",
+  },
+  "/compare": {
+    title: "Compare cars — CarVibes",
+    description: "Head-to-head car comparison and battle.",
+  },
+  "/search": {
+    title: "Search — CarVibes",
+    description: "Search cars and stories on CarVibes.",
+  },
+  "/brands": {
+    title: "Brands — CarVibes",
+    description: "Explore every brand in the CarVibes database.",
+  },
+  "/contact": {
+    title: "Contact — CarVibes",
+    description: "Get in touch with CarVibes.",
+  },
+  "/privacy-policy": {
+    title: "Privacy Policy — CarVibes",
+    description: "How CarVibes handles your data.",
+  },
+  "/terms": {
+    title: "Terms of Use — CarVibes",
+    description: "Terms of use for CarVibes.",
+  },
+};
+
 export interface PageMeta {
   car?: Car;
   story?: Story;
   notFound: boolean;
   path: string;
+  skip?: boolean;
 }
 
-export function usePageMeta({ car, story, notFound, path }: PageMeta) {
+export function usePageMeta({ car, story, notFound, path, skip }: PageMeta) {
   useEffect(() => {
+    if (skip) return;
     let title = DEFAULT_TITLE;
     let description = DEFAULT_DESCRIPTION;
     let image = DEFAULT_IMAGE;
@@ -78,6 +123,12 @@ export function usePageMeta({ car, story, notFound, path }: PageMeta) {
       setRobots("noindex, nofollow");
     } else {
       setRobots(null);
+    }
+
+    const routeMeta = ROUTE_META[path.replace(/\/$/, "") || "/"];
+    if (routeMeta && !car && !story && !notFound) {
+      title = routeMeta.title;
+      description = routeMeta.description;
     }
 
     if (car) {
