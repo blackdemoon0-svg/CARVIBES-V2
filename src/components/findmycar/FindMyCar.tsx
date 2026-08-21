@@ -24,7 +24,7 @@ import {
   subscribePrefs,
 } from "../../lib/prefs";
 import { formatPrice, formatStat } from "../../lib/carUtils";
-import CarDetail from "../universe/CarDetail";
+import type { Car } from "../../lib/cars";
 import { ArrowRight, ArrowUpRight } from "../icons";
 
 const BUDGET_OPTIONS = [1000, 5000, 10000, 20000, 30000, 50000, 75000, 100000, 150000, 250000, 500000];
@@ -53,12 +53,19 @@ const TOTAL_QUESTIONS = 8;
 
 type Stage = "intro" | "questions" | "calculating" | "results";
 
-export default function FindMyCar({ lang, onClose }: { lang: Lang; onClose: () => void }) {
+export default function FindMyCar({
+  lang,
+  onClose,
+  onOpenCar,
+}: {
+  lang: Lang;
+  onClose: () => void;
+  onOpenCar: (car: Car) => void;
+}) {
   const [stage, setStage] = useState<Stage>("intro");
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<FinderAnswers>(defaultAnswers);
   const [results, setResults] = useState<MatchResult[]>([]);
-  const [selected, setSelected] = useState<import("../../lib/cars").Car | null>(null);
   const [sortK, setSortK] = useState<"best" | "price" | "performance" | "reliability">("best");
   const [, force] = useState(0); // refresh favorite/compare toggles
 
@@ -299,7 +306,7 @@ export default function FindMyCar({ lang, onClose }: { lang: Lang; onClose: () =
               hasPerfect={hasPerfect}
               sortK={sortK}
               setSortK={setSortK}
-              onExplore={setSelected}
+              onExplore={onOpenCar}
               onChangeAnswers={() => setStage("questions")}
               onRestart={() => {
                 setAnswers(defaultAnswers);
@@ -310,16 +317,6 @@ export default function FindMyCar({ lang, onClose }: { lang: Lang; onClose: () =
           )}
         </div>
       </div>
-
-      {selected && (
-        <CarDetail
-          key={selected.id}
-          car={selected}
-          lang={lang}
-          onClose={() => setSelected(null)}
-          onOpen={setSelected}
-        />
-      )}
     </div>
   );
 }
@@ -540,7 +537,7 @@ function Results({ lang, results, hasPerfect, sortK, setSortK, onExplore, onChan
   lang: Lang; results: MatchResult[]; hasPerfect: boolean;
   sortK: "best" | "price" | "performance" | "reliability";
   setSortK: (s: "best" | "price" | "performance" | "reliability") => void;
-  onExplore: (c: import("../../lib/cars").Car) => void;
+  onExplore: (c: Car) => void;
   onChangeAnswers: () => void; onRestart: () => void;
 }) {
   const toggleFav = (id: string) => { toggleFavorite(id); };
@@ -617,7 +614,7 @@ function Results({ lang, results, hasPerfect, sortK, setSortK, onExplore, onChan
 
 function ResultCard({ lang, result, index, onExplore, onToggleFav, onToggleCmp }: {
   lang: Lang; result: MatchResult; index: number;
-  onExplore: (c: import("../../lib/cars").Car) => void;
+  onExplore: (c: Car) => void;
   onToggleFav: (id: string) => void; onToggleCmp: (id: string) => void;
 }) {
   const { car, score } = result;

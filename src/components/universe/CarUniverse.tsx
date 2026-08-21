@@ -16,7 +16,6 @@ import {
 } from "../../lib/carUtils";
 import { PRICE_STEPS } from "../../lib/carUtils";
 import CarCard from "./CarCard";
-import CarDetail from "./CarDetail";
 import { SearchIcon, ChevronDown, ArrowRight } from "../icons";
 
 const PAGE_SIZE = 9;
@@ -30,13 +29,18 @@ const SORT_OPTIONS: { id: SortKey; key: string }[] = [
   { id: "powerful", key: "sort_powerful" },
 ];
 
-export default function CarUniverse({ lang }: { lang: Lang }) {
+export default function CarUniverse({
+  lang,
+  onOpen,
+}: {
+  lang: Lang;
+  onOpen: (car: Car) => void;
+}) {
   const [query, setQuery] = useState("");
   const [activeCat, setActiveCat] = useState<Category | null>(null);
   const [filters, setFilters] = useState<Filters>(defaultFilters);
   const [sort, setSort] = useState<SortKey>("popular");
   const [page, setPage] = useState(0);
-  const [selected, setSelected] = useState<Car | null>(null);
   const [showFilters, setShowFilters] = useState(false);
 
   // Reset pagination whenever inputs change
@@ -347,7 +351,7 @@ export default function CarUniverse({ lang }: { lang: Lang }) {
                 car={car}
                 lang={lang}
                 index={i}
-                onOpen={setSelected}
+                onOpen={onOpen}
               />
             ))}
           </div>
@@ -400,17 +404,6 @@ export default function CarUniverse({ lang }: { lang: Lang }) {
           </div>
         )}
       </div>
-
-      {/* Detail modal */}
-      {selected && (
-        <CarDetail
-          key={selected.id}
-          car={selected}
-          lang={lang}
-          onClose={() => setSelected(null)}
-          onOpen={setSelected}
-        />
-      )}
     </section>
   );
 }

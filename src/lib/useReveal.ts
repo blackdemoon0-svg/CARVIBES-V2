@@ -4,7 +4,7 @@ import { useEffect } from "react";
  * Attaches an IntersectionObserver to all `.reveal` elements and adds
  * `is-visible` when they enter the viewport (with a slight delay).
  */
-export function useReveal() {
+export function useReveal(watch?: unknown) {
   useEffect(() => {
     const els = Array.from(document.querySelectorAll<HTMLElement>(".reveal"));
 
@@ -30,5 +30,5 @@ export function useReveal() {
 
     els.forEach((el) => observer.observe(el));
     return () => observer.disconnect();
-  }, []);
+  }, [watch]);
 }

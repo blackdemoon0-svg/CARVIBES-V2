@@ -1,8 +1,18 @@
 import { useCallback, useState } from "react";
+import {
+  BrowserRouter,
+  Route,
+  Routes,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 import type { Lang } from "./lib/i18n";
 import { getStoredLang, storeLang } from "./lib/i18n";
 import { useReveal } from "./lib/useReveal";
 import { addToCompare } from "./lib/prefs";
+import { cars } from "./lib/db";
+import { storyById } from "./lib/stories";
+import { usePageMeta } from "./lib/seo";
 import LanguageScreen from "./components/LanguageScreen";
 import Navigation from "./components/Navigation";
 import Hero from "./components/Hero";
@@ -19,6 +29,7 @@ import CompareModal from "./components/compare/CompareModal";
 import GlobalSearch from "./components/GlobalSearch";
 import Footer from "./components/Footer";
 import FindMyCar from "./components/findmycar/FindMyCar";
+import NotFound from "./components/NotFound";
 import type { Story } from "./lib/stories";
 import type { Car } from "./lib/cars";
 
@@ -29,18 +40,62 @@ function Homepage({
   lang: Lang;
   onLangChange: (l: Lang) => void;
 }) {
-  useReveal();
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const [finderOpen, setFinderOpen] = useState(false);
-  const [activeStory, setActiveStory] = useState<Story | null>(null);
-  const [detailCar, setDetailCar] = useState<Car | null>(null);
   const [compareOpen, setCompareOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+
+  // --- The URL is the single source of truth for detail overlays. ---
+  // This keeps the V2 modal design intact while making every car and
+  // story deep-linkable (and refresh-safe via the Vercel SPA rewrite).
+  const path = location.pathname;
+  const carMatch = path.match(/^\/car\/([^/]+)\/?$/);
+  const storyMatch = path.match(/^\/story\/([^/]+)\/?$/);
+  const carId = carMatch ? carMatch[1] : undefined;
+  const storyId = storyMatch ? storyMatch[1] : undefined;
+
+  const detailCar = carId ? cars.find((c) => c.id === carId) : undefined;
+  const activeStory = storyId ? storyById(storyId) : undefined;
+
+  const notFound =
+    (carId !== undefined && detailCar === undefined) ||
+    (storyId !== undefined && activeStory === undefined) ||
+    (path !== "/" && carMatch === null && storyMatch === null);
+
+  // Reveal-on-scroll must re-run when we swap the 404 screen back to the
+  // homepage (the `.reveal` elements are freshly mounted in that case).
+  useReveal(notFound);
+
+  // --- Navigation helpers ---
+  const openCar = useCallback(
+    (car: Car) => navigate(`/car/${car.id}`),
+    [navigate]
+  );
+  const openStory = useCallback(
+    (story: Story) => navigate(`/story/${story.id}`),
+    [navigate]
+  );
+  const closeDetail = useCallback(() => {
+    // Go back when there is in-app history; otherwise return home.
+    const idx = (window.history.state as { idx?: number } | null)?.idx ?? 0;
+    if (idx > 0) navigate(-1);
+    else navigate("/", { replace: true });
+  }, [navigate]);
 
   // Add a car to compare and open the battle modal.
   const handleCompareCar = useCallback((car: Car) => {
     addToCompare(car.id);
     setCompareOpen(true);
   }, []);
+
+  // --- Per-route SEO metadata (title / canonical / Open Graph) ---
+  usePageMeta({ car: detailCar, story: activeStory, notFound, path });
+
+  if (notFound) {
+    return <NotFound onHome={() => navigate("/", { replace: true })} />;
+  }
 
   return (
     <div className="min-h-screen bg-ink text-white">
@@ -53,14 +108,14 @@ function Homepage({
       <main>
         <Hero lang={lang} onFind={() => setFinderOpen(true)} />
         <DiscoverSection lang={lang} />
-        <StoriesSection lang={lang} onOpen={setActiveStory} />
+        <StoriesSection lang={lang} onOpen={openStory} />
         <FindMyCarSection lang={lang} onStart={() => setFinderOpen(true)} />
-        <CarUniverse lang={lang} />
+        <CarUniverse lang={lang} onOpen={openCar} />
         <DailySection lang={lang} />
         <FavoritesSection
           lang={lang}
-          onOpenCar={setDetailCar}
-          onOpenStory={setActiveStory}
+          onOpenCar={openCar}
+          onOpenStory={openStory}
           onCompareCar={handleCompareCar}
         />
       </main>
@@ -81,13 +136,17 @@ function Homepage({
         <GlobalSearch
           lang={lang}
           onClose={() => setSearchOpen(false)}
-          onOpenCar={setDetailCar}
-          onOpenStory={setActiveStory}
+          onOpenCar={openCar}
+          onOpenStory={openStory}
         />
       )}
 
       {finderOpen && (
-        <FindMyCar lang={lang} onClose={() => setFinderOpen(false)} />
+        <FindMyCar
+          lang={lang}
+          onClose={() => setFinderOpen(false)}
+          onOpenCar={openCar}
+        />
       )}
 
       {activeStory && (
@@ -95,9 +154,9 @@ function Homepage({
           key={activeStory.id}
           story={activeStory}
           lang={lang}
-          onClose={() => setActiveStory(null)}
-          onOpenStory={setActiveStory}
-          onOpenCar={setDetailCar}
+          onClose={closeDetail}
+          onOpenStory={openStory}
+          onOpenCar={openCar}
           onCompareCar={handleCompareCar}
         />
       )}
@@ -107,8 +166,8 @@ function Homepage({
           key={detailCar.id}
           car={detailCar}
           lang={lang}
-          onClose={() => setDetailCar(null)}
-          onOpen={setDetailCar}
+          onClose={closeDetail}
+          onOpen={openCar}
         />
       )}
     </div>
@@ -129,10 +188,18 @@ export default function App() {
     setLang(l);
   }, []);
 
-  // First visit — show language selection.
-  if (lang === null) {
-    return <LanguageScreen onSelect={handleSelect} />;
-  }
-
-  return <Homepage lang={lang} onLangChange={handleLangChange} />;
+  return (
+    <BrowserRouter>
+      {lang === null ? (
+        <LanguageScreen onSelect={handleSelect} />
+      ) : (
+        <Routes>
+          <Route
+            path="*"
+            element={<Homepage lang={lang} onLangChange={handleLangChange} />}
+          />
+        </Routes>
+      )}
+    </BrowserRouter>
+  );
 }

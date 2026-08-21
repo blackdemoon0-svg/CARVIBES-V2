@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://carvibes-coral.vercel.app/sitemap.xml
