@@ -21,13 +21,14 @@ export default function Hero({ lang, onFind }: { lang: Lang; onFind?: () => void
         <img
           src={HERO_IMG}
           alt="Black luxury coupe in a dark studio"
-          className="camera-drift h-full w-full object-cover object-center"
+          className="camera-drift h-full w-full object-cover object-center lg:brightness-105"
           fetchPriority="high"
           decoding="async"
         />
         {/* Cinematic vignettes + legibility overlays */}
         <div className="absolute inset-0 bg-gradient-to-b from-ink/80 via-ink/20 to-ink" />
-        <div className="absolute inset-0 bg-gradient-to-r from-ink/80 via-transparent to-ink/40" />
+        {/* Directional scrim: dark stage behind the copy (left), car reads brighter on the right */}
+        <div className="absolute inset-0 bg-gradient-to-r from-ink/85 via-ink/30 to-transparent lg:from-ink/90 lg:via-ink/35" />
         {/* Radial vignette for richer cinematic depth */}
         <div
           className="absolute inset-0"
@@ -40,6 +41,21 @@ export default function Hero({ lang, onFind }: { lang: Lang; onFind?: () => void
         <div
           className="absolute -left-40 -top-40 h-[60vmin] w-[60vmin] rounded-full opacity-[0.16] blur-[120px]"
           style={{ background: "radial-gradient(circle, #3b82f6 0%, transparent 70%)" }}
+        />
+        {/* Soft stage light behind the copy — anchors the headline into the scene */}
+        <div
+          className="absolute inset-0 hidden lg:block"
+          style={{
+            background:
+              "radial-gradient(45% 55% at 30% 48%, rgba(255,255,255,0.09) 0%, rgba(255,255,255,0.02) 45%, transparent 70%)",
+          }}
+        />
+        <div
+          className="absolute inset-0 lg:hidden"
+          style={{
+            background:
+              "radial-gradient(85% 50% at 50% 30%, rgba(255,255,255,0.07) 0%, transparent 70%)",
+          }}
         />
         {/* Subtle light reflection sweep */}
         <div className="pointer-events-none absolute inset-y-0 left-0 w-1/2">
@@ -67,37 +83,51 @@ export default function Hero({ lang, onFind }: { lang: Lang; onFind?: () => void
           </p>
 
           {/* Title */}
-          <h1 className="font-display text-[clamp(2.6rem,8vw,6.2rem)] font-extrabold leading-[0.95] tracking-tight text-white">
+          <h1 className="font-display text-[clamp(2.5rem,6.5vw,5.5rem)] font-extrabold leading-[0.95] tracking-tight text-white">
             <span
               className="hero-in block"
-              style={{ animationDelay: "300ms" }}
+              style={{
+                animationDelay: "300ms",
+                textShadow:
+                  "0 2px 8px rgba(0,0,0,0.55), 0 16px 60px rgba(0,0,0,0.6)",
+              }}
             >
               {t(lang, "hero_title_1")}
             </span>
             <span
-              className="hero-in block text-metallic"
+              className="hero-in relative block text-metallic"
               style={{ animationDelay: "480ms" }}
             >
+              {/* Soft dark aura behind the metallic line — seats it into the scene */}
+              <span
+                aria-hidden="true"
+                className="absolute inset-0 translate-y-1 select-none text-ink opacity-60 blur-[18px]"
+              >
+                {t(lang, "hero_title_2")}
+              </span>
               {t(lang, "hero_title_2")}
             </span>
           </h1>
 
           {/* Subtitle */}
           <p
-            className="hero-in mt-6 max-w-xl text-base leading-relaxed text-mist sm:text-lg"
-            style={{ animationDelay: "680ms" }}
+            className="hero-in mt-5 max-w-xl text-base leading-[1.7] tracking-normal text-mist sm:mt-6 sm:text-lg"
+            style={{
+              animationDelay: "680ms",
+              textShadow: "0 2px 14px rgba(0,0,0,0.6)",
+            }}
           >
             {t(lang, "hero_sub")}
           </p>
 
           {/* Buttons */}
           <div
-            className="hero-in mt-10 flex flex-wrap items-center gap-4"
+            className="hero-in mt-12 flex flex-wrap items-center gap-x-4 gap-y-3 sm:mt-14"
             style={{ animationDelay: "840ms" }}
           >
             <a
               href="#explore"
-              className="group inline-flex h-13 items-center gap-3 bg-accent px-7 text-[12px] font-semibold tracking-[0.18em] text-white transition-all duration-300 hover:bg-accent-soft hover:shadow-[0_0_40px_-8px_rgba(227,38,46,0.6)]"
+              className="group inline-flex h-13 items-center gap-3 bg-accent px-7 text-[12px] font-semibold tracking-[0.18em] text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-accent-soft hover:shadow-[0_0_40px_-8px_rgba(227,38,46,0.6)] active:translate-y-0"
             >
               {t(lang, "hero_explore")}
               <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
@@ -110,7 +140,7 @@ export default function Hero({ lang, onFind }: { lang: Lang; onFind?: () => void
                   onFind();
                 }
               }}
-              className="group inline-flex h-13 items-center gap-3 border border-white/30 px-7 text-[12px] font-semibold tracking-[0.18em] text-white transition-all duration-300 hover:border-white/70 hover:bg-white hover:text-ink"
+              className="group inline-flex h-13 items-center gap-3 border border-white/30 px-7 text-[12px] font-semibold tracking-[0.18em] text-white transition-all duration-300 hover:-translate-y-0.5 hover:border-white/70 hover:bg-white hover:text-ink active:translate-y-0"
             >
               {t(lang, "hero_find")}
             </a>
