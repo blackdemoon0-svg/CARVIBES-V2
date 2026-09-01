@@ -156,7 +156,7 @@ export default function Navigation({
       >
         <div
           className={cn(
-            "mx-auto flex max-w-[1480px] items-center justify-between px-5 transition-all duration-500 sm:px-8",
+            "mx-auto flex max-w-[1480px] items-center justify-between px-4 transition-all duration-500 sm:px-8",
             scrolled ? "h-14" : "h-20"
           )}
         >
@@ -239,7 +239,7 @@ export default function Navigation({
             <button
               onClick={onSearch}
               aria-label={t(lang, "nav_search")}
-              className="group flex h-9 items-center gap-2 bg-accent px-3 text-white transition-all duration-300 hover:bg-accent-soft hover:shadow-[0_0_24px_-6px_rgba(227,38,46,0.6)] sm:px-4"
+              className="group flex h-10 items-center gap-2 bg-accent px-2.5 text-white transition-all duration-300 hover:bg-accent-soft hover:shadow-[0_0_24px_-6px_rgba(227,38,46,0.6)] sm:px-4"
             >
               <SearchIcon className="h-4.5 w-4.5" />
               <span className="hidden text-[11px] font-semibold tracking-[0.18em] md:inline">
@@ -254,14 +254,14 @@ export default function Navigation({
                 aria-label={t(lang, "nav_language")}
                 aria-expanded={langOpen}
                 className={cn(
-                  "group flex h-9 items-center gap-2 border px-3 text-[11px] font-semibold tracking-[0.18em] transition-colors",
+                  "group flex h-10 items-center gap-2 border px-2.5 text-[11px] font-semibold tracking-[0.18em] transition-colors sm:px-3",
                   langOpen
                     ? "border-white/30 text-white"
                     : "border-line text-mist hover:border-white/25 hover:text-white"
                 )}
               >
                 <GlobeIcon className="h-4 w-4" />
-                <span className="uppercase">{lang}</span>
+                <span className="hidden uppercase min-[380px]:inline">{lang}</span>
                 <ChevronDown
                   className={cn(
                     "h-3.5 w-3.5 transition-transform duration-300",
@@ -313,7 +313,7 @@ export default function Navigation({
               onClick={() => setMobileOpen((v) => !v)}
               aria-label="Menu"
               aria-expanded={mobileOpen}
-              className="flex h-9 w-9 flex-col items-center justify-center gap-1.5 border border-line text-white lg:hidden"
+              className="flex h-10 w-10 flex-col items-center justify-center gap-1.5 border border-line text-white lg:hidden"
             >
               <span
                 className={cn(
@@ -339,7 +339,7 @@ export default function Navigation({
           mobileOpen ? "opacity-100" : "pointer-events-none opacity-0"
         )}
       >
-        <div className="px-8 pt-4">
+        <div className="px-5 pt-6 sm:px-8">
           {MOBILE_GROUPS.map((group, gi) => (
             <div key={group.titleKey} className={gi > 0 ? "mt-7" : undefined}>
               <p className="pb-2 text-[11px] font-medium tracking-mega text-fog">
@@ -391,7 +391,7 @@ export default function Navigation({
         </div>
 
         {/* Mobile language selector */}
-        <div className="mt-8 px-8 pb-8">
+        <div className="mt-8 px-5 pb-[max(2rem,env(safe-area-inset-bottom))] sm:px-8">
           <p className="text-[11px] font-medium tracking-mega text-fog">
             {t(lang, "nav_language")}
           </p>

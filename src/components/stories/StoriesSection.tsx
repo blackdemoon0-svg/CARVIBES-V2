@@ -106,7 +106,7 @@ export default function StoriesSection({
                     <p className="mt-4 hidden max-w-xl text-sm leading-relaxed text-mist sm:block">
                       {featured.description}
                     </p>
-                    <span className="mt-6 inline-flex h-13 items-center gap-3 bg-accent px-7 text-[12px] font-semibold tracking-[0.18em] text-white transition-colors group-hover:bg-accent-soft">
+                    <span className="mt-6 flex h-13 w-full max-w-xs items-center justify-center gap-3 bg-accent px-5 text-[12px] font-semibold tracking-[0.18em] text-white transition-colors group-hover:bg-accent-soft sm:inline-flex sm:w-auto sm:max-w-none sm:px-7">
                       {t(lang, "st_enter_story")}
                       <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
                     </span>

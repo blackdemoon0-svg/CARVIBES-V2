@@ -158,7 +158,10 @@ export default function StoryDetail({
                 soundOn ? "text-accent-soft" : "text-mist hover:text-white"
               }`}
             >
-              {soundOn ? "🔊" : "🔇"} {soundOn ? t(lang, "st_sound_on") : t(lang, "st_sound_off")}
+              {soundOn ? "🔊" : "🔇"}
+              <span className="hidden sm:inline">
+                {soundOn ? t(lang, "st_sound_on") : t(lang, "st_sound_off")}
+              </span>
             </button>
             <button
               onClick={() => {
@@ -203,7 +206,7 @@ export default function StoryDetail({
                   setStarted(true);
                   setTimeout(() => window.scrollTo({ top: window.innerHeight * 0.4, behavior: "smooth" }), 50);
                 }}
-                className="hero-in group mt-8 inline-flex h-14 items-center gap-3 bg-accent px-9 text-[12px] font-semibold tracking-[0.2em] text-white transition-colors hover:bg-accent-soft"
+                className="hero-in group mt-8 flex h-14 w-full max-w-xs items-center justify-center gap-3 bg-accent px-6 text-[12px] font-semibold tracking-[0.2em] text-white transition-colors hover:bg-accent-soft sm:inline-flex sm:w-auto sm:max-w-none sm:px-9"
                 style={{ animationDelay: "280ms" }}
               >
                 {progress > 0 && !isComplete ? t(lang, "st_continue") : t(lang, "st_start")}
@@ -314,8 +317,8 @@ export default function StoryDetail({
                       { k: "st_weight", v: linkedCar.weight ? `${formatStat(linkedCar.weight)} kg` : "N/A" },
                     ].map((s) => (
                       <div key={s.k} className="bg-charcoal px-4 py-4">
-                        <p className="text-[9px] font-medium tracking-[0.16em] text-fog">{t(lang, s.k)}</p>
-                        <p className="mt-1 truncate font-display text-base font-semibold text-white">{s.v}</p>
+                        <p className="text-[10px] font-medium tracking-[0.16em] text-fog">{t(lang, s.k)}</p>
+                        <p className="mt-1 font-display text-base font-semibold leading-snug text-white">{s.v}</p>
                       </div>
                     ))}
                   </div>

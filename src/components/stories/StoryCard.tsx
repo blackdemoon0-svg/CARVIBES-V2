@@ -41,7 +41,7 @@ export default function StoryCard({
         />
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink/90 via-ink/25 to-transparent transition-opacity duration-700 group-hover:opacity-95" />
         {/* Category */}
-        <span className="absolute left-4 top-4 border border-white/15 bg-ink/50 px-2.5 py-1 text-[9px] font-semibold tracking-[0.2em] text-white backdrop-blur-sm">
+        <span className="absolute left-4 top-4 border border-white/15 bg-ink/50 px-2.5 py-1 text-[10px] font-semibold tracking-[0.2em] text-white backdrop-blur-sm">
           {t(lang, `st_cat_${story.categories[0]}`)}
         </span>
         {/* Year */}

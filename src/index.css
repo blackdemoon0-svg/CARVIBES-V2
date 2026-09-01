@@ -38,6 +38,12 @@
     letter-spacing: -0.01em;
   }
 
+  /* Keep anchored sections clear of the fixed header when the mobile
+     menu (or pagination) scrolls to them. */
+  section[id] {
+    scroll-margin-top: 5.5rem;
+  }
+
   ::selection {
     background: rgba(227, 38, 46, 0.35);
     color: #fff;
@@ -94,6 +100,10 @@
   }
   .hairline {
     border: 1px solid var(--color-line);
+  }
+  /* Fixed bottom elements respect the iPhone home-indicator safe area. */
+  .safe-bottom {
+    bottom: max(1.25rem, env(safe-area-inset-bottom));
   }
 }
 

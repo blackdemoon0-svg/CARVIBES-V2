@@ -251,8 +251,8 @@ export default function CarDetail({
             </div>
           </div>
 
-          {/* Hero image */}
-          <div className="relative aspect-[16/9] overflow-hidden border border-line bg-graphite">
+          {/* Hero image — taller ratio on phones so the title/price overlay fits */}
+          <div className="relative aspect-[4/3] overflow-hidden border border-line bg-graphite sm:aspect-[16/9]">
             <img
               src={gallery[activeImage]}
               alt={`${car.brand} ${car.model}`}
@@ -260,7 +260,7 @@ export default function CarDetail({
             />
             <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-transparent to-ink/20" />
             {/* Title overlay */}
-            <div className="absolute inset-x-0 bottom-0 p-6 sm:p-10">
+            <div className="absolute inset-x-0 bottom-0 p-5 sm:p-10">
               <div className="flex flex-wrap items-end justify-between gap-4">
                 <div>
                   <p className="text-xs font-medium tracking-[0.2em] text-mist">
@@ -324,7 +324,7 @@ export default function CarDetail({
           <div className="grid grid-cols-2 gap-px border border-t-0 border-line bg-line sm:grid-cols-3 lg:grid-cols-6">
             {heroStats.map((s) => (
               <div key={s.key} className="bg-charcoal px-4 py-4">
-                <p className="text-[9px] font-medium tracking-[0.18em] text-fog">
+                <p className="text-[10px] font-medium tracking-[0.18em] text-fog">
                   {t(lang, s.key)}
                 </p>
                 <p className="mt-1.5 truncate font-display text-base font-semibold text-white sm:text-lg" title={`${s.value} ${s.suffix}`.trim()}>

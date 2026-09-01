@@ -339,7 +339,7 @@ function Intro({ lang, onStart }: { lang: Lang; onStart: () => void }) {
       </p>
       <button
         onClick={onStart}
-        className="hero-in group mt-12 inline-flex h-16 items-center gap-3 bg-accent px-12 text-[13px] font-semibold tracking-[0.2em] text-white transition-all duration-300 hover:bg-accent-soft hover:shadow-[0_0_60px_-10px_rgba(227,38,46,0.7)]"
+        className="hero-in group mt-12 inline-flex h-16 max-w-full items-center gap-3 bg-accent px-8 text-[13px] font-semibold tracking-[0.2em] text-white transition-all duration-300 hover:bg-accent-soft hover:shadow-[0_0_60px_-10px_rgba(227,38,46,0.7)] sm:px-12"
         style={{ animationDelay: "300ms" }}
       >
         {t(lang, "fmc_start")}
@@ -439,7 +439,7 @@ function BudgetStep({ lang, budget, customOpen, customValue, setCustomOpen, setC
               value={customValue}
               onChange={(e) => setCustomValue(e.target.value)}
               placeholder={t(lang, "fmc_custom_placeholder")}
-              className="h-12 w-56 border border-line bg-charcoal px-4 text-white placeholder:text-fog focus:border-white/30 focus:outline-none"
+              className="h-12 w-full border border-line bg-charcoal px-4 text-white placeholder:text-fog focus:border-white/30 focus:outline-none sm:w-56"
             />
             <button
               onClick={() => {

@@ -465,7 +465,7 @@ export default function CarUniverse({
             </p>
             <button
               onClick={clearAll}
-              className="mt-6 border border-white/30 px-6 py-3 text-[11px] font-semibold tracking-[0.18em] text-white transition-colors hover:border-accent hover:bg-accent"
+              className="mt-6 w-full border border-white/30 px-6 py-3 text-[11px] font-semibold tracking-[0.18em] text-white transition-colors hover:border-accent hover:bg-accent sm:w-auto"
             >
               {t(lang, "filter_clear").toUpperCase()}
             </button>
@@ -474,7 +474,7 @@ export default function CarUniverse({
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="mt-12 flex items-center justify-center gap-2">
+          <div className="mt-12 flex flex-wrap items-center justify-center gap-2">
             {Array.from({ length: totalPages }).map((_, i) => (
               <button
                 key={i}

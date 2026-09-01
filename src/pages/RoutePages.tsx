@@ -163,9 +163,9 @@ export function BrandsPage(props: ShellProps) {
                 <button
                   key={brand}
                   onClick={() => props.onOpenCar(cars.find((c) => c.brand === brand)!)}
-                  className="border border-line bg-charcoal px-4 py-5 text-left transition-colors hover:border-white/25"
+                  className="min-w-0 border border-line bg-charcoal px-4 py-5 text-left transition-colors hover:border-white/25"
                 >
-                  <p className="font-display text-lg font-semibold text-white">{brand}</p>
+                  <p className="break-words font-display text-lg font-semibold text-white">{brand}</p>
                   <p className="mt-1 text-xs text-fog">{count}</p>
                 </button>
               );

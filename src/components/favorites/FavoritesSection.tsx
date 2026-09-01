@@ -104,10 +104,10 @@ export default function FavoritesSection({
                       <p className="mt-1 text-xs text-fog">
                         {formatPrice(c.price, lang)} · {formatStat(c.hp)} hp
                       </p>
-                      <div className="mt-4 flex flex-wrap gap-2">
+                      <div className="mt-4 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
                         <button
                           onClick={() => onOpenCar(c)}
-                          className="flex h-10 flex-1 items-center justify-center border border-white/25 px-3 text-[10px] font-semibold tracking-[0.12em] text-white transition-colors hover:border-accent hover:bg-accent"
+                          className="col-span-2 flex h-10 items-center justify-center border border-white/25 px-3 text-[10px] font-semibold tracking-[0.12em] text-white transition-colors hover:border-accent hover:bg-accent sm:col-span-1 sm:flex-1"
                         >
                           {t(lang, "fmc_explore")}
                         </button>
@@ -148,10 +148,10 @@ export default function FavoritesSection({
                     <div className="flex flex-1 flex-col p-4">
                       <h3 className="font-display text-base font-semibold text-white">{s.title}</h3>
                       <p className="mt-1 text-xs text-fog">{s.car} · {s.year}</p>
-                      <div className="mt-4 flex gap-2">
+                      <div className="mt-4 flex flex-wrap gap-2">
                         <button
                           onClick={() => onOpenStory(s)}
-                          className="flex h-10 flex-1 items-center justify-center border border-white/25 px-3 text-[10px] font-semibold tracking-[0.12em] text-white transition-colors hover:border-accent hover:bg-accent"
+                          className="flex h-10 min-w-0 flex-1 items-center justify-center border border-white/25 px-3 text-[10px] font-semibold tracking-[0.12em] text-white transition-colors hover:border-accent hover:bg-accent"
                         >
                           {t(lang, "st_read_story")}
                         </button>

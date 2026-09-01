@@ -107,12 +107,12 @@ export default function Hero({
 
           {/* Buttons */}
           <div
-            className="hero-in mt-6 flex flex-wrap items-center gap-4"
+            className="hero-in mt-6 flex flex-col items-stretch gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4"
             style={{ animationDelay: "920ms" }}
           >
             <a
               href="#explore"
-              className="group inline-flex h-13 items-center gap-3 bg-accent px-7 text-[12px] font-semibold tracking-[0.18em] text-white transition-all duration-300 hover:bg-accent-soft hover:shadow-[0_0_40px_-8px_rgba(227,38,46,0.6)]"
+              className="group inline-flex h-13 items-center justify-center gap-3 bg-accent px-7 text-[12px] font-semibold tracking-[0.18em] text-white transition-all duration-300 hover:bg-accent-soft hover:shadow-[0_0_40px_-8px_rgba(227,38,46,0.6)] sm:w-auto"
             >
               {t(lang, "hero_explore")}
               <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
@@ -120,14 +120,14 @@ export default function Hero({
             <button
               type="button"
               onClick={onBrands}
-              className="group inline-flex h-13 items-center gap-3 border border-white/30 px-7 text-[12px] font-semibold tracking-[0.18em] text-white transition-all duration-300 hover:border-white/70 hover:bg-white hover:text-ink"
+              className="group inline-flex h-13 items-center justify-center gap-3 border border-white/30 px-7 text-[12px] font-semibold tracking-[0.18em] text-white transition-all duration-300 hover:border-white/70 hover:bg-white hover:text-ink sm:w-auto"
             >
               {t(lang, "hero_brands")}
             </button>
             <button
               type="button"
               onClick={onFind}
-              className="group inline-flex h-13 items-center gap-2 px-1 text-[11px] font-medium tracking-[0.18em] text-fog underline decoration-line underline-offset-8 transition-colors duration-300 hover:text-white"
+              className="group inline-flex h-13 items-center justify-center gap-2 px-1 text-[11px] font-medium tracking-[0.18em] text-fog underline decoration-line underline-offset-8 transition-colors duration-300 hover:text-white sm:w-auto"
             >
               {t(lang, "hero_find")}
             </button>
@@ -147,7 +147,7 @@ export default function Hero({
               <div className="font-display text-3xl font-bold text-white sm:text-4xl lg:text-5xl">
                 {s.value.toLocaleString()}
               </div>
-              <div className="mt-1.5 text-[9px] font-medium tracking-[0.18em] text-fog sm:text-[10px] sm:tracking-[0.22em]">
+              <div className="mt-1.5 text-[10px] font-medium tracking-[0.18em] text-fog sm:text-[10px] sm:tracking-[0.22em]">
                 {t(lang, s.key)}
               </div>
             </div>
