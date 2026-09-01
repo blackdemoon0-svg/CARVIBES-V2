@@ -16,17 +16,58 @@ function showBody() {
   document.body.style.overflow = "";
 }
 
-/** Compact bordered spec table — one row per real field. */
-function SpecTable({ rows }: { rows: { label: string; value: string }[] }) {
+/**
+ * Extract structured engine facts from the existing engine string.
+ * Values are derived only from real data already in the database;
+ * anything unrecognized is omitted (never guessed).
+ */
+function engineBreakdown(engine: string) {
+  let displacement: string | undefined;
+  let cylinders: string | undefined;
+  let aspiration: string | undefined;
+
+  const d = engine.match(/(\d+(?:\.\d+)?)L\b/);
+  if (d) displacement = `${d[1]} L`;
+
+  const block = engine.match(/\b([VWI])(\d{1,2})\b/);
+  if (block) cylinders = `${block[1]}${block[2]}`;
+  else {
+    const flat = engine.match(/Flat-(\d{1,2})\b/i);
+    if (flat) cylinders = `Flat-${flat[1]}`;
+    else if (/rotary/i.test(engine)) cylinders = "Rotary";
+  }
+
+  if (/twin-turbo/i.test(engine)) aspiration = "Twin-turbo";
+  else if (/quad-turbo/i.test(engine)) aspiration = "Quad-turbo";
+  else if (/turbo/i.test(engine)) aspiration = "Turbocharged";
+  else if (/supercharged/i.test(engine)) aspiration = "Supercharged";
+  else if (/\bNA\b|naturally aspirated/i.test(engine)) aspiration = "Naturally aspirated";
+
+  return { displacement, cylinders, aspiration };
+}
+
+/** Compact specification-group card: strong group label + scannable rows. */
+function SpecGroup({
+  title,
+  rows,
+}: {
+  title: string;
+  rows: { label: string; value: string }[];
+}) {
   return (
-    <dl className="divide-y divide-line border-y border-line">
-      {rows.map((r) => (
-        <div key={r.label} className="flex items-center justify-between gap-4 py-2.5">
-          <dt className="text-[13px] text-fog">{r.label}</dt>
-          <dd className="text-right text-[13px] font-medium text-white">{r.value}</dd>
-        </div>
-      ))}
-    </dl>
+    <div className="border border-line bg-charcoal">
+      <p className="border-b border-line px-4 py-3 text-[11px] font-semibold tracking-mega text-white">
+        {title}
+      </p>
+      <dl className="divide-y divide-line">
+        {rows.map((r) => (
+          <div key={r.label} className="flex items-baseline justify-between gap-3 px-4 py-2.5">
+            <dt className="text-[12px] text-fog">{r.label}</dt>
+            <dd className="text-right text-[12px] font-semibold text-white">{r.value}</dd>
+          </div>
+        ))}
+      </dl>
+    </div>
   );
 }
 
@@ -102,35 +143,45 @@ export default function CarDetail({
     { key: "detail_transmission", value: car.transmission, suffix: "" },
   ];
 
-  // ---- Real performance / drivetrain rows (only existing fields) ----
-  const performanceRows = [
-    { label: t(lang, "detail_hp"), value: car.hp ? `${formatStat(car.hp)} hp` : t(lang, "detail_na") },
-    { label: t(lang, "detail_torque"), value: car.torque ? `${formatStat(car.torque)} Nm` : t(lang, "detail_na") },
-    {
-      label: t(lang, "detail_zerohundred"),
-      value: car.zeroToHundred ? `${car.zeroToHundred} s` : t(lang, "detail_na"),
-    },
-    {
-      label: t(lang, "detail_topspeed"),
-      value: car.topSpeed ? `${formatStat(car.topSpeed)} km/h` : t(lang, "detail_na"),
-    },
-  ];
-  if (powerToWeight) performanceRows.push({ label: t(lang, "detail_power_weight"), value: powerToWeight });
-
-  const drivetrainRows = [
+  // ---- ENGINE — real engine facts from the existing engine field ----
+  const { displacement, cylinders, aspiration } = engineBreakdown(car.engine);
+  const engineRows: { label: string; value: string }[] = [
     { label: t(lang, "detail_engine"), value: car.engine },
-    { label: t(lang, "detail_transmission"), value: car.transmission },
-    { label: t(lang, "detail_drivetrain"), value: car.drivetrain || t(lang, "detail_na") },
+  ];
+  if (displacement)
+    engineRows.push({ label: t(lang, "spec_displacement"), value: displacement });
+  if (cylinders) engineRows.push({ label: t(lang, "spec_cylinders"), value: cylinders });
+  if (aspiration) engineRows.push({ label: t(lang, "spec_aspiration"), value: aspiration });
+  if (car.hp > 0) engineRows.push({ label: t(lang, "detail_hp"), value: `${formatStat(car.hp)} hp` });
+  if (car.torque) engineRows.push({ label: t(lang, "detail_torque"), value: `${formatStat(car.torque)} Nm` });
+
+  // ---- PERFORMANCE — only fields that exist ----
+  const performanceRows: { label: string; value: string }[] = [];
+  if (car.zeroToHundred)
+    performanceRows.push({ label: t(lang, "detail_zerohundred"), value: `${car.zeroToHundred} s` });
+  if (car.topSpeed)
+    performanceRows.push({
+      label: t(lang, "detail_topspeed"),
+      value: `${formatStat(car.topSpeed)} km/h`,
+    });
+  performanceRows.push({ label: t(lang, "detail_transmission"), value: car.transmission });
+  if (car.drivetrain)
+    performanceRows.push({ label: t(lang, "detail_drivetrain"), value: car.drivetrain });
+  if (powerToWeight)
+    performanceRows.push({ label: t(lang, "detail_power_weight"), value: powerToWeight });
+
+  // ---- DIMENSIONS — only where real data exists ----
+  const dimensionsRows: { label: string; value: string }[] = [];
+  if (car.weight)
+    dimensionsRows.push({ label: t(lang, "detail_weight"), value: `${formatStat(car.weight)} kg` });
+
+  // ---- EFFICIENCY — fuel type; consumption/CO2 are not stored ----
+  const efficiencyRows: { label: string; value: string }[] = [
     { label: t(lang, "detail_fuel"), value: car.fuel },
   ];
-  if (car.generation) drivetrainRows.push({ label: t(lang, "detail_generation"), value: car.generation });
 
-  // ---- Dimensions & weight: only when the data exists ----
-  const dimensionsRows: { label: string; value: string }[] = [{ label: t(lang, "detail_body"), value: car.body }];
-  if (car.weight) dimensionsRows.push({ label: t(lang, "detail_weight"), value: `${formatStat(car.weight)} kg` });
-
-  // ---- Pricing: real price + real derived per-power cost ----
-  const pricingRows = [
+  // ---- PRICING — real starting price + real derived per-power cost ----
+  const pricingRows: { label: string; value: string }[] = [
     { label: t(lang, "detail_price"), value: formatPrice(car.price, lang) },
   ];
   if (pricePerPower) pricingRows.push({ label: t(lang, "detail_price_power"), value: pricePerPower });
@@ -300,40 +351,40 @@ export default function CarDetail({
             </p>
           </section>
 
-          {/* PERFORMANCE + ENGINE & DRIVETRAIN */}
-          <section className="mt-10 grid gap-8 lg:grid-cols-2">
-            <div>
-              <SectionTitle>{t(lang, "detail_performance").toUpperCase()}</SectionTitle>
-              <SpecTable rows={performanceRows} />
-            </div>
-            <div>
-              <SectionTitle>{t(lang, "detail_engine_drivetrain")}</SectionTitle>
-              <SpecTable rows={drivetrainRows} />
+          {/* SPECIFICATIONS — grouped database-style layout */}
+          <section className="mt-10">
+            <SectionTitle>{t(lang, "detail_specs")}</SectionTitle>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+              {engineRows.length > 0 && (
+                <SpecGroup title={t(lang, "spec_engine")} rows={engineRows} />
+              )}
+              {performanceRows.length > 0 && (
+                <SpecGroup title={t(lang, "spec_performance")} rows={performanceRows} />
+              )}
+              {dimensionsRows.length > 0 && (
+                <SpecGroup title={t(lang, "spec_dimensions")} rows={dimensionsRows} />
+              )}
+              {efficiencyRows.length > 0 && (
+                <SpecGroup title={t(lang, "spec_efficiency")} rows={efficiencyRows} />
+              )}
+              {pricingRows.length > 0 && (
+                <SpecGroup title={t(lang, "spec_pricing")} rows={pricingRows} />
+              )}
             </div>
           </section>
 
-          {/* DIMENSIONS + PRICING + CATEGORIES */}
-          <section className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-            <div>
-              <SectionTitle>{t(lang, "detail_dimensions")}</SectionTitle>
-              <SpecTable rows={dimensionsRows} />
-            </div>
-            <div>
-              <SectionTitle>{t(lang, "detail_pricing")}</SectionTitle>
-              <SpecTable rows={pricingRows} />
-            </div>
-            <div>
-              <SectionTitle>{t(lang, "detail_categories")}</SectionTitle>
-              <div className="flex flex-wrap gap-2 border-y border-line py-4">
-                {car.categories.map((cat) => (
-                  <span
-                    key={cat}
-                    className="border border-line px-3 py-1.5 text-[10px] font-semibold tracking-[0.16em] text-mist"
-                  >
-                    {t(lang, categoryKey(cat))}
-                  </span>
-                ))}
-              </div>
+          {/* CATEGORIES — real category tags */}
+          <section className="mt-8">
+            <SectionTitle>{t(lang, "detail_categories")}</SectionTitle>
+            <div className="flex flex-wrap gap-2 border-y border-line py-4">
+              {car.categories.map((cat) => (
+                <span
+                  key={cat}
+                  className="border border-line px-3 py-1.5 text-[10px] font-semibold tracking-[0.16em] text-mist"
+                >
+                  {t(lang, categoryKey(cat))}
+                </span>
+              ))}
             </div>
           </section>
 
