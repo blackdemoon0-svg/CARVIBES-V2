@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link, NavLink, useLocation } from "react-router-dom";
 import { cn } from "../utils/cn";
 import { LANGS, t, type Lang } from "../lib/i18n";
 import { Logo } from "./Logo";
@@ -11,17 +12,65 @@ interface NavProps {
   onSearch?: () => void;
 }
 
-const CENTER_LINKS = [
-  { key: "nav_explore", href: "#explore" },
-  { key: "nav_find", href: "#find-my-car" },
-  { key: "nav_stories", href: "#stories" },
-  { key: "nav_favorites", href: "#favorites" },
+// ---------------------------------------------------------------------------
+// Navigation model
+//
+// Desktop keeps 4 primary destinations visible; everything secondary lives in
+// a "More" dropdown. Mobile groups the same destinations into DISCOVER / TOOLS.
+// A destination carrying a `section` id points at a homepage section (hash
+// route such as /#rankings) and therefore needs explicit scroll handling.
+// ---------------------------------------------------------------------------
+
+interface Destination {
+  key: string;
+  to: string;
+  section?: string;
+}
+
+const PRIMARY_LINKS: Destination[] = [
+  { key: "nav_explore", to: "/explore" },
+  { key: "nav_brands", to: "/brands" },
+  { key: "nav_guides", to: "/news" },
+  { key: "nav_rankings", to: "/#rankings", section: "rankings" },
 ];
 
-export default function Navigation({ lang, onLangChange, onCompare, onSearch }: NavProps) {
+const SECONDARY_LINKS: Destination[] = [
+  { key: "nav_find", to: "/find-my-car" },
+  { key: "nav_favorites", to: "/favorites" },
+  { key: "nav_contact", to: "/contact" },
+];
+
+const MOBILE_GROUPS: { titleKey: string; links: Destination[] }[] = [
+  {
+    titleKey: "nav_group_discover",
+    links: [{ key: "nav_home", to: "/#top", section: "top" }, ...PRIMARY_LINKS],
+  },
+  {
+    titleKey: "nav_group_tools",
+    links: SECONDARY_LINKS,
+  },
+];
+
+function scrollToSection(section: string) {
+  document
+    .getElementById(section)
+    ?.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+const linkClasses =
+  "nav-link text-[13px] font-medium tracking-[0.18em] transition-colors duration-300 hover:text-white";
+
+export default function Navigation({
+  lang,
+  onLangChange,
+  onCompare,
+  onSearch,
+}: NavProps) {
   const [scrolled, setScrolled] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -31,7 +80,10 @@ export default function Navigation({ lang, onLangChange, onCompare, onSearch }: 
   }, []);
 
   useEffect(() => {
-    const close = () => setLangOpen(false);
+    const close = () => {
+      setLangOpen(false);
+      setMoreOpen(false);
+    };
     window.addEventListener("click", close);
     return () => window.removeEventListener("click", close);
   }, []);
@@ -42,6 +94,55 @@ export default function Navigation({ lang, onLangChange, onCompare, onSearch }: 
       document.body.style.overflow = "";
     };
   }, [mobileOpen]);
+
+  // Scroll to the homepage section named by the URL hash (e.g. /#rankings).
+  // React Router does not scroll to hash anchors by itself, so this runs after
+  // every navigation — it works both on the homepage and when arriving there
+  // from another route (the homepage DOM is mounted by effect time).
+  useEffect(() => {
+    if (location.pathname !== "/" || !location.hash) return;
+    const section = location.hash.slice(1);
+    const frame = requestAnimationFrame(() => scrollToSection(section));
+    return () => cancelAnimationFrame(frame);
+  }, [location.pathname, location.hash]);
+
+  // Same-page section clicks: update-free re-scroll, and close any open menu.
+  // Cross-route clicks are left to the hash effect above, which fires once the
+  // homepage has rendered.
+  const handleSectionClick = (section?: string) => {
+    setMoreOpen(false);
+    setMobileOpen(false);
+    if (!section || location.pathname !== "/") return;
+    // Defer so the mobile menu can unlock body scrolling first.
+    window.setTimeout(() => scrollToSection(section), 60);
+  };
+
+  const renderSectionAwareLink = (
+    link: Destination,
+    className: string,
+    children: React.ReactNode
+  ) =>
+    link.section ? (
+      <Link
+        key={link.key}
+        to={link.to}
+        onClick={() => handleSectionClick(link.section)}
+        className={className}
+      >
+        {children}
+      </Link>
+    ) : (
+      <NavLink
+        key={link.key}
+        to={link.to}
+        onClick={() => handleSectionClick()}
+        className={({ isActive }) =>
+          cn(className, isActive ? "text-white" : undefined)
+        }
+      >
+        {children}
+      </NavLink>
+    );
 
   return (
     <>
@@ -59,9 +160,10 @@ export default function Navigation({ lang, onLangChange, onCompare, onSearch }: 
             scrolled ? "h-14" : "h-20"
           )}
         >
-          {/* Left — logo */}
-          <a
-            href="#top"
+          {/* Left — logo (Home) */}
+          <Link
+            to="/#top"
+            onClick={() => handleSectionClick("top")}
             className="flex shrink-0 items-center"
             aria-label="CarVibes home"
           >
@@ -69,43 +171,78 @@ export default function Navigation({ lang, onLangChange, onCompare, onSearch }: 
               compact={scrolled}
               className="transition-all duration-500"
             />
-          </a>
+          </Link>
 
-          {/* Center — links */}
-          <nav className="hidden items-center gap-10 lg:flex">
-            {CENTER_LINKS.map((link) => (
-              <a
-                key={link.key}
-                href={link.href}
-                className="nav-link text-[13px] font-medium tracking-[0.18em] text-mist transition-colors duration-300 hover:text-white"
+          {/* Center — primary destinations + "More" menu */}
+          <nav className="hidden items-center gap-8 lg:flex">
+            {PRIMARY_LINKS.map((link) =>
+              renderSectionAwareLink(link, cn(linkClasses, "text-mist"), t(lang, link.key))
+            )}
+
+            {/* Secondary destinations */}
+            <div className="relative" onClick={(e) => e.stopPropagation()}>
+              <button
+                onClick={() => setMoreOpen((v) => !v)}
+                aria-label={t(lang, "nav_more")}
+                aria-expanded={moreOpen}
+                className={cn(
+                  "group flex h-9 items-center gap-2 border px-3 text-[11px] font-semibold tracking-[0.18em] transition-colors",
+                  moreOpen
+                    ? "border-white/30 text-white"
+                    : "border-line text-mist hover:border-white/25 hover:text-white"
+                )}
               >
-                {t(lang, link.key)}
-              </a>
-            ))}
+                {t(lang, "nav_more")}
+                <ChevronDown
+                  className={cn(
+                    "h-3.5 w-3.5 transition-transform duration-300",
+                    moreOpen && "rotate-180"
+                  )}
+                />
+              </button>
+
+              <div
+                className={cn(
+                  "absolute right-0 top-full mt-2 w-52 origin-top-right overflow-hidden border border-line bg-charcoal shadow-2xl shadow-black/50 transition-all duration-200",
+                  moreOpen
+                    ? "translate-y-0 opacity-100"
+                    : "pointer-events-none -translate-y-1 opacity-0"
+                )}
+              >
+                {SECONDARY_LINKS.map((link) => (
+                  <Link
+                    key={link.key}
+                    to={link.to}
+                    onClick={() => setMoreOpen(false)}
+                    className="flex w-full items-center justify-between px-4 py-3 text-left text-[11px] font-semibold tracking-[0.18em] text-mist transition-colors hover:bg-graphite/60 hover:text-white"
+                  >
+                    {t(lang, link.key)}
+                  </Link>
+                ))}
+                <button
+                  onClick={() => {
+                    setMoreOpen(false);
+                    onCompare?.();
+                  }}
+                  className="flex w-full items-center gap-2 px-4 py-3 text-left text-[11px] font-semibold tracking-[0.18em] text-mist transition-colors hover:bg-graphite/60 hover:text-white"
+                >
+                  <span aria-hidden="true">⚔</span>
+                  {t(lang, "cp_compare")}
+                </button>
+              </div>
+            </div>
           </nav>
 
           {/* Right — actions */}
           <div className="flex items-center gap-2 sm:gap-3">
-            {/* Compare */}
-            <button
-              onClick={onCompare}
-              aria-label="Compare"
-              className="group flex h-9 items-center gap-2 rounded-none border border-transparent px-2.5 text-mist transition-colors hover:border-line hover:text-white sm:px-3"
-            >
-              <span aria-hidden="true">⚔</span>
-              <span className="hidden text-[11px] font-medium tracking-[0.18em] xl:inline">
-                {t(lang, "cp_compare")}
-              </span>
-            </button>
-
-            {/* Search */}
+            {/* Search — primary CTA */}
             <button
               onClick={onSearch}
               aria-label={t(lang, "nav_search")}
-              className="group flex h-9 items-center gap-2 rounded-none border border-transparent px-2.5 text-mist transition-colors hover:border-line hover:text-white sm:px-3"
+              className="group flex h-9 items-center gap-2 bg-accent px-3 text-white transition-all duration-300 hover:bg-accent-soft hover:shadow-[0_0_24px_-6px_rgba(227,38,46,0.6)] sm:px-4"
             >
               <SearchIcon className="h-4.5 w-4.5" />
-              <span className="hidden text-[11px] font-medium tracking-[0.18em] xl:inline">
+              <span className="hidden text-[11px] font-semibold tracking-[0.18em] md:inline">
                 {t(lang, "nav_search")}
               </span>
             </button>
@@ -198,46 +335,63 @@ export default function Navigation({ lang, onLangChange, onCompare, onSearch }: 
       {/* Mobile menu overlay */}
       <div
         className={cn(
-          "fixed inset-0 z-40 flex flex-col bg-ink/98 pt-24 backdrop-blur-xl transition-all duration-500 lg:hidden",
+          "fixed inset-0 z-40 flex flex-col overflow-y-auto bg-ink/98 pt-20 backdrop-blur-xl transition-all duration-500 lg:hidden",
           mobileOpen ? "opacity-100" : "pointer-events-none opacity-0"
         )}
       >
-        <nav className="flex flex-col gap-1 px-8">
-          {CENTER_LINKS.map((link, i) => (
-            <a
-              key={link.key}
-              href={link.href}
-              onClick={() => setMobileOpen(false)}
-              className="flex items-center justify-between border-b border-line py-6 font-display text-2xl font-semibold tracking-tight text-white transition-colors hover:text-accent-soft"
-              style={{
-                transitionDelay: `${i * 60}ms`,
-                ...(mobileOpen
-                  ? { opacity: 1, transform: "translateY(0)" }
-                  : { opacity: 0, transform: "translateY(12px)" }),
-                transition:
-                  "opacity 0.4s ease, transform 0.4s ease, color 0.3s ease",
-              }}
-            >
-              {t(lang, link.key)}
-              <ArrowRight className="h-5 w-5 text-fog" />
-            </a>
+        <div className="px-8 pt-4">
+          {MOBILE_GROUPS.map((group, gi) => (
+            <div key={group.titleKey} className={gi > 0 ? "mt-7" : undefined}>
+              <p className="pb-2 text-[11px] font-medium tracking-mega text-fog">
+                {t(lang, group.titleKey)}
+              </p>
+              <nav className="flex flex-col">
+                {group.links.map((link, i) => (
+                  <Link
+                    key={link.key}
+                    to={link.to}
+                    onClick={() => handleSectionClick(link.section)}
+                    className="flex items-center justify-between border-b border-line py-4 font-display text-xl font-semibold tracking-tight text-white transition-colors hover:text-accent-soft"
+                    style={{
+                      transitionDelay: `${(gi * 5 + i) * 40}ms`,
+                      ...(mobileOpen
+                        ? { opacity: 1, transform: "translateY(0)" }
+                        : { opacity: 0, transform: "translateY(12px)" }),
+                      transition:
+                        "opacity 0.4s ease, transform 0.4s ease, color 0.3s ease",
+                    }}
+                  >
+                    {t(lang, link.key)}
+                    <ArrowRight className="h-5 w-5 text-fog" />
+                  </Link>
+                ))}
+                {group.titleKey === "nav_group_tools" && (
+                  <button
+                    onClick={() => {
+                      setMobileOpen(false);
+                      onCompare?.();
+                    }}
+                    className="flex items-center justify-between border-b border-line py-4 text-left font-display text-xl font-semibold tracking-tight text-white transition-colors hover:text-accent-soft"
+                    style={{
+                      transitionDelay: `${(gi * 5 + group.links.length) * 40}ms`,
+                      ...(mobileOpen
+                        ? { opacity: 1, transform: "translateY(0)" }
+                        : { opacity: 0, transform: "translateY(12px)" }),
+                      transition:
+                        "opacity 0.4s ease, transform 0.4s ease, color 0.3s ease",
+                    }}
+                  >
+                    ⚔ {t(lang, "cp_compare")}
+                    <ArrowRight className="h-5 w-5 text-fog" />
+                  </button>
+                )}
+              </nav>
+            </div>
           ))}
-
-          {/* Compare action (mobile) */}
-          <button
-            onClick={() => {
-              setMobileOpen(false);
-              onCompare?.();
-            }}
-            className="flex items-center justify-between border-b border-line py-6 font-display text-2xl font-semibold tracking-tight text-white transition-colors hover:text-accent-soft"
-          >
-            ⚔ {t(lang, "cp_compare")}
-            <ArrowRight className="h-5 w-5 text-fog" />
-          </button>
-        </nav>
+        </div>
 
         {/* Mobile language selector */}
-        <div className="mt-8 px-8">
+        <div className="mt-8 px-8 pb-8">
           <p className="text-[11px] font-medium tracking-mega text-fog">
             {t(lang, "nav_language")}
           </p>
