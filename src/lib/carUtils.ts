@@ -67,6 +67,9 @@ export function applySearch(list: Car[], query: string): Car[] {
       c.model,
       c.generation,
       c.body,
+      c.engine,
+      c.fuel,
+      String(c.year),
       ...c.categories,
     ]
       .join(" ")

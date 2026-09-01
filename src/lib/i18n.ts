@@ -103,7 +103,12 @@ const fr: Dict = {
     "Une sélection croissante de machines réelles à travers chaque marque et chaque catégorie.",
   universe_count: "véhicules",
 
-  search_placeholder: "Rechercher par marque, modèle ou catégorie…",
+  search_placeholder: "Rechercher par marque, modèle, moteur ou catégorie…",
+  search_suggested: "SUGGESTIONS",
+  search_all_results: "VOIR TOUS LES RÉSULTATS",
+  search_results_of: "sur",
+  search_empty_hint:
+    "Aucun résultat pour cette recherche. Essayez un autre terme ou retirez un filtre.",
   filter_label: "FILTRES",
   filter_clear: "Réinitialiser les filtres",
   sort_label: "TRIER",
@@ -442,7 +447,12 @@ const en: Dict = {
     "A growing selection of real machines across every brand and category.",
   universe_count: "vehicles",
 
-  search_placeholder: "Search by brand, model or category…",
+  search_placeholder: "Search by brand, model, engine or category…",
+  search_suggested: "SUGGESTED",
+  search_all_results: "VIEW ALL RESULTS",
+  search_results_of: "of",
+  search_empty_hint:
+    "No matches for this search. Try a different term or remove a filter.",
   filter_label: "FILTERS",
   filter_clear: "Clear filters",
   sort_label: "SORT",
@@ -784,7 +794,12 @@ const es: Dict = {
     "Una selección creciente de máquinas reales en cada marca y categoría.",
   universe_count: "vehículos",
 
-  search_placeholder: "Buscar por marca, modelo o categoría…",
+  search_placeholder: "Buscar por marca, modelo, motor o categoría…",
+  search_suggested: "SUGERENCIAS",
+  search_all_results: "VER TODOS LOS RESULTADOS",
+  search_results_of: "de",
+  search_empty_hint:
+    "Sin resultados para esta búsqueda. Prueba otro término o elimina un filtro.",
   filter_label: "FILTROS",
   filter_clear: "Limpiar filtros",
   sort_label: "ORDENAR",

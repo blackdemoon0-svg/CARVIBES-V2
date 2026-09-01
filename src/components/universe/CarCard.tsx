@@ -38,11 +38,6 @@ export default function CarCard({
         <span className="absolute left-4 top-4 border border-white/15 bg-ink/50 px-2.5 py-1 text-[9px] font-semibold tracking-[0.2em] text-white backdrop-blur-sm">
           {t(lang, categoryKey(car.categories[0]))}
         </span>
-
-        {/* Year */}
-        <span className="absolute right-4 top-4 font-display text-sm font-semibold text-white/70">
-          {car.year}
-        </span>
       </div>
 
       {/* Body */}
@@ -54,8 +49,13 @@ export default function CarCard({
         </div>
         <p className="mt-1 text-sm text-mist">{car.engine}</p>
 
+        {/* Year — always visible */}
+        <p className="mt-2.5 text-[10px] font-semibold tracking-[0.16em] text-fog">
+          {car.year}
+        </p>
+
         {/* Price + stats */}
-        <div className="mt-4 flex items-center justify-between border-t border-line pt-4">
+        <div className="mt-3 flex items-center justify-between border-t border-line pt-3">
           <span className="text-sm font-semibold tracking-tight text-white">
             {formatPrice(car.price, lang)}
           </span>
@@ -71,26 +71,6 @@ export default function CarCard({
               </span>
               s
             </span>
-          </div>
-        </div>
-
-        {/* Reveal specs + CTA */}
-        <div className="mt-4 grid grid-rows-[0fr] transition-all duration-500 ease-out group-hover:grid-rows-[1fr] group-focus-within:grid-rows-[1fr]">
-          <div className="overflow-hidden">
-            <dl className="space-y-1.5 border-t border-line pt-3 text-xs">
-              <div className="flex justify-between">
-                <dt className="text-fog">{t(lang, "detail_torque")}</dt>
-                <dd className="text-white">
-                  {car.torque ? `${formatStat(car.torque)} Nm` : "N/A"}
-                </dd>
-              </div>
-              <div className="flex justify-between">
-                <dt className="text-fog">{t(lang, "detail_topspeed")}</dt>
-                <dd className="text-white">
-                  {car.topSpeed ? `${formatStat(car.topSpeed)} km/h` : "N/A"}
-                </dd>
-              </div>
-            </dl>
           </div>
         </div>
 
