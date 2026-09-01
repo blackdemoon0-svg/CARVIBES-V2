@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { t, type Lang } from "../../lib/i18n";
 import {
+  categoryKey,
   categoryList,
   type Car,
   type Category,
@@ -14,7 +16,7 @@ import {
   defaultFilters,
   type Filters,
 } from "../../lib/carUtils";
-import { PRICE_STEPS } from "../../lib/carUtils";
+import { PRICE_STEPS, formatPrice } from "../../lib/carUtils";
 import CarCard from "./CarCard";
 import { SearchIcon, ChevronDown, ArrowRight } from "../icons";
 
@@ -41,7 +43,23 @@ export default function CarUniverse({
   const [filters, setFilters] = useState<Filters>(defaultFilters);
   const [sort, setSort] = useState<SortKey>("popular");
   const [page, setPage] = useState(0);
-  const [showFilters, setShowFilters] = useState(false);
+  const [showFilters, setShowFilters] = useState(true);
+  const [searchParams] = useSearchParams();
+
+  // Deep links: /explore?cat=sports, ?brand=BMW or ?q=911 preselect filters
+  useEffect(() => {
+    const cat = searchParams.get("cat");
+    if (cat && categoryList.some((c) => c.id === cat)) {
+      setActiveCat(cat as Category);
+    }
+    const brand = searchParams.get("brand");
+    if (brand) {
+      setFilters((f) => ({ ...f, brand }));
+      setActiveCat(null);
+    }
+    const q = searchParams.get("q");
+    if (q) setQuery(q);
+  }, [searchParams]);
 
   // Reset pagination whenever inputs change
   useEffect(() => {
@@ -85,6 +103,50 @@ export default function CarUniverse({
     filters.minYear > 0 ||
     filters.minHp > 0;
 
+  // Active filters as removable chips — what the search is currently doing.
+  const activeChips: { label: string; clear: () => void }[] = [];
+  if (activeCat)
+    activeChips.push({
+      label: t(lang, categoryKey(activeCat)),
+      clear: () => setActiveCat(null),
+    });
+  if (filters.brand)
+    activeChips.push({
+      label: filters.brand,
+      clear: () => setFilters({ ...filters, brand: "" }),
+    });
+  if (filters.maxPrice > 0)
+    activeChips.push({
+      label: PRICE_STEPS.find((p) => p.value === filters.maxPrice)?.label ??
+        formatPrice(filters.maxPrice, lang),
+      clear: () => setFilters({ ...filters, maxPrice: 0 }),
+    });
+  if (filters.minYear > 0)
+    activeChips.push({
+      label: `${filters.minYear}+`,
+      clear: () => setFilters({ ...filters, minYear: 0 }),
+    });
+  if (filters.minHp > 0)
+    activeChips.push({
+      label: `${filters.minHp}+ ${t(lang, "card_hp")}`,
+      clear: () => setFilters({ ...filters, minHp: 0 }),
+    });
+  if (filters.body)
+    activeChips.push({
+      label: filters.body,
+      clear: () => setFilters({ ...filters, body: "" }),
+    });
+  if (filters.fuel)
+    activeChips.push({
+      label: filters.fuel,
+      clear: () => setFilters({ ...filters, fuel: "" }),
+    });
+  if (filters.transmission)
+    activeChips.push({
+      label: filters.transmission,
+      clear: () => setFilters({ ...filters, transmission: "" }),
+    });
+
   return (
     <section
       id="explore"
@@ -122,8 +184,18 @@ export default function CarUniverse({
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder={t(lang, "search_placeholder")}
-              className="h-12 w-full border border-line bg-charcoal pl-11 pr-4 text-sm text-white placeholder:text-fog focus:border-white/30 focus:outline-none"
+              className="h-12 w-full border border-line bg-charcoal pl-11 pr-11 text-sm text-white placeholder:text-fog focus:border-accent/60 focus:outline-none"
             />
+            {query && (
+              <button
+                type="button"
+                onClick={() => setQuery("")}
+                aria-label={t(lang, "filter_clear")}
+                className="absolute right-3 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center text-fog transition-colors hover:text-white"
+              >
+                ✕
+              </button>
+            )}
           </div>
           <div className="relative w-full sm:w-64">
             <select
@@ -335,10 +407,38 @@ export default function CarUniverse({
           </label>
         </div>
 
+        {/* Active filters */}
+        {activeChips.length > 0 && (
+          <div className="mb-6 flex flex-wrap items-center gap-2">
+            {activeChips.map((chip) => (
+              <button
+                key={chip.label}
+                type="button"
+                onClick={chip.clear}
+                className="flex items-center gap-2 border border-line bg-charcoal px-3 py-1.5 text-[11px] font-semibold tracking-[0.12em] text-mist transition-colors hover:border-accent/60 hover:text-white"
+              >
+                {chip.label}
+                <span aria-hidden="true">✕</span>
+              </button>
+            ))}
+            {hasActiveFilters && (
+              <button
+                type="button"
+                onClick={clearAll}
+                className="text-[11px] font-medium tracking-[0.14em] text-fog transition-colors hover:text-accent-soft"
+              >
+                {t(lang, "filter_clear").toUpperCase()} ✕
+              </button>
+            )}
+          </div>
+        )}
+
         {/* Results count */}
         <div className="mb-6 flex items-center justify-between text-xs text-fog">
           <span>
-            {filtered.length} {t(lang, "results_showing")}
+            {filtered.length} {t(lang, "results_showing")}{" "}
+            {t(lang, "search_results_of")} {cars.length.toLocaleString()}{" "}
+            {t(lang, "universe_count")}
           </span>
         </div>
 
@@ -356,9 +456,12 @@ export default function CarUniverse({
             ))}
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center border border-line py-24 text-center">
+          <div className="flex flex-col items-center justify-center border border-line px-5 py-24 text-center">
             <p className="font-display text-2xl font-semibold text-white">
               {t(lang, "no_results")}
+            </p>
+            <p className="mt-3 max-w-md text-sm leading-relaxed text-mist">
+              {t(lang, "search_empty_hint")}
             </p>
             <button
               onClick={clearAll}

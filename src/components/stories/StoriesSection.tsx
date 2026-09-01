@@ -1,16 +1,22 @@
 import { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import { t, type Lang } from "../../lib/i18n";
 import { stories, featuredStory, storyCategories, type Story, type StoryCategory } from "../../lib/stories";
 import StoryCard from "./StoryCard";
 import StoryImage from "./StoryImage";
 import { ArrowRight, SearchIcon } from "../icons";
 
+const COMPACT_COUNT = 6;
+
 export default function StoriesSection({
   lang,
   onOpen,
+  compact = false,
 }: {
   lang: Lang;
   onOpen: (s: Story) => void;
+  /** Homepage mode: featured story + a short grid, with a link to the full news library. */
+  compact?: boolean;
 }) {
   const [category, setCategory] = useState<StoryCategory | "all">("all");
   const [query, setQuery] = useState("");
@@ -32,13 +38,16 @@ export default function StoriesSection({
 
   const featured = featuredStory;
   const hidden = stories.filter((s) => s.hidden);
+  const gridStories = compact
+    ? stories.filter((s) => !s.featured).slice(0, COMPACT_COUNT)
+    : filtered;
 
   return (
-    <section id="stories" className="relative bg-ink py-24 sm:py-32">
+    <section id="stories" className="relative bg-ink py-20 sm:py-24">
       <div className="mx-auto max-w-[1480px] px-5 sm:px-8 lg:px-16">
         {/* ---- Hero ---- */}
-        <div className="mb-16 text-center">
-          <p className="reveal mb-5 flex items-center justify-center gap-3 text-[11px] font-medium tracking-mega text-fog">
+        <div className="mb-14 flex flex-col items-center gap-6 text-center">
+          <p className="reveal mb-0 flex items-center justify-center gap-3 text-[11px] font-medium tracking-mega text-fog">
             <span className="h-px w-8 bg-accent" />
             {t(lang, "st_eyebrow")}
             <span className="h-px w-8 bg-accent" />
@@ -46,9 +55,19 @@ export default function StoriesSection({
           <h2 className="reveal font-display text-4xl font-bold leading-[1.05] tracking-tight text-white sm:text-6xl lg:text-7xl">
             {t(lang, "st_hero_title")}
           </h2>
-          <p className="reveal mx-auto mt-6 max-w-2xl text-base leading-relaxed text-mist sm:text-lg" data-delay="120">
+          <p className="reveal mx-auto mt-0 max-w-2xl text-base leading-relaxed text-mist sm:text-lg" data-delay="120">
             {t(lang, "st_hero_sub")}
           </p>
+          {compact && (
+            <Link
+              to="/news"
+              className="reveal group inline-flex items-center gap-2 text-[11px] font-semibold tracking-[0.18em] text-mist transition-colors duration-300 hover:text-white"
+              data-delay="160"
+            >
+              {t(lang, "st_view_all")}
+              <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+            </Link>
+          )}
         </div>
 
         {/* ---- Featured story ---- */}
@@ -98,57 +117,59 @@ export default function StoriesSection({
           </div>
         )}
 
-        {/* ---- Search + category filters ---- */}
-        <div className="mb-8 space-y-5">
-          <div className="reveal relative max-w-xl">
-            <SearchIcon className="pointer-events-none absolute left-4 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-fog" />
-            <input
-              type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder={t(lang, "st_search")}
-              className="h-12 w-full border border-line bg-charcoal pl-11 pr-4 text-sm text-white placeholder:text-fog focus:border-white/30 focus:outline-none"
-            />
-          </div>
+        {/* ---- Search + category filters (full library only) ---- */}
+        {!compact && (
+          <div className="mb-8 space-y-5">
+            <div className="reveal relative max-w-xl">
+              <SearchIcon className="pointer-events-none absolute left-4 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-fog" />
+              <input
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder={t(lang, "st_search")}
+                className="h-12 w-full border border-line bg-charcoal pl-11 pr-4 text-sm text-white placeholder:text-fog focus:border-white/30 focus:outline-none"
+              />
+            </div>
 
-          <div className="reveal -mx-5 overflow-x-auto px-5 pb-1 sm:mx-0 sm:px-0">
-            <div className="flex w-max gap-2">
-              <button
-                onClick={() => setCategory("all")}
-                className={`whitespace-nowrap border px-4 py-2.5 text-[11px] font-semibold tracking-[0.14em] transition-all duration-300 ${
-                  category === "all"
-                    ? "border-accent bg-accent text-white"
-                    : "border-line text-mist hover:border-white/25 hover:text-white"
-                }`}
-              >
-                {t(lang, "st_all")}
-              </button>
-              {storyCategories.map((c) => (
+            <div className="reveal -mx-5 overflow-x-auto px-5 pb-1 sm:mx-0 sm:px-0">
+              <div className="flex w-max gap-2">
                 <button
-                  key={c.id}
-                  onClick={() => setCategory(c.id)}
+                  onClick={() => setCategory("all")}
                   className={`whitespace-nowrap border px-4 py-2.5 text-[11px] font-semibold tracking-[0.14em] transition-all duration-300 ${
-                    category === c.id
+                    category === "all"
                       ? "border-accent bg-accent text-white"
                       : "border-line text-mist hover:border-white/25 hover:text-white"
                   }`}
                 >
-                  {t(lang, c.key)}
+                  {t(lang, "st_all")}
                 </button>
-              ))}
+                {storyCategories.map((c) => (
+                  <button
+                    key={c.id}
+                    onClick={() => setCategory(c.id)}
+                    className={`whitespace-nowrap border px-4 py-2.5 text-[11px] font-semibold tracking-[0.14em] transition-all duration-300 ${
+                      category === c.id
+                        ? "border-accent bg-accent text-white"
+                        : "border-line text-mist hover:border-white/25 hover:text-white"
+                    }`}
+                  >
+                    {t(lang, c.key)}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* ---- Story count + grid ---- */}
         <div className="mb-6 flex items-center justify-between text-xs text-fog">
           <span>
-            {filtered.length} {t(lang, "st_results")}
+            {compact ? stories.length : filtered.length} {t(lang, "st_results")}
           </span>
         </div>
-        {filtered.length > 0 ? (
+        {gridStories.length > 0 ? (
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {filtered.map((s, i) => (
+            {gridStories.map((s, i) => (
               <StoryCard key={s.id} story={s} lang={lang} onOpen={onOpen} index={i} />
             ))}
           </div>
@@ -160,8 +181,8 @@ export default function StoriesSection({
           </div>
         )}
 
-        {/* ---- Hidden Legends ---- */}
-        {hidden.length > 0 && (
+        {/* ---- Hidden Legends (full library only) ---- */}
+        {!compact && hidden.length > 0 && (
           <div className="mt-24">
             <div className="mb-8 text-center">
               <p className="text-[11px] font-semibold tracking-mega text-fog">

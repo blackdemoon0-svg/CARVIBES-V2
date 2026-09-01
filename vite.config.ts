@@ -17,6 +17,10 @@ export default defineConfig({
     // correctly on deep SPA routes (/car/:id) served by the Vercel rewrite.
     viteSingleFile({ overrideConfig: { base: "/" } }),
   ],
+  server: {
+    // Live-preview hosts (e.g. *.e2b.app) must be allowed to view the app.
+    allowedHosts: [".e2b.app"],
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "src"),

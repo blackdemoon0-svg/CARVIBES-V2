@@ -17,12 +17,13 @@ import LanguageScreen from "./components/LanguageScreen";
 import Navigation from "./components/Navigation";
 import Hero from "./components/Hero";
 import DiscoverSection from "./components/DiscoverSection";
+import PopularCarsSection from "./components/PopularCarsSection";
+import RankingsSection from "./components/RankingsSection";
 import StoriesSection from "./components/stories/StoriesSection";
 import StoryDetail from "./components/stories/StoryDetail";
 import FindMyCarSection from "./components/FindMyCarSection";
 import CarUniverse from "./components/universe/CarUniverse";
 import CarDetail from "./components/universe/CarDetail";
-import DailySection from "./components/DailySection";
 import FavoritesSection from "./components/favorites/FavoritesSection";
 import CompareBar from "./components/compare/CompareBar";
 import CompareModal from "./components/compare/CompareModal";
@@ -118,12 +119,18 @@ function Homepage({
         onSearch={() => setSearchOpen(true)}
       />
       <main>
-        <Hero lang={lang} onFind={() => setFinderOpen(true)} />
+        <Hero
+          lang={lang}
+          onFind={() => setFinderOpen(true)}
+          onSearch={() => setSearchOpen(true)}
+          onBrands={() => navigate("/brands")}
+        />
+        <PopularCarsSection lang={lang} onOpen={openCar} />
         <DiscoverSection lang={lang} />
-        <StoriesSection lang={lang} onOpen={openStory} />
+        <RankingsSection lang={lang} onOpen={openCar} />
+        <StoriesSection lang={lang} onOpen={openStory} compact />
         <FindMyCarSection lang={lang} onStart={() => setFinderOpen(true)} />
         <CarUniverse lang={lang} onOpen={openCar} />
-        <DailySection lang={lang} />
         <FavoritesSection
           lang={lang}
           onOpenCar={openCar}

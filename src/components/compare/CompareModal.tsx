@@ -1,33 +1,128 @@
 import { useEffect, useMemo, useState } from "react";
 import { t, type Lang } from "../../lib/i18n";
+import { cn } from "../../utils/cn";
 import { cars } from "../../lib/db";
 import type { Car } from "../../lib/cars";
 import { getCompareIds, removeFromCompare, clearCompare, addToCompare, subscribePrefs } from "../../lib/prefs";
-import { categoryWinners, rankForBattle } from "../../lib/compare";
-import { formatStat } from "../../lib/carUtils";
+import { rankForBattle } from "../../lib/compare";
+import { formatPrice, formatStat } from "../../lib/carUtils";
 import { ArrowRight, SearchIcon } from "../icons";
 
-// Rows of the comparison table
-const SPEC_ROWS: { key: string; label: string; get: (c: Car) => string }[] = [
-  { key: "price", label: "cp_price", get: (c) => (c.price > 0 ? formatStat(c.price) : "N/A") },
-  { key: "year", label: "cp_year", get: (c) => String(c.year) },
-  { key: "hp", label: "cp_hp", get: (c) => (c.hp > 0 ? `${formatStat(c.hp)} hp` : "N/A") },
-  { key: "torque", label: "cp_torque", get: (c) => (c.torque ? `${formatStat(c.torque)} Nm` : "N/A") },
-  { key: "engine", label: "cp_engine", get: (c) => c.engine },
-  { key: "trans", label: "cp_trans", get: (c) => c.transmission },
-  { key: "drive", label: "cp_drive", get: (c) => c.drivetrain || "N/A" },
-  { key: "0100", label: "cp_0100", get: (c) => (c.zeroToHundred ? `${c.zeroToHundred}s` : "N/A") },
-  { key: "top", label: "cp_top", get: (c) => (c.topSpeed ? `${formatStat(c.topSpeed)} km/h` : "N/A") },
-  { key: "weight", label: "cp_weight", get: (c) => (c.weight ? `${formatStat(c.weight)} kg` : "N/A") },
-  { key: "fuel", label: "cp_fuel", get: (c) => c.fuel },
+type GroupId = "pricing" | "engine" | "performance" | "dimensions" | "efficiency";
+
+const GROUPS: { id: GroupId; labelKey: string }[] = [
+  { id: "pricing", labelKey: "cp_group_pricing" },
+  { id: "engine", labelKey: "cp_group_engine" },
+  { id: "performance", labelKey: "cp_group_performance" },
+  { id: "dimensions", labelKey: "cp_group_dimensions" },
+  { id: "efficiency", labelKey: "cp_group_efficiency" },
 ];
 
-// Animated bar categories
-const BAR_ROWS = [
-  { key: "hp", label: "cp_hp", max: 1000, get: (c: Car) => c.hp || 0 },
-  { key: "0100", label: "cp_0100", max: 12, get: (c: Car) => c.zeroToHundred || 0, invert: true },
-  { key: "top", label: "cp_top", max: 440, get: (c: Car) => c.topSpeed || 0 },
-  { key: "torque", label: "cp_torque", max: 2000, get: (c: Car) => c.torque || 0 },
+interface CompareRow {
+  id: string;
+  labelKey: string;
+  group: GroupId;
+  get: (c: Car, lang: Lang) => string;
+  /** Raw numeric value for objective comparison — null when unavailable. */
+  num?: (c: Car) => number | null;
+  /** Whether a lower or higher value is better for this metric. */
+  better?: "lower" | "higher";
+}
+
+// Only real fields from the vehicle database. Qualitative rows (engine,
+// transmission, drivetrain, fuel) carry no `num`/`better` — they are never
+// judged. Metrics with missing values render as unavailable.
+const ROWS: CompareRow[] = [
+  // PRICING & GENERAL
+  {
+    id: "price",
+    labelKey: "cp_price",
+    group: "pricing",
+    get: (c, lang) => formatPrice(c.price, lang),
+    num: (c) => (c.price > 0 ? c.price : null),
+    better: "lower",
+  },
+  {
+    id: "year",
+    labelKey: "cp_year",
+    group: "pricing",
+    get: (c) => String(c.year),
+  },
+  {
+    id: "body",
+    labelKey: "detail_body",
+    group: "pricing",
+    get: (c) => c.body,
+  },
+  // ENGINE
+  {
+    id: "engine",
+    labelKey: "cp_engine",
+    group: "engine",
+    get: (c) => c.engine,
+  },
+  {
+    id: "hp",
+    labelKey: "cp_hp",
+    group: "engine",
+    get: (c, lang) => (c.hp > 0 ? `${formatStat(c.hp)} hp` : t(lang, "cp_na")),
+    num: (c) => (c.hp > 0 ? c.hp : null),
+    better: "higher",
+  },
+  {
+    id: "torque",
+    labelKey: "cp_torque",
+    group: "engine",
+    get: (c, lang) => (c.torque ? `${formatStat(c.torque)} Nm` : t(lang, "cp_na")),
+    num: (c) => c.torque || null,
+    better: "higher",
+  },
+  // PERFORMANCE
+  {
+    id: "zto100",
+    labelKey: "cp_0100",
+    group: "performance",
+    get: (c, lang) => (c.zeroToHundred ? `${c.zeroToHundred} s` : t(lang, "cp_na")),
+    num: (c) => c.zeroToHundred || null,
+    better: "lower",
+  },
+  {
+    id: "top",
+    labelKey: "cp_top",
+    group: "performance",
+    get: (c, lang) =>
+      c.topSpeed ? `${formatStat(c.topSpeed)} km/h` : t(lang, "cp_na"),
+    num: (c) => c.topSpeed || null,
+    better: "higher",
+  },
+  {
+    id: "trans",
+    labelKey: "cp_trans",
+    group: "performance",
+    get: (c) => c.transmission,
+  },
+  {
+    id: "drive",
+    labelKey: "cp_drive",
+    group: "performance",
+    get: (c, lang) => c.drivetrain || t(lang, "cp_na"),
+  },
+  // DIMENSIONS
+  {
+    id: "weight",
+    labelKey: "cp_weight",
+    group: "dimensions",
+    get: (c, lang) => (c.weight ? `${formatStat(c.weight)} kg` : t(lang, "cp_na")),
+    num: (c) => c.weight || null,
+    better: "lower",
+  },
+  // EFFICIENCY
+  {
+    id: "fuel",
+    labelKey: "cp_fuel",
+    group: "efficiency",
+    get: (c) => c.fuel,
+  },
 ];
 
 export default function CompareModal({
@@ -70,7 +165,51 @@ export default function CompareModal({
   }, [query, ids]);
 
   const ranked = useMemo(() => rankForBattle(selectedCars), [selectedCars]);
-  const winners = useMemo(() => categoryWinners(selectedCars), [selectedCars]);
+
+  /**
+   * Objective "best" per metric: only metrics where the value is numeric and
+   * the direction (lower/higher better) is logically valid. Missing values
+   * are excluded; ties produce no highlight.
+   * Returns rowId -> index of the single best car.
+   */
+  const bestByRow = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const row of ROWS) {
+      if (!row.num || !row.better) continue;
+      const values = selectedCars
+        .map((c, i) => ({ v: row.num!(c), i }))
+        .filter((x): x is { v: number; i: number } => x.v !== null);
+      if (values.length < 2) continue;
+      const bestValue = values.reduce((a, b) =>
+        row.better === "lower" ? (b.v < a.v ? b : a) : b.v > a.v ? b : a
+      ).v;
+      const winners = values.filter((x) => x.v === bestValue);
+      if (winners.length === 1) map.set(row.id, winners[0].i);
+    }
+    return map;
+  }, [selectedCars]);
+
+  /** Objective metric leaders, shown as compact chips (ties included). */
+  const leaders = useMemo(() => {
+    const out: { row: CompareRow; label: string; car: Car | null }[] = [];
+    for (const row of ROWS) {
+      if (!row.num || !row.better) continue;
+      const entries = selectedCars
+        .map((c) => ({ car: c, v: row.num!(c) }))
+        .filter((x): x is { car: Car; v: number } => x.v !== null);
+      if (entries.length < 2) continue;
+      const bestValue = entries.reduce((a, b) =>
+        row.better === "lower" ? (b.v < a.v ? b : a) : b.v > a.v ? b : a
+      ).v;
+      const winners = entries.filter((x) => x.v === bestValue).map((x) => x.car);
+      out.push({
+        row,
+        label: t(lang, row.labelKey),
+        car: winners.length === 1 ? winners[0] : null,
+      });
+    }
+    return out;
+  }, [selectedCars, lang]);
 
   const addCar = (id: string) => {
     const res = addToCompare(id);
@@ -117,9 +256,7 @@ export default function CompareModal({
           <h1 className="font-display text-4xl font-bold tracking-tight text-white sm:text-6xl">
             {t(lang, "cp_battle")}
           </h1>
-          <p className="mt-3 max-w-lg text-sm text-mist">
-            {t(lang, "fav_sub")}
-          </p>
+          <p className="mt-3 max-w-lg text-sm text-mist">{t(lang, "cp_intro")}</p>
 
           {/* Warning toast */}
           {warning && (
@@ -204,7 +341,7 @@ export default function CompareModal({
                 {t(lang, "cp_compare_cars")}
               </p>
               <p className="mt-3 max-w-sm text-sm text-mist">
-                {t(lang, "fav_sub")}
+                {t(lang, "cp_intro")}
               </p>
               <button
                 onClick={() => setSearchOpen(true)}
@@ -215,117 +352,135 @@ export default function CompareModal({
             </div>
           )}
 
-          {/* Comparison table */}
+          {/* Comparison */}
           {selectedCars.length > 0 && (
             <div className="mt-12">
-              {/* Head-to-head winner chips */}
-              <div className="mb-8">
-                <h2 className="mb-4 flex items-center gap-3 text-[11px] font-semibold tracking-mega text-fog">
-                  <span className="h-px w-6 bg-accent" />
-                  {t(lang, "cp_head_to_head")}
-                </h2>
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-                  {winners.map((w) => (
-                    <div key={w.key} className="border border-line bg-charcoal px-4 py-3">
-                      <p className="text-[10px] font-medium tracking-[0.16em] text-fog">
-                        {t(lang, `cp_${w.key}`).toUpperCase()}
-                      </p>
-                      <p className="mt-1 text-sm font-semibold text-white">
-                        {w.winner ? (
-                          <span className="text-accent-soft">🏆 </span>
-                        ) : (
-                          <span className="text-fog">— </span>
-                        )}
-                        {w.winner ? `${w.winner.brand} ${w.winner.model}` : "—"}
-                      </p>
-                    </div>
-                  ))}
+              {/* Objective leaders */}
+              {selectedCars.length > 1 && (
+                <div className="mb-10">
+                  <h2 className="mb-4 flex items-center gap-3 text-[11px] font-semibold tracking-mega text-fog">
+                    <span className="h-px w-6 bg-accent" />
+                    {t(lang, "cp_obj_title")}
+                  </h2>
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                    {leaders.map((l) => (
+                      <div key={l.row.id} className="border border-line bg-charcoal px-4 py-3">
+                        <p className="text-[10px] font-medium tracking-[0.16em] text-fog">
+                          {l.label.toUpperCase()}
+                        </p>
+                        <p className="mt-1 text-sm font-semibold text-white">
+                          {l.car ? (
+                            <span className="text-accent-soft">
+                              {l.car.brand} {l.car.model}
+                            </span>
+                          ) : (
+                            <span className="text-fog">{t(lang, "cp_tie")}</span>
+                          )}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="mt-3 max-w-2xl text-[11px] leading-relaxed text-fog">
+                    {t(lang, "cp_obj_sub")}
+                  </p>
                 </div>
-              </div>
+              )}
 
-              {/* Spec table */}
-              <div className="overflow-x-auto border border-line">
-                <table className="w-full min-w-[640px] border-collapse text-sm">
+              {/* Desktop: grouped comparison table */}
+              <div className="hidden overflow-hidden border border-line lg:block">
+                <table className="w-full border-collapse text-[13px]">
                   <thead>
-                    <tr className="border-b border-line">
-                      <th className="w-40 px-4 py-4 text-left text-[10px] font-semibold tracking-[0.16em] text-fog" />
+                    <tr className="border-b border-line bg-charcoal">
+                      <th className="w-44 px-4 py-4 text-left align-bottom text-[10px] font-semibold tracking-[0.16em] text-fog" />
                       {selectedCars.map((c) => (
-                        <th key={c.id} className="px-4 py-4 text-left">
+                        <th key={c.id} className="px-4 py-4 text-left align-bottom">
+                          <img src={c.image} alt={c.model} className="mb-3 h-16 w-24 object-cover" loading="lazy" />
                           <p className="font-display text-base font-bold text-white">{c.brand} {c.model}</p>
-                          <p className="text-xs font-normal text-mist">{c.year}</p>
+                          <p className="text-xs font-normal text-mist">{c.year} · {c.body}</p>
                         </th>
                       ))}
                     </tr>
                   </thead>
                   <tbody>
-                    {SPEC_ROWS.map((row, i) => (
-                      <tr key={row.key} className={`border-b border-line ${i % 2 ? "bg-charcoal/40" : ""}`}>
-                        <td className="px-4 py-3 text-[11px] font-medium tracking-[0.14em] text-mist">
-                          {t(lang, row.label)}
-                        </td>
-                        {selectedCars.map((c) => (
-                          <td key={c.id} className="px-4 py-3 font-display text-sm font-semibold text-white">
-                            {row.get(c)}
-                          </td>
-                        ))}
-                      </tr>
+                    {GROUPS.map((group) => (
+                      <GroupRows
+                        key={group.id}
+                        group={group}
+                        lang={lang}
+                        cars={selectedCars}
+                        bestByRow={bestByRow}
+                      />
                     ))}
                   </tbody>
                 </table>
               </div>
 
-              {/* Animated performance bars */}
-              <h2 className="mb-5 mt-12 flex items-center gap-3 text-[11px] font-semibold tracking-mega text-fog">
-                <span className="h-px w-6 bg-accent" />
-                {t(lang, "cp_performance").toUpperCase()}
-              </h2>
-              <div className="space-y-6">
-                {BAR_ROWS.map((bar) => {
-                  const values = selectedCars.map((c) => {
-                    const raw = bar.get(c);
-                    const pct = Math.max(4, Math.min(100, (raw / bar.max) * 100));
-                    return { car: c, raw, pct: bar.invert ? (bar.max - raw) / bar.max * 100 : pct };
-                  });
-                  return (
-                    <div key={bar.key}>
-                      <div className="mb-2 flex items-center justify-between text-[10px] font-medium tracking-[0.16em] text-fog">
-                        <span>{t(lang, bar.label).toUpperCase()}</span>
-                        <span className="flex gap-4">
-                          {values.map((v) => (
-                            <span key={v.car.id} className="text-mist">{formatStat(v.raw)}</span>
-                          ))}
-                        </span>
-                      </div>
-                      <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${selectedCars.length}, 1fr)` }}>
-                        {values.map((v, i) => (
-                          <div key={v.car.id} className="h-2 w-full bg-line">
-                            <div
-                              className="h-full bg-accent transition-all duration-1000 ease-out"
-                              style={{ width: `${v.pct}%`, opacity: 0.5 + (i === 0 ? 0.5 : 0) }}
-                            />
-                          </div>
-                        ))}
+              {/* Mobile: stacked per-vehicle cards */}
+              <div className="space-y-4 lg:hidden">
+                {selectedCars.map((car, carIndex) => (
+                  <div key={car.id} className="border border-line bg-charcoal">
+                    <div className="flex items-center gap-3 border-b border-line p-4">
+                      <img src={car.image} alt={car.model} className="h-16 w-24 shrink-0 object-cover" loading="lazy" />
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate font-display text-base font-bold text-white">
+                          {car.brand} {car.model}
+                        </p>
+                        <p className="mt-0.5 text-xs text-fog">{car.year} · {car.body}</p>
+                        <p className="mt-1 font-display text-sm font-semibold text-white">
+                          {formatPrice(car.price, lang)}
+                        </p>
                       </div>
                     </div>
-                  );
-                })}
+                    <dl className="divide-y divide-line">
+                      {ROWS.map((row) => {
+                        const isBest = bestByRow.get(row.id) === carIndex;
+                        const value = row.get(car, lang);
+                        const unavailable = value === t(lang, "cp_na");
+                        return (
+                          <div key={row.id} className="flex items-baseline justify-between gap-3 px-4 py-2.5">
+                            <dt className="text-[12px] text-fog">{t(lang, row.labelKey)}</dt>
+                            <dd
+                              className={cn(
+                                "text-right text-[12px] font-semibold",
+                                unavailable ? "italic text-fog" : "text-white",
+                                isBest && "text-accent-soft"
+                              )}
+                            >
+                              {value}
+                              {isBest && (
+                                <span className="ml-1.5 text-[8px] font-bold tracking-[0.14em] text-accent-soft">
+                                  {t(lang, "cp_best")}
+                                </span>
+                              )}
+                            </dd>
+                          </div>
+                        );
+                      })}
+                    </dl>
+                  </div>
+                ))}
               </div>
 
-              {/* Winner */}
-              <div className="mt-16 border border-line bg-charcoal p-6 sm:p-10">
+              {/* Editorial CarVibes score (clearly labelled, not an objective verdict) */}
+              <div className="mt-12 border border-line bg-charcoal p-6 sm:p-10">
                 <h2 className="mb-6 flex items-center gap-3 text-[11px] font-semibold tracking-mega text-accent">
                   <span className="h-px w-6 bg-accent" />
-                  {t(lang, "cp_winner").toUpperCase()}
+                  {t(lang, "detail_score").toUpperCase()}
                 </h2>
 
                 {!revealed ? (
-                  <button
-                    onClick={handleReveal}
-                    className="group inline-flex h-14 items-center gap-3 bg-accent px-9 text-[12px] font-semibold tracking-[0.2em] text-white transition-colors hover:bg-accent-soft"
-                  >
-                    {t(lang, "cp_winner_revealed")}
-                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                  </button>
+                  <div>
+                    <button
+                      onClick={handleReveal}
+                      className="group inline-flex h-14 items-center gap-3 bg-accent px-9 text-[12px] font-semibold tracking-[0.2em] text-white transition-colors hover:bg-accent-soft"
+                    >
+                      {t(lang, "cp_winner_revealed")}
+                      <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    </button>
+                    <p className="mt-4 max-w-2xl text-[11px] leading-relaxed text-fog">
+                      {t(lang, "cp_score_note")}
+                    </p>
+                  </div>
                 ) : (
                   <div className="space-y-4">
                     {ranked.map((r, i) => (
@@ -355,6 +510,9 @@ export default function CompareModal({
                         </div>
                       </div>
                     ))}
+                    <p className="max-w-2xl text-[11px] leading-relaxed text-fog">
+                      {t(lang, "cp_score_note")}
+                    </p>
                   </div>
                 )}
               </div>
@@ -363,5 +521,61 @@ export default function CompareModal({
         </div>
       </div>
     </div>
+  );
+}
+
+/** One group: a full-width group header row + its metric rows. */
+function GroupRows({
+  group,
+  lang,
+  cars,
+  bestByRow,
+}: {
+  group: { id: GroupId; labelKey: string };
+  lang: Lang;
+  cars: Car[];
+  bestByRow: Map<string, number>;
+}) {
+  const rows = ROWS.filter((r) => r.group === group.id);
+  return (
+    <>
+      <tr className="border-b border-line bg-graphite">
+        <td
+          colSpan={cars.length + 1}
+          className="px-4 py-2.5 text-[10px] font-semibold tracking-[0.2em] text-white"
+        >
+          {t(lang, group.labelKey)}
+        </td>
+      </tr>
+      {rows.map((row, i) => (
+        <tr key={row.id} className={`border-b border-line ${i % 2 ? "bg-charcoal/40" : ""}`}>
+          <td className="px-4 py-3 text-[11px] font-medium tracking-[0.14em] text-mist">
+            {t(lang, row.labelKey)}
+          </td>
+          {cars.map((c, carIndex) => {
+            const isBest = bestByRow.get(row.id) === carIndex;
+            const value = row.get(c, lang);
+            const unavailable = value === t(lang, "cp_na");
+            return (
+              <td
+                key={c.id}
+                className={cn(
+                  "px-4 py-3 font-display text-sm font-semibold",
+                  unavailable ? "italic text-fog" : "text-white",
+                  isBest && "bg-accent/10 text-accent-soft"
+                )}
+              >
+                {value}
+                {isBest && (
+                  <span className="ml-1.5 align-middle text-[8px] font-bold tracking-[0.14em] text-accent-soft">
+                    {t(lang, "cp_best")}
+                  </span>
+                )}
+              </td>
+            );
+          })}
+        </tr>
+      ))}
+    </>
   );
 }
