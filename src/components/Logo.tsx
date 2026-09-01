@@ -34,12 +34,12 @@ export function Logo({
   compact?: boolean;
 }) {
   return (
-    <div className={cn("flex items-center gap-2.5", className)}>
-      <LogoMark className="h-7 w-7 shrink-0 text-white" />
+    <div className={cn("flex items-center gap-2 sm:gap-2.5", className)}>
+      <LogoMark className="h-6 w-6 shrink-0 text-white sm:h-7 sm:w-7" />
       <span
         className={cn(
           "font-display font-extrabold tracking-[0.08em] text-white select-none",
-          compact ? "text-xl" : "text-2xl"
+          compact ? "text-xl" : "text-xl sm:text-2xl"
         )}
         style={{ letterSpacing: "0.08em" }}
       >

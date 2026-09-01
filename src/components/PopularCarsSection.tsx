@@ -71,7 +71,7 @@ export default function PopularCarsSection({
                     imgClassName="transition-transform duration-[1100ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.07]"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-ink/60 via-transparent to-transparent" />
-                  <span className="absolute left-3 top-3 border border-white/15 bg-ink/50 px-2.5 py-1 text-[9px] font-semibold tracking-[0.2em] text-white backdrop-blur-sm">
+                  <span className="absolute left-3 top-3 border border-white/15 bg-ink/50 px-2.5 py-1 text-[10px] font-semibold tracking-[0.2em] text-white backdrop-blur-sm">
                     {t(lang, categoryKey(car.categories[0]))}
                   </span>
                   <span className="absolute right-3 top-3 font-display text-sm font-bold text-white/70">

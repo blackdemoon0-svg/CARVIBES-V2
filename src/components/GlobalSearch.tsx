@@ -79,6 +79,15 @@ export default function GlobalSearch({
 
   return (
     <div className="fixed inset-0 z-[58] overflow-y-auto bg-ink/95 backdrop-blur-xl" onClick={onClose}>
+      {/* Always-visible close on mobile (and keyboard users) */}
+      <button
+        type="button"
+        onClick={onClose}
+        aria-label={t(lang, "detail_close")}
+        className="fixed right-4 top-4 z-10 flex h-10 w-10 items-center justify-center border border-line bg-charcoal/80 text-fog backdrop-blur-sm transition-colors hover:border-white/30 hover:text-white"
+      >
+        ✕
+      </button>
       <div className="mx-auto max-w-2xl px-5 pt-24 sm:pt-28" onClick={(e) => e.stopPropagation()}>
         {/* Search field */}
         <div className="relative">

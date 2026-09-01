@@ -247,7 +247,7 @@ export default function CompareModal({
                   {t(lang, "cp_clear")}
                 </button>
               )}
-              <span className="font-display text-sm font-semibold tracking-[0.18em] text-fog">
+              <span className="hidden font-display text-sm font-semibold tracking-[0.18em] text-fog md:inline">
                 {t(lang, "cp_battle").toUpperCase()}
               </span>
             </div>
@@ -472,7 +472,7 @@ export default function CompareModal({
                   <div>
                     <button
                       onClick={handleReveal}
-                      className="group inline-flex h-14 items-center gap-3 bg-accent px-9 text-[12px] font-semibold tracking-[0.2em] text-white transition-colors hover:bg-accent-soft"
+                      className="group flex h-14 w-full items-center justify-center gap-3 bg-accent px-6 text-[12px] font-semibold tracking-[0.2em] text-white transition-colors hover:bg-accent-soft sm:inline-flex sm:w-auto sm:px-9"
                     >
                       {t(lang, "cp_winner_revealed")}
                       <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />

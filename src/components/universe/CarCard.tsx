@@ -35,7 +35,7 @@ export default function CarCard({
         <div className="absolute inset-0 bg-accent/0 transition-colors duration-700 group-hover:bg-accent/10" />
 
         {/* Category tag */}
-        <span className="absolute left-4 top-4 border border-white/15 bg-ink/50 px-2.5 py-1 text-[9px] font-semibold tracking-[0.2em] text-white backdrop-blur-sm">
+        <span className="absolute left-4 top-4 border border-white/15 bg-ink/50 px-2.5 py-1 text-[10px] font-semibold tracking-[0.2em] text-white backdrop-blur-sm">
           {t(lang, categoryKey(car.categories[0]))}
         </span>
       </div>
@@ -55,11 +55,11 @@ export default function CarCard({
         </p>
 
         {/* Price + stats */}
-        <div className="mt-3 flex items-center justify-between border-t border-line pt-3">
-          <span className="text-sm font-semibold tracking-tight text-white">
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-x-2 gap-y-1 border-t border-line pt-3 sm:gap-x-4">
+          <span className="min-w-0 text-sm font-semibold tracking-tight text-white">
             {formatPrice(car.price, lang)}
           </span>
-          <div className="flex items-center gap-4 text-xs text-fog">
+          <div className="flex flex-wrap items-center gap-2 text-xs text-fog sm:gap-4">
             <span className="flex items-baseline gap-1">
               <span className="font-semibold text-white">{formatStat(car.hp)}</span>
               {t(lang, "card_hp")}
