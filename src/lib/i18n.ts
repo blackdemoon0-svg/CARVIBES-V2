@@ -384,6 +384,17 @@ const fr: Dict = {
   cp_comfort: "CONFORT",
   cp_tech: "TECHNOLOGIE",
   cp_na: "N/D",
+  cp_intro: "Comparez jusqu'à 3 véhicules côte à côte sur leurs spécifications réelles.",
+  cp_group_pricing: "PRIX & GÉNÉRAL",
+  cp_group_engine: "MOTEUR",
+  cp_group_performance: "PERFORMANCES",
+  cp_group_dimensions: "DIMENSIONS",
+  cp_group_efficiency: "EFFICACITÉ",
+  cp_obj_title: "MEILLEURE VALEUR PAR MÉTRIQUE",
+  cp_obj_sub: "Seules les caractéristiques objectivement comparables sont classées. Les détails qualitatifs (moteur, carburant, boîte, transmission) sont affichés sans jugement.",
+  cp_best: "MEILLEUR",
+  cp_tie: "ÉGALITÉ",
+  cp_score_note: "Index éditorial CarVibes basé sur la formule de notation du site — pas un verdict objectif. Voir le tableau ci-dessus pour les comparaisons objectives.",
   cp_saved: "ENREGISTRÉ",
   cp_save: "ENREGISTRER",
 
@@ -766,6 +777,20 @@ const en: Dict = {
   cp_comfort: "COMFORT",
   cp_tech: "TECHNOLOGY",
   cp_na: "N/A",
+  cp_intro:
+    "Compare up to 3 vehicles side by side on their real specifications.",
+  cp_group_pricing: "PRICING & GENERAL",
+  cp_group_engine: "ENGINE",
+  cp_group_performance: "PERFORMANCE",
+  cp_group_dimensions: "DIMENSIONS",
+  cp_group_efficiency: "EFFICIENCY",
+  cp_obj_title: "BEST VALUE PER METRIC",
+  cp_obj_sub:
+    "Only objectively comparable specs are ranked. Qualitative details (engine, fuel type, transmission, drivetrain) are shown without judgment.",
+  cp_best: "BEST",
+  cp_tie: "TIE",
+  cp_score_note:
+    "CarVibes' editorial index built from the site's own scoring formula — not an objective verdict. See the table above for objective spec comparisons.",
   cp_saved: "SAVED",
   cp_save: "SAVE",
 
@@ -1145,6 +1170,20 @@ const es: Dict = {
   cp_comfort: "CONFORT",
   cp_tech: "TECNOLOGÍA",
   cp_na: "N/D",
+  cp_intro:
+    "Compara hasta 3 vehículos lado a lado según sus especificaciones reales.",
+  cp_group_pricing: "PRECIO & GENERAL",
+  cp_group_engine: "MOTOR",
+  cp_group_performance: "RENDIMIENTO",
+  cp_group_dimensions: "DIMENSIONES",
+  cp_group_efficiency: "EFICIENCIA",
+  cp_obj_title: "MEJOR VALOR POR MÉTRICA",
+  cp_obj_sub:
+    "Solo se clasifican las especificaciones objetivamente comparables. Los detalles cualitativos (motor, combustible, caja, tracción) se muestran sin juicio.",
+  cp_best: "MEJOR",
+  cp_tie: "EMPATE",
+  cp_score_note:
+    "Índice editorial de CarVibes basado en la fórmula de puntuación del sitio, no un veredicto objetivo. Consulta la tabla para comparaciones objetivas.",
   cp_saved: "GUARDADO",
   cp_save: "GUARDAR",
 
