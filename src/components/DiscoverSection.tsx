@@ -1,85 +1,120 @@
+import { useMemo } from "react";
+import { Link } from "react-router-dom";
 import { t, type Lang } from "../lib/i18n";
-import { categories } from "../lib/data";
+import { cars, allBrands } from "../lib/db";
+import { stories } from "../lib/stories";
+import { categoryList } from "../lib/cars";
 import { ArrowRight } from "./icons";
 
+const BRAND_LIMIT = 8;
+
 export default function DiscoverSection({ lang }: { lang: Lang }) {
-  const names: Record<string, string> = {
-    sport: t(lang, "cat_sport"),
-    luxury: t(lang, "cat_luxury"),
-    everyday: t(lang, "cat_everyday"),
-  };
-  const descs: Record<string, string> = {
-    sport: t(lang, "cat_sport_desc"),
-    luxury: t(lang, "cat_luxury_desc"),
-    everyday: t(lang, "cat_everyday_desc"),
-  };
+  // Real counts derived from the live database — never hardcoded.
+  const categoryCounts = useMemo(
+    () =>
+      new Map(
+        categoryList.map((cat) => [
+          cat.id,
+          cars.filter((c) => c.categories.includes(cat.id)).length,
+        ])
+      ),
+    []
+  );
+
+  const topBrands = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const c of cars) counts.set(c.brand, (counts.get(c.brand) ?? 0) + 1);
+    return [...counts.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, BRAND_LIMIT);
+  }, []);
 
   return (
-    <section id="discover" className="relative bg-ink py-24 sm:py-32">
+    <section id="discover" className="relative border-t border-line bg-ink py-20 sm:py-24">
       <div className="mx-auto max-w-[1480px] px-5 sm:px-8 lg:px-16">
         {/* Heading */}
-        <div className="mb-14 flex flex-col gap-6 sm:mb-20 sm:flex-row sm:items-end sm:justify-between">
+        <div className="mb-12 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
           <div>
             <p className="reveal mb-4 flex items-center gap-3 text-[11px] font-medium tracking-mega text-fog">
               <span className="h-px w-8 bg-accent" />
-              {t(lang, "discover_eyebrow")}
+              {t(lang, "browse_eyebrow")}
             </p>
             <h2 className="reveal font-display text-4xl font-bold leading-[1.05] tracking-tight text-white sm:text-6xl">
-              {t(lang, "discover_title")}
+              {t(lang, "browse_title")}
             </h2>
           </div>
           <p
-            className="reveal max-w-xs text-sm leading-relaxed text-mist"
+            className="reveal max-w-md text-sm leading-relaxed text-mist"
             data-delay="150"
           >
-            {t(lang, "discover_sub")}
+            {t(lang, "browse_sub")}{" "}
+            <span className="text-white/80">
+              {cars.length.toLocaleString()} {t(lang, "browse_cars")} ·{" "}
+              {allBrands.length} {t(lang, "stat_brands").toLowerCase()} ·{" "}
+              {stories.length} {t(lang, "stat_stories").toLowerCase()} ·{" "}
+              {categoryList.length}{" "}
+              {t(lang, "stat_categories").toLowerCase()}
+            </span>
           </p>
         </div>
 
-        {/* Cards */}
-        <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
-          {categories.map((cat, i) => (
-            <a
+        {/* Categories */}
+        <div className="mb-4 flex items-center gap-3">
+          <span className="h-px w-8 bg-accent" />
+          <span className="text-[11px] font-semibold tracking-mega text-fog">
+            {t(lang, "browse_categories")}
+          </span>
+        </div>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+          {categoryList.map((cat, i) => (
+            <Link
               key={cat.id}
-              href="#explore"
-              className="reveal edge-light group relative block h-[62vh] min-h-[420px] cursor-pointer overflow-hidden border border-line bg-charcoal transition-all duration-500 hover:border-white/25 hover:shadow-[0_40px_80px_-30px_rgba(0,0,0,0.95)] sm:h-[68vh]"
-              data-delay={i * 130}
+              to={`/explore?cat=${cat.id}`}
+              className="reveal edge-light group flex items-center justify-between gap-3 border border-line bg-charcoal px-5 py-5 transition-all duration-300 hover:border-white/25 hover:bg-graphite"
+              data-delay={i * 50}
             >
-              {/* Image */}
-              <img
-                src={cat.image}
-                alt={cat.alt}
-                loading="lazy"
-                decoding="async"
-                className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.07]"
-              />
-              {/* Lighting + legibility */}
-              <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/25 to-transparent opacity-90 transition-opacity duration-700 group-hover:opacity-100" />
-              <div className="absolute inset-0 bg-accent/0 transition-colors duration-700 group-hover:bg-accent/10" />
-
-              {/* Index number */}
-              <span className="absolute right-5 top-5 font-display text-sm font-semibold text-white/40 transition-colors duration-500 group-hover:text-white">
-                {cat.number}
-              </span>
-
-              {/* Bottom content */}
-              <div className="absolute inset-x-0 bottom-0 p-6 sm:p-8">
-                <h3 className="font-display text-4xl font-bold tracking-tight text-white transition-transform duration-500 ease-out group-hover:-translate-y-1.5 sm:text-5xl">
-                  {names[cat.id]}
-                </h3>
-                <p className="mt-2 max-w-[90%] text-sm text-mist opacity-0 transition-all duration-500 ease-out group-hover:translate-y-0 group-hover:opacity-100 group-focus:opacity-100">
-                  {descs[cat.id]}
+              <div className="min-w-0">
+                <p className="truncate font-display text-lg font-semibold text-white transition-colors duration-300 group-hover:text-accent-soft sm:text-xl">
+                  {t(lang, cat.key)}
                 </p>
-
-                <div className="mt-5 flex items-center gap-2 text-[11px] font-semibold tracking-[0.18em] text-white">
-                  <span className="translate-x-0 transition-transform duration-500 group-hover:translate-x-0">
-                    {t(lang, "cat_view")}
-                  </span>
-                  <ArrowRight className="h-4 w-4 -translate-x-1 opacity-0 transition-all duration-500 group-hover:translate-x-0 group-hover:opacity-100" />
-                  <span className="h-px w-0 bg-accent transition-all duration-500 group-hover:w-8" />
-                </div>
+                <p className="mt-1 text-xs text-fog">
+                  {categoryCounts.get(cat.id)} {t(lang, "browse_cars")}
+                </p>
               </div>
-            </a>
+              <ArrowRight className="h-4 w-4 shrink-0 text-fog transition-all duration-300 group-hover:translate-x-1 group-hover:text-accent-soft" />
+            </Link>
+          ))}
+        </div>
+
+        {/* Popular brands */}
+        <div className="mt-14 mb-4 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <span className="h-px w-8 bg-accent" />
+            <span className="text-[11px] font-semibold tracking-mega text-fog">
+              {t(lang, "browse_brands")}
+            </span>
+          </div>
+          <Link
+            to="/brands"
+            className="group flex items-center gap-1.5 text-[11px] font-semibold tracking-[0.16em] text-mist transition-colors duration-300 hover:text-white"
+          >
+            {t(lang, "browse_all_brands")}
+            <ArrowRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-1" />
+          </Link>
+        </div>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {topBrands.map(([brand, count], i) => (
+            <Link
+              key={brand}
+              to={`/explore?brand=${encodeURIComponent(brand)}`}
+              className="reveal edge-light group flex items-center justify-between gap-3 border border-line bg-charcoal px-4 py-4 transition-all duration-300 hover:border-white/25 hover:bg-graphite"
+              data-delay={i * 50}
+            >
+              <p className="truncate font-display text-base font-semibold text-white transition-colors duration-300 group-hover:text-accent-soft">
+                {brand}
+              </p>
+              <span className="shrink-0 text-xs text-fog">{count}</span>
+            </Link>
           ))}
         </div>
       </div>

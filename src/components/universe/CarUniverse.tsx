@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { t, type Lang } from "../../lib/i18n";
 import {
   categoryList,
@@ -42,6 +43,20 @@ export default function CarUniverse({
   const [sort, setSort] = useState<SortKey>("popular");
   const [page, setPage] = useState(0);
   const [showFilters, setShowFilters] = useState(false);
+  const [searchParams] = useSearchParams();
+
+  // Deep links: /explore?cat=sports or /explore?brand=BMW preselect filters
+  useEffect(() => {
+    const cat = searchParams.get("cat");
+    if (cat && categoryList.some((c) => c.id === cat)) {
+      setActiveCat(cat as Category);
+    }
+    const brand = searchParams.get("brand");
+    if (brand) {
+      setFilters((f) => ({ ...f, brand }));
+      setActiveCat(null);
+    }
+  }, [searchParams]);
 
   // Reset pagination whenever inputs change
   useEffect(() => {

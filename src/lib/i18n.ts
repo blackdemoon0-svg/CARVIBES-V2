@@ -33,15 +33,39 @@ const fr: Dict = {
   hero_title_1: "LE MONDE DES VOITURES,",
   hero_title_2: "RÉINVENTÉ.",
   hero_sub:
-    "Découvrez des voitures d'exception, des histoires légendaires et les machines qui définissent la culture automobile.",
+    "Une véritable base de données automobile : voitures réelles, marques, catégories, histoires et classements, tout au même endroit.",
   hero_explore: "EXPLORER LES VOITURES",
+  hero_search_placeholder:
+    "Rechercher une voiture, une marque ou une catégorie…",
+  hero_brands: "EXPLORER LES MARQUES",
   hero_find: "TROUVER MA VOITURE",
   hero_story: "DÉCOUVRIR UNE HISTOIRE",
 
   stat_cars: "VOITURES",
   stat_brands: "MARQUES",
   stat_stories: "HISTOIRES",
+  stat_categories: "CATÉGORIES",
   scroll_hint: "DÉFILER POUR DÉCOUVRIR",
+
+  browse_eyebrow: "LA BASE DE DONNÉES",
+  browse_title: "PARCOUREZ LA BASE AUTOMOBILE",
+  browse_sub: "Tous les contenus proviennent de données structurées réelles.",
+  browse_categories: "CATÉGORIES",
+  browse_brands: "MARQUES POPULAIRES",
+  browse_all_brands: "TOUTES LES MARQUES",
+  browse_cars: "voitures",
+
+  popular_eyebrow: "SÉLECTION POPULAIRE",
+  popular_title: "VOITURES POPULAIRES",
+  popular_sub:
+    "Les machines les plus recherchées de la base, classées par popularité.",
+  popular_view_all: "VOIR TOUTES LES VOITURES",
+
+  rank_eyebrow: "CLASSEMENTS",
+  rank_title: "LE CLASSEMENT CARVIBES",
+  rank_sub:
+    "Un score de 0 à 100 calculé à partir des caractéristiques réelles : performance, valeur, fiabilité, confort et technologie.",
+  rank_count: "voitures classées",
 
   discover_eyebrow: "LA COLLECTION",
   discover_title: "DÉCOUVREZ VOTRE PROCHAINE VOITURE",
@@ -267,6 +291,7 @@ const fr: Dict = {
   st_sound_on: "SON ACTIVÉ",
   st_sound_off: "SON COUPÉ",
   st_results: "histoires",
+  st_view_all: "VOIR TOUS LES ARTICLES",
 
   st_cat_legends: "LÉGENDES",
   st_cat_creators: "CRÉATEURS",
@@ -347,15 +372,39 @@ const en: Dict = {
   hero_title_1: "THE WORLD OF CARS,",
   hero_title_2: "REIMAGINED.",
   hero_sub:
-    "Discover extraordinary cars, legendary stories and the machines that define automotive culture.",
+    "A real automotive knowledge base: genuine cars, brands, categories, stories and rankings — all in one place.",
   hero_explore: "EXPLORE CARS",
+  hero_search_placeholder:
+    "Search a car, brand or category…",
+  hero_brands: "EXPLORE BRANDS",
   hero_find: "FIND MY CAR",
   hero_story: "DISCOVER A STORY",
 
   stat_cars: "CARS",
   stat_brands: "BRANDS",
   stat_stories: "STORIES",
+  stat_categories: "CATEGORIES",
   scroll_hint: "SCROLL TO DISCOVER",
+
+  browse_eyebrow: "THE DATABASE",
+  browse_title: "BROWSE THE AUTOMOTIVE DATABASE",
+  browse_sub: "Every entry comes from real, structured data.",
+  browse_categories: "CATEGORIES",
+  browse_brands: "POPULAR BRANDS",
+  browse_all_brands: "ALL BRANDS",
+  browse_cars: "cars",
+
+  popular_eyebrow: "MOST SOUGHT-AFTER",
+  popular_title: "POPULAR CARS",
+  popular_sub:
+    "The most-wanted machines in the database, ranked by popularity.",
+  popular_view_all: "VIEW ALL CARS",
+
+  rank_eyebrow: "RANKINGS",
+  rank_title: "THE CARVIBES RANKING",
+  rank_sub:
+    "A 0–100 score built from real specifications: performance, value, reliability, comfort and technology.",
+  rank_count: "ranked cars",
 
   discover_eyebrow: "THE COLLECTION",
   discover_title: "DISCOVER YOUR NEXT CAR",
@@ -583,6 +632,7 @@ const en: Dict = {
   st_sound_on: "SOUND ON",
   st_sound_off: "SOUND OFF",
   st_results: "stories",
+  st_view_all: "VIEW ALL ARTICLES",
 
   st_cat_legends: "LEGENDS",
   st_cat_creators: "CREATORS",
@@ -664,15 +714,39 @@ const es: Dict = {
   hero_title_1: "EL MUNDO DE LOS COCHES,",
   hero_title_2: "REIMAGINADO.",
   hero_sub:
-    "Descubre coches extraordinarios, historias legendarias y las máquinas que definen la cultura del automóvil.",
+    "Una base de conocimiento automotriz real: coches, marcas, categorías, historias y rankings, todo en un solo lugar.",
   hero_explore: "EXPLORAR COCHES",
+  hero_search_placeholder:
+    "Busca un coche, una marca o una categoría…",
+  hero_brands: "EXPLORAR MARCAS",
   hero_find: "ENCONTRAR MI COCHE",
   hero_story: "DESCUBRIR UNA HISTORIA",
 
   stat_cars: "COCHES",
   stat_brands: "MARCAS",
   stat_stories: "HISTORIAS",
+  stat_categories: "CATEGORÍAS",
   scroll_hint: "DESPLÁZATE PARA DESCUBRIR",
+
+  browse_eyebrow: "LA BASE DE DATOS",
+  browse_title: "EXPLORA LA BASE AUTOMOTRIZ",
+  browse_sub: "Cada entrada proviene de datos reales y estructurados.",
+  browse_categories: "CATEGORÍAS",
+  browse_brands: "MARCAS POPULARES",
+  browse_all_brands: "TODAS LAS MARCAS",
+  browse_cars: "coches",
+
+  popular_eyebrow: "LOS MÁS BUSCADOS",
+  popular_title: "COCHES POPULARES",
+  popular_sub:
+    "Las máquinas más deseadas de la base de datos, ordenadas por popularidad.",
+  popular_view_all: "VER TODOS LOS COCHES",
+
+  rank_eyebrow: "CLASIFICACIONES",
+  rank_title: "EL RANKING CARVIBES",
+  rank_sub:
+    "Una puntuación de 0 a 100 basada en especificaciones reales: rendimiento, valor, fiabilidad, confort y tecnología.",
+  rank_count: "coches clasificados",
 
   discover_eyebrow: "LA COLECCIÓN",
   discover_title: "DESCUBRE TU PRÓXIMO COCHE",
@@ -898,6 +972,7 @@ const es: Dict = {
   st_sound_on: "SONIDO ACTIVADO",
   st_sound_off: "SONIDO APAGADO",
   st_results: "historias",
+  st_view_all: "VER TODOS LOS ARTÍCULOS",
 
   st_cat_legends: "LEYENDAS",
   st_cat_creators: "CREADORES",
