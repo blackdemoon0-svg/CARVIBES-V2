@@ -98,14 +98,6 @@ export function YouTubeIcon({ className }: IconProps) {
   );
 }
 
-export function TikTokIcon({ className }: IconProps) {
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
-      <path d="M19.32 5.29a4.9 4.9 0 0 1-1.16-3.29h-3.34v13.22a2.84 2.84 0 1 1-2.84-2.84c.3 0 .59.05.85.13V9.1a6.26 6.26 0 0 0-.85-.06 6.15 6.15 0 1 0 6.15 6.15V9.56a8.12 8.12 0 0 0 4.75 1.52V7.74a4.92 4.92 0 0 1-3.56-2.45Z" />
-    </svg>
-  );
-}
-
 export function InstagramIcon({ className }: IconProps) {
   return (
     <svg

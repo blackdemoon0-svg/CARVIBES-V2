@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { cn } from "../utils/cn";
 import { LANGS, t, type Lang } from "../lib/i18n";
+import { useBodyScrollLock } from "../lib/useOverlay";
 import { Logo } from "./Logo";
 import { SearchIcon, GlobeIcon, ChevronDown, ArrowRight } from "./icons";
 
@@ -88,12 +89,8 @@ export default function Navigation({
     return () => window.removeEventListener("click", close);
   }, []);
 
-  useEffect(() => {
-    document.body.style.overflow = mobileOpen ? "hidden" : "";
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [mobileOpen]);
+  // Lock the page behind the mobile menu while it is open.
+  useBodyScrollLock(mobileOpen);
 
   // Scroll to the homepage section named by the URL hash (e.g. /#rankings).
   // React Router does not scroll to hash anchors by itself, so this runs after

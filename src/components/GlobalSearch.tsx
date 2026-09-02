@@ -4,8 +4,9 @@ import { t, type Lang } from "../lib/i18n";
 import { cars } from "../lib/db";
 import { stories } from "../lib/stories";
 import { applySearch, formatPrice } from "../lib/carUtils";
-import { categoryKey, categoryList, type Car, type Category } from "../lib/cars";
+import { categoryKey, categoryList, type Car } from "../lib/cars";
 import type { Story } from "../lib/stories";
+import { useOverlay } from "../lib/useOverlay";
 import { ArrowRight, SearchIcon } from "./icons";
 
 const MAX_CARS = 8;
@@ -26,21 +27,16 @@ export default function GlobalSearch({
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    document.body.style.overflow = "hidden";
-    inputRef.current?.focus();
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
-    window.addEventListener("keydown", onKey);
-    return () => {
-      document.body.style.overflow = "";
-      window.removeEventListener("keydown", onKey);
-    };
-  }, [onClose]);
+  useOverlay(onClose);
 
-  // Real quick-search suggestions pulled from the database.
+  // Move focus into the search field as soon as the overlay opens.
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
+
+  // Real quick-search suggestions pulled from the database. They only
+  // depend on the (static) dataset, so they are computed once.
   const suggestions = useMemo(() => {
-    if (query.trim().length >= 2)
-      return { brands: [] as string[], cats: [] as { id: Category; key: string }[] };
     const counts = new Map<string, number>();
     for (const c of cars) counts.set(c.brand, (counts.get(c.brand) ?? 0) + 1);
     const brands = [...counts.entries()]
@@ -49,7 +45,7 @@ export default function GlobalSearch({
       .map(([brand]) => brand);
     const cats = categoryList.slice(0, 4).map((c) => ({ id: c.id, key: c.key }));
     return { brands, cats };
-  }, [query]);
+  }, []);
 
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -78,7 +74,13 @@ export default function GlobalSearch({
   const clear = () => setQuery("");
 
   return (
-    <div className="fixed inset-0 z-[58] overflow-y-auto bg-ink/95 backdrop-blur-xl" onClick={onClose}>
+    <div
+      className="fixed inset-0 z-[58] overflow-y-auto bg-ink/95 backdrop-blur-xl"
+      role="dialog"
+      aria-modal="true"
+      aria-label={t(lang, "nav_search")}
+      onClick={onClose}
+    >
       {/* Always-visible close on mobile (and keyboard users) */}
       <button
         type="button"
@@ -101,6 +103,7 @@ export default function GlobalSearch({
               if (e.key === "Enter" && showPanel) viewAll();
             }}
             placeholder={t(lang, "search_placeholder")}
+            aria-label={t(lang, "search_placeholder")}
             className="h-14 w-full border border-line bg-charcoal pl-12 pr-12 text-base text-white placeholder:text-fog focus:border-accent focus:outline-none"
           />
           {query && (

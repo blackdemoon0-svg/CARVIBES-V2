@@ -103,24 +103,6 @@ export function applySort(list: Car[], sort: SortKey): Car[] {
   }
 }
 
-/** Find similar cars: share a category, then sort by closeness of hp. */
-export function similarCars(all: Car[], car: Car, limit = 3): Car[] {
-  return all
-    .filter((c) => c.id !== car.id)
-    .map((c) => {
-      const shared = c.categories.filter((x) => car.categories.includes(x)).length;
-      return { car: c, shared };
-    })
-    .filter((x) => x.shared > 0)
-    .sort(
-      (a, b) =>
-        b.shared - a.shared ||
-        Math.abs(a.car.hp - car.hp) - Math.abs(b.car.hp - car.hp)
-    )
-    .slice(0, limit)
-    .map((x) => x.car);
-}
-
 /**
  * Smart recommendations — "You may also like".
  * Scores by brand, category, body type, price band and horsepower band,
