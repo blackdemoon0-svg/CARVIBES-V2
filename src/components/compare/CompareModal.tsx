@@ -271,7 +271,7 @@ export default function CompareModal({
           <div className="mt-8 flex flex-wrap items-center gap-3">
             {selectedCars.map((car) => (
               <div key={car.id} className="group relative flex items-center gap-3 border border-line bg-charcoal pl-3 pr-2 py-2">
-                <img src={car.image} alt={car.model} className="h-12 w-16 object-cover" />
+                <img src={car.image} alt={car.model} className="h-12 w-16 object-cover"  decoding="async" onError={(e) => { (e.currentTarget as HTMLImageElement).onerror = null; (e.currentTarget as HTMLImageElement).src = "https://images.pexels.com/photos/261985/pexels-photo-261985.jpeg?auto=compress&cs=tinysrgb&fit=crop&w=200&h=140"; }} />
                 <div className="pr-1">
                   <p className="text-sm font-semibold text-white">{car.brand} {car.model}</p>
                   <p className="text-[11px] text-fog">{car.year}</p>
@@ -322,7 +322,7 @@ export default function CompareModal({
                       onClick={() => addCar(c.id)}
                       className="flex items-center gap-3 border border-line bg-ink px-3 py-2 text-left transition-colors hover:border-accent"
                     >
-                      <img src={c.image} alt={c.model} className="h-10 w-14 object-cover" loading="lazy" />
+                      <img src={c.image} alt={c.model} className="h-10 w-14 object-cover" loading="lazy"  decoding="async" onError={(e) => { (e.currentTarget as HTMLImageElement).onerror = null; (e.currentTarget as HTMLImageElement).src = "https://images.pexels.com/photos/261985/pexels-photo-261985.jpeg?auto=compress&cs=tinysrgb&fit=crop&w=200&h=140"; }} />
                       <div>
                         <p className="text-sm font-semibold text-white">{c.brand} {c.model}</p>
                         <p className="text-[11px] text-fog">{c.year} · {formatStat(c.hp)} hp</p>
@@ -394,7 +394,7 @@ export default function CompareModal({
                       <th className="w-44 px-4 py-4 text-left align-bottom text-[10px] font-semibold tracking-[0.16em] text-fog" />
                       {selectedCars.map((c) => (
                         <th key={c.id} className="px-4 py-4 text-left align-bottom">
-                          <img src={c.image} alt={c.model} className="mb-3 h-16 w-24 object-cover" loading="lazy" />
+                          <img src={c.image} alt={c.model} className="mb-3 h-16 w-24 object-cover" loading="lazy"  decoding="async" onError={(e) => { (e.currentTarget as HTMLImageElement).onerror = null; (e.currentTarget as HTMLImageElement).src = "https://images.pexels.com/photos/261985/pexels-photo-261985.jpeg?auto=compress&cs=tinysrgb&fit=crop&w=200&h=140"; }} />
                           <p className="font-display text-base font-bold text-white">{c.brand} {c.model}</p>
                           <p className="text-xs font-normal text-mist">{c.year} · {c.body}</p>
                         </th>
@@ -420,7 +420,7 @@ export default function CompareModal({
                 {selectedCars.map((car, carIndex) => (
                   <div key={car.id} className="border border-line bg-charcoal">
                     <div className="flex items-center gap-3 border-b border-line p-4">
-                      <img src={car.image} alt={car.model} className="h-16 w-24 shrink-0 object-cover" loading="lazy" />
+                      <img src={car.image} alt={car.model} className="h-16 w-24 shrink-0 object-cover" loading="lazy"  decoding="async" onError={(e) => { (e.currentTarget as HTMLImageElement).onerror = null; (e.currentTarget as HTMLImageElement).src = "https://images.pexels.com/photos/261985/pexels-photo-261985.jpeg?auto=compress&cs=tinysrgb&fit=crop&w=200&h=140"; }} />
                       <div className="min-w-0 flex-1">
                         <p className="truncate font-display text-base font-bold text-white">
                           {car.brand} {car.model}
@@ -501,7 +501,7 @@ export default function CompareModal({
                             </span>
                           )}
                         </div>
-                        <img src={r.car.image} alt={r.car.model} className="hidden h-14 w-20 object-cover sm:block" loading="lazy" />
+                        <img src={r.car.image} alt={r.car.model} className="hidden h-14 w-20 object-cover sm:block" loading="lazy"  decoding="async" onError={(e) => { (e.currentTarget as HTMLImageElement).onerror = null; (e.currentTarget as HTMLImageElement).src = "https://images.pexels.com/photos/261985/pexels-photo-261985.jpeg?auto=compress&cs=tinysrgb&fit=crop&w=200&h=140"; }} />
                         <div className="flex-1">
                           <p className="font-display text-lg font-bold text-white">{r.car.brand} {r.car.model}</p>
                           <p className="text-xs text-mist">

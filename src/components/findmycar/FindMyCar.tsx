@@ -654,7 +654,7 @@ function ResultCard({ lang, result, index, onExplore, onToggleFav, onToggleCmp }
           loading="lazy"
           decoding="async"
           className="h-full w-full object-cover transition-transform duration-[1100ms] group-hover:scale-[1.06]"
-        />
+         onError={(e) => { (e.currentTarget as HTMLImageElement).onerror = null; (e.currentTarget as HTMLImageElement).src = "https://images.pexels.com/photos/261985/pexels-photo-261985.jpeg?auto=compress&cs=tinysrgb&fit=crop&w=200&h=140"; }} />
         <div className="absolute inset-0 bg-gradient-to-t from-ink/60 to-transparent" />
       </div>
 

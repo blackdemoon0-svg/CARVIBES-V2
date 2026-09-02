@@ -39,6 +39,10 @@ export default function Hero({
           className="camera-drift h-full w-full object-cover object-center"
           fetchPriority="high"
           decoding="async"
+          onError={(e) => {
+            (e.currentTarget as HTMLImageElement).onerror = null;
+            (e.currentTarget as HTMLImageElement).style.display = "none";
+          }}
         />
         {/* Cinematic vignettes + legibility overlays */}
         <div className="absolute inset-0 bg-gradient-to-b from-ink/80 via-ink/20 to-ink" />
