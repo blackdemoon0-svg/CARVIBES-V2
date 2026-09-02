@@ -172,7 +172,18 @@ export default function GlobalSearch({
                     }}
                     className="flex w-full items-center gap-3 border-b border-line py-3 text-left transition-colors hover:bg-ink"
                   >
-                    <img src={c.image} alt={c.model} className="h-14 w-20 shrink-0 object-cover" loading="lazy" />
+                    <img
+                      src={c.image}
+                      alt={c.model}
+                      className="h-14 w-20 shrink-0 object-cover"
+                      loading="lazy"
+                      decoding="async"
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).onerror = null;
+                        (e.currentTarget as HTMLImageElement).src =
+                          "https://images.pexels.com/photos/261985/pexels-photo-261985.jpeg?auto=compress&cs=tinysrgb&fit=crop&w=200&h=140";
+                      }}
+                    />
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-semibold text-white">
                         {c.brand} {c.model}
@@ -206,7 +217,18 @@ export default function GlobalSearch({
                     }}
                     className="flex w-full items-center gap-3 border-b border-line py-3 text-left transition-colors hover:bg-ink"
                   >
-                    <img src={s.image} alt={s.title} className="h-14 w-20 shrink-0 object-cover" loading="lazy" />
+                    <img
+                      src={s.image}
+                      alt={s.title}
+                      className="h-14 w-20 shrink-0 object-cover"
+                      loading="lazy"
+                      decoding="async"
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).onerror = null;
+                        (e.currentTarget as HTMLImageElement).src =
+                          "https://images.pexels.com/photos/261985/pexels-photo-261985.jpeg?auto=compress&cs=tinysrgb&fit=crop&w=200&h=140";
+                      }}
+                    />
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-semibold text-white">{s.title}</p>
                       <p className="mt-0.5 truncate text-[11px] text-fog">

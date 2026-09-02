@@ -246,6 +246,13 @@ export default function CarDetail({
               src={gallery[activeImage]}
               alt={`${car.brand} ${car.model}`}
               className="h-full w-full object-cover"
+              loading="eager"
+              decoding="async"
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).onerror = null;
+                (e.currentTarget as HTMLImageElement).src =
+                  "https://images.pexels.com/photos/261985/pexels-photo-261985.jpeg?auto=compress&cs=tinysrgb&fit=crop&w=1400&h=900";
+              }}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-transparent to-ink/20" />
             {/* Title overlay */}
@@ -302,7 +309,13 @@ export default function CarDetail({
                     src={g}
                     alt={`${car.brand} ${car.model} view ${i + 1}`}
                     loading="lazy"
+                    decoding="async"
                     className="h-full w-full object-cover"
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).onerror = null;
+                      (e.currentTarget as HTMLImageElement).src =
+                        "https://images.pexels.com/photos/261985/pexels-photo-261985.jpeg?auto=compress&cs=tinysrgb&fit=crop&w=400&h=260";
+                    }}
                   />
                 </button>
               ))}

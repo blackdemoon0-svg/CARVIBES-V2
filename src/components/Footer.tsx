@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { LANGS, t, type Lang } from "../lib/i18n";
 import { Logo } from "./Logo";
 import { YouTubeIcon, InstagramIcon } from "./icons";
@@ -8,21 +9,24 @@ interface FooterProps {
   onCompare?: () => void;
 }
 
-const LINK_GROUPS = [
+const LINK_GROUPS: {
+  title: string;
+  links: { label: string; to: string; external?: boolean }[];
+}[] = [
   {
     title: "DISCOVER",
     links: [
-      { label: "Explore", href: "#explore" },
-      { label: "Find My Car", href: "#find-my-car" },
-      { label: "Stories", href: "#stories" },
-      { label: "Favorites", href: "#favorites" },
+      { label: "Explore", to: "/explore" },
+      { label: "Find My Car", to: "/find-my-car" },
+      { label: "Stories", to: "/news" },
+      { label: "Favorites", to: "/favorites" },
     ],
   },
   {
     title: "COMPANY",
     links: [
-      { label: "About", href: "#top" },
-      { label: "Contact", href: "#top" },
+      { label: "About", to: "/#top" },
+      { label: "Contact", to: "/contact" },
     ],
   },
 ];
@@ -34,9 +38,9 @@ export default function Footer({ lang, onLangChange, onCompare }: FooterProps) {
         <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
           {/* Brand */}
           <div>
-            <a href="#top" aria-label="CarVibes home">
+            <Link to="/#top" aria-label="CarVibes home">
               <Logo />
-            </a>
+            </Link>
             <p className="mt-4 text-[11px] font-medium tracking-mega text-fog">
               DISCOVER. FEEL. DRIVE.
             </p>
@@ -81,12 +85,12 @@ export default function Footer({ lang, onLangChange, onCompare }: FooterProps) {
               <ul className="mt-5 space-y-3">
                 {group.links.map((link) => (
                   <li key={link.label}>
-                    <a
-                      href={link.href}
+                    <Link
+                      to={link.to}
                       className="text-sm text-mist transition-colors duration-300 hover:text-white"
                     >
                       {link.label}
-                    </a>
+                    </Link>
                   </li>
                 ))}
                 {group.title === "DISCOVER" && onCompare && (

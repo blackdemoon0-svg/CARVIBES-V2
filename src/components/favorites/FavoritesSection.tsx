@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import { t, type Lang } from "../../lib/i18n";
 import { cars } from "../../lib/db";
 import type { Car } from "../../lib/cars";
@@ -94,7 +95,7 @@ export default function FavoritesSection({
                         alt={c.model}
                         loading="lazy"
                         className="h-full w-full object-cover transition-transform duration-[1100ms] group-hover:scale-[1.07]"
-                      />
+                       decoding="async" onError={(e) => { (e.currentTarget as HTMLImageElement).onerror = null; (e.currentTarget as HTMLImageElement).src = "https://images.pexels.com/photos/261985/pexels-photo-261985.jpeg?auto=compress&cs=tinysrgb&fit=crop&w=200&h=140"; }} />
                       <div className="absolute inset-0 bg-gradient-to-t from-ink/70 to-transparent" />
                     </div>
                     <div className="flex flex-1 flex-col p-4">
@@ -129,7 +130,7 @@ export default function FavoritesSection({
                 ))}
               </div>
             ) : (
-              <EmptyState message={t(lang, "fav_empty")} cta={t(lang, "fav_explore")} href="#explore" />
+              <EmptyState message={t(lang, "fav_empty")} cta={t(lang, "fav_explore")} to="/explore" />
             )}
           </>
         )}
@@ -142,7 +143,7 @@ export default function FavoritesSection({
                 {favStories.map((s, i) => (
                   <div key={s.id} className="card-in group relative flex flex-col border border-line bg-charcoal" style={{ animationDelay: `${i * 70}ms` }}>
                     <div className="relative aspect-[16/10] overflow-hidden bg-graphite">
-                      <img src={s.image} alt={s.title} loading="lazy" className="h-full w-full object-cover transition-transform duration-[1100ms] group-hover:scale-[1.07]" />
+                      <img src={s.image} alt={s.title} loading="lazy" className="h-full w-full object-cover transition-transform duration-[1100ms] group-hover:scale-[1.07]"  decoding="async" onError={(e) => { (e.currentTarget as HTMLImageElement).onerror = null; (e.currentTarget as HTMLImageElement).src = "https://images.pexels.com/photos/261985/pexels-photo-261985.jpeg?auto=compress&cs=tinysrgb&fit=crop&w=200&h=140"; }} />
                       <div className="absolute inset-0 bg-gradient-to-t from-ink/80 to-transparent" />
                     </div>
                     <div className="flex flex-1 flex-col p-4">
@@ -167,7 +168,7 @@ export default function FavoritesSection({
                 ))}
               </div>
             ) : (
-              <EmptyState message={t(lang, "fav_empty_stories")} cta={t(lang, "st_explore")} href="#stories" />
+              <EmptyState message={t(lang, "fav_empty_stories")} cta={t(lang, "st_explore")} to="/news" />
             )}
           </>
         )}
@@ -198,7 +199,7 @@ export default function FavoritesSection({
                     className="group flex w-40 flex-col border border-line bg-charcoal text-left transition-colors hover:border-white/25"
                   >
                     <div className="aspect-[16/10] overflow-hidden bg-graphite">
-                      <img src={c.image} alt={c.model} loading="lazy" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.06]" />
+                      <img src={c.image} alt={c.model} loading="lazy" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.06]"  decoding="async" onError={(e) => { (e.currentTarget as HTMLImageElement).onerror = null; (e.currentTarget as HTMLImageElement).src = "https://images.pexels.com/photos/261985/pexels-photo-261985.jpeg?auto=compress&cs=tinysrgb&fit=crop&w=200&h=140"; }} />
                     </div>
                     <div className="p-3">
                       <p className="truncate font-display text-sm font-semibold text-white">{c.brand} {c.model}</p>
@@ -217,17 +218,17 @@ export default function FavoritesSection({
   );
 }
 
-function EmptyState({ message, cta, href }: { message: string; cta: string; href: string }) {
+function EmptyState({ message, cta, to }: { message: string; cta: string; to: string }) {
   return (
     <div className="flex flex-col items-center justify-center border border-line py-20 text-center">
       <p className="max-w-sm text-sm text-mist">{message}</p>
-      <a
-        href={href}
+      <Link
+        to={to}
         className="group mt-6 inline-flex h-12 items-center gap-3 border border-accent bg-accent px-7 text-[11px] font-semibold tracking-[0.18em] text-white transition-colors hover:bg-accent-soft"
       >
         {cta}
         <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-      </a>
+      </Link>
     </div>
   );
 }
