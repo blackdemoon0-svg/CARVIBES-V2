@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { t, type Lang } from "../lib/i18n";
 import { cars, allBrands } from "../lib/db";
@@ -142,6 +143,19 @@ function LegalLayout({
 }
 
 export function BrandsPage(props: ShellProps) {
+  // Single pass over the database: brand → vehicle count + first vehicle.
+  // (Previously this was `cars.filter(...)` + `cars.find(...)` inside the
+  // map callback, i.e. two full scans per brand on every render.)
+  const brandIndex = useMemo(() => {
+    const index = new Map<string, { count: number; first: Car }>();
+    for (const car of cars) {
+      const entry = index.get(car.brand);
+      if (entry) entry.count += 1;
+      else index.set(car.brand, { count: 1, first: car });
+    }
+    return index;
+  }, []);
+
   return (
     <Chrome {...props}>
       <section className="border-t border-line bg-ink py-24 sm:py-32">
@@ -158,15 +172,16 @@ export function BrandsPage(props: ShellProps) {
           </p>
           <div className="mt-12 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
             {allBrands.map((brand) => {
-              const count = cars.filter((c) => c.brand === brand).length;
+              const entry = brandIndex.get(brand);
+              if (!entry) return null;
               return (
                 <button
                   key={brand}
-                  onClick={() => props.onOpenCar(cars.find((c) => c.brand === brand)!)}
+                  onClick={() => props.onOpenCar(entry.first)}
                   className="min-w-0 border border-line bg-charcoal px-4 py-5 text-left transition-colors hover:border-white/25"
                 >
                   <p className="break-words font-display text-lg font-semibold text-white">{brand}</p>
-                  <p className="mt-1 text-xs text-fog">{count}</p>
+                  <p className="mt-1 text-xs text-fog">{entry.count}</p>
                 </button>
               );
             })}

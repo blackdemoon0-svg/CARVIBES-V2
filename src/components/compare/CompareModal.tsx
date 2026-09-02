@@ -4,6 +4,7 @@ import { cn } from "../../utils/cn";
 import { cars } from "../../lib/db";
 import type { Car } from "../../lib/cars";
 import { getCompareIds, removeFromCompare, clearCompare, addToCompare, subscribePrefs } from "../../lib/prefs";
+import { useOverlay } from "../../lib/useOverlay";
 import { rankForBattle } from "../../lib/compare";
 import { formatPrice, formatStat } from "../../lib/carUtils";
 import { ArrowRight, SearchIcon } from "../icons";
@@ -140,15 +141,8 @@ export default function CompareModal({
 
   useEffect(() => subscribePrefs(() => setIds(getCompareIds())), []);
 
-  useEffect(() => {
-    document.body.style.overflow = "hidden";
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
-    window.addEventListener("keydown", onKey);
-    return () => {
-      document.body.style.overflow = "";
-      window.removeEventListener("keydown", onKey);
-    };
-  }, [onClose]);
+  // Body scroll lock + Escape-to-close for the battle overlay.
+  useOverlay(onClose);
 
   const selectedCars = useMemo(
     () => ids.map((id) => cars.find((c) => c.id === id)).filter(Boolean) as Car[],
@@ -223,7 +217,12 @@ export default function CompareModal({
   };
 
   return (
-    <div className="fixed inset-0 z-[55] overflow-y-auto bg-ink/98 backdrop-blur-xl">
+    <div
+      className="fixed inset-0 z-[55] overflow-y-auto bg-ink/98 backdrop-blur-xl"
+      role="dialog"
+      aria-modal="true"
+      aria-label={t(lang, "cp_battle")}
+    >
       <div className="min-h-full">
         <div className="mx-auto max-w-6xl px-5 py-8 sm:px-8">
           {/* Top bar */}
@@ -311,6 +310,7 @@ export default function CompareModal({
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder={t(lang, "cp_search")}
+                  aria-label={t(lang, "cp_search")}
                   className="h-11 w-full border border-line bg-ink pl-9 pr-3 text-sm text-white placeholder:text-fog focus:border-white/30 focus:outline-none"
                 />
               </div>

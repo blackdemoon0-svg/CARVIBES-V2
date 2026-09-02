@@ -5,16 +5,10 @@ import { cars } from "../../lib/db";
 import { battleScore } from "../../lib/compare";
 import { categoryKey, type Car } from "../../lib/cars";
 import { addRecent } from "../../lib/prefs";
+import { useOverlay } from "../../lib/useOverlay";
 import { ArrowRight } from "../icons";
 import { SaveButton, CompareButton } from "../compare/ActionButtons";
 import CarCard from "./CarCard";
-
-function hideBody() {
-  document.body.style.overflow = "hidden";
-}
-function showBody() {
-  document.body.style.overflow = "";
-}
 
 /**
  * Extract structured engine facts from the existing engine string.
@@ -93,18 +87,13 @@ export default function CarDetail({
 }) {
   const [activeImage, setActiveImage] = useState(0);
 
+  // Body scroll lock + Escape-to-close for the detail overlay.
+  useOverlay(onClose);
+
+  // Track recently viewed vehicles.
   useEffect(() => {
-    hideBody();
-    addRecent(car.id); // track recently viewed
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => {
-      showBody();
-      window.removeEventListener("keydown", onKey);
-    };
-  }, [onClose, car.id]);
+    addRecent(car.id);
+  }, [car.id]);
 
   const similar = useMemo(() => recommendCars(cars, car, 3), [car]);
   const sameBrand = useMemo(

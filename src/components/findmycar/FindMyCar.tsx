@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { t, type Lang } from "../../lib/i18n";
 import { cars } from "../../lib/db";
 import {
@@ -24,6 +24,7 @@ import {
   subscribePrefs,
 } from "../../lib/prefs";
 import { formatPrice, formatStat } from "../../lib/carUtils";
+import { useOverlay } from "../../lib/useOverlay";
 import type { Car } from "../../lib/cars";
 import { ArrowRight, ArrowUpRight } from "../icons";
 
@@ -73,29 +74,31 @@ export default function FindMyCar({
   const [customOpen, setCustomOpen] = useState(false);
   const [customValue, setCustomValue] = useState("");
 
-  // Lock body scroll while open
-  useEffect(() => {
-    document.body.style.overflow = "hidden";
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
-    window.addEventListener("keydown", onKey);
-    return () => {
-      document.body.style.overflow = "";
-      window.removeEventListener("keydown", onKey);
-    };
-  }, [onClose]);
+  // Lock body scroll while open + close on Escape
+  useOverlay(onClose);
 
   // Refresh toggles on prefs change
   useEffect(() => subscribePrefs(() => force((x) => x + 1)), []);
+
+  // The cinematic "calculating" delay must never outlive the wizard,
+  // otherwise it fires setState on an unmounted component.
+  const calcTimer = useRef<number | undefined>(undefined);
+  useEffect(
+    () => () => {
+      if (calcTimer.current !== undefined) window.clearTimeout(calcTimer.current);
+    },
+    []
+  );
 
   const runMatch = useCallback(() => {
     setStage("calculating");
     // Simulate a cinematic calculation while we actually compute instantly.
     const ranked = rankCars(cars, answers);
-    const timer = setTimeout(() => {
+    calcTimer.current = window.setTimeout(() => {
+      calcTimer.current = undefined;
       setResults(ranked.slice(0, 12));
       setStage("results");
     }, 1800);
-    return () => clearTimeout(timer);
   }, [answers]);
 
   const canNext = useCallback((): boolean => {
@@ -151,7 +154,12 @@ export default function FindMyCar({
   const displayResults = sortedResults.slice(0, 5);
 
   return (
-    <div className="fixed inset-0 z-[55] overflow-y-auto bg-ink/98 backdrop-blur-xl">
+    <div
+      className="fixed inset-0 z-[55] overflow-y-auto bg-ink/98 backdrop-blur-xl"
+      role="dialog"
+      aria-modal="true"
+      aria-label={t(lang, "nav_find")}
+    >
       <div className="min-h-full">
         <div className="mx-auto flex min-h-screen max-w-4xl flex-col px-5 py-8 sm:px-8">
           {/* Header */}

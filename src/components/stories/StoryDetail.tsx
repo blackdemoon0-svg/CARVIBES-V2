@@ -11,6 +11,7 @@ import {
   saveStoryProgress,
   subscribePrefs,
 } from "../../lib/prefs";
+import { useOverlay } from "../../lib/useOverlay";
 import { ArrowRight } from "../icons";
 import StoryImage from "./StoryImage";
 
@@ -55,17 +56,20 @@ export default function StoryDetail({
   );
   const related = useMemo(() => relatedStories(story), [story]);
 
-  // body scroll lock
-  useEffect(() => {
-    document.body.style.overflow = "hidden";
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
-    window.addEventListener("keydown", onKey);
-    return () => {
-      document.body.style.overflow = "";
-      window.removeEventListener("keydown", onKey);
+  // Ambient sound context — created on demand, never autoplays.
+  const audioRef = useRef<{ ctx: AudioContext; gain: GainNode } | null>(null);
+  const [soundOn, setSoundOn] = useState(false);
+
+  // Body scroll lock + Escape-to-close for the story reader.
+  useOverlay(onClose);
+
+  // Always release the ambient audio when the reader closes.
+  useEffect(
+    () => () => {
       audioRef.current?.ctx.close();
-    };
-  }, [onClose]);
+    },
+    []
+  );
 
   useEffect(() => subscribePrefs(() => setSaved(isStorySaved(story.id))), [story.id]);
 
@@ -99,9 +103,7 @@ export default function StoryDetail({
     return () => window.removeEventListener("scroll", onScroll);
   }, [started, story.id]);
 
-  // Ambient sound (original generated audio, OFF by default — never autoplays)
-  const audioRef = useRef<{ ctx: AudioContext; gain: GainNode } | null>(null);
-  const [soundOn, setSoundOn] = useState(false);
+  // Ambient sound toggle — generated audio, OFF by default, never autoplays.
   const toggleSound = () => {
     if (soundOn) {
       audioRef.current?.ctx.close();
@@ -132,7 +134,12 @@ export default function StoryDetail({
   };
 
   return (
-    <div className="fixed inset-0 z-[55] overflow-y-auto bg-ink">
+    <div
+      className="fixed inset-0 z-[55] overflow-y-auto bg-ink"
+      role="dialog"
+      aria-modal="true"
+      aria-label={story.title}
+    >
       <div ref={contentRef} className="relative">
         {/* Ambient accent glow */}
         <div
@@ -233,7 +240,7 @@ export default function StoryDetail({
                 />
               </div>
               <span className="text-[10px] tracking-[0.16em] text-fog">
-                {getStoryProgress(story.id)}%
+                {progress}%
               </span>
             </div>
           </div>

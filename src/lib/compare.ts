@@ -11,21 +11,6 @@ export interface CompareScore {
   breakdown: { key: string; label: string; value: number; max: number }[];
 }
 
-export interface CategoryWinner {
-  key: string;
-  label: string;
-  winner: Car | null; // null = tie / n/a
-  values: { car: Car; value: number }[];
-  higherIsBetter: boolean;
-}
-
-// Head-to-head winner comparison across comparable categories.
-export interface H2H {
-  car: Car;
-  label: string;
-  wins: number;
-}
-
 const RELIABLE_BRANDS = new Set([
   "Toyota", "Honda", "Lexus", "Mazda", "Subaru", "Suzuki", "Datsun", "Volvo",
 ]);
@@ -118,47 +103,7 @@ function c0to100Score(c: Car): number {
   return Math.max(0, Math.min(1, 1 - (t - 1.9) / 10));
 }
 
-/**
- * Compute per-category winners across the compared cars.
- * Returns winners in a deterministic display order.
- */
-export function categoryWinners(cars: Car[]): CategoryWinner[] {
-  const categories: {
-    key: string;
-    label: string;
-    pick: (c: Car) => number;
-    higherIsBetter: boolean;
-  }[] = [
-    { key: "price", label: "price", pick: (c) => (c.price > 0 ? c.price : 0), higherIsBetter: false },
-    { key: "hp", label: "horsepower", pick: (c) => norm(c.hp), higherIsBetter: true },
-    { key: "accel", label: "acceleration", pick: (c) => (c.zeroToHundred ? c.zeroToHundred : 0), higherIsBetter: false },
-    { key: "top", label: "top_speed", pick: (c) => norm(c.topSpeed || 0), higherIsBetter: true },
-    { key: "torque", label: "torque", pick: (c) => norm(c.torque || 0), higherIsBetter: true },
-    { key: "weight", label: "weight", pick: (c) => norm(c.weight || 0), higherIsBetter: false },
-    { key: "reliability", label: "reliability", pick: reliabilityScore, higherIsBetter: true },
-    { key: "comfort", label: "comfort", pick: comfortScore, higherIsBetter: true },
-    { key: "technology", label: "technology", pick: techScore, higherIsBetter: true },
-  ];
-
-  return categories.map((cat) => {
-    const values = cars.map((car) => ({ car, value: cat.pick(car) }));
-    const scored = values.filter((v) => v.value > 0);
-    if (scored.length === 0) return { ...cat, winner: null, values: [] };
-    const best = scored.reduce((a, b) =>
-      cat.higherIsBetter
-        ? b.value > a.value ? b : a
-        : b.value < a.value ? b : a
-    ).value;
-    const tied = scored.filter((v) => v.value === best).length > 1;
-    return {
-      ...cat,
-      winner: tied ? null : scored.find((v) => v.value === best)!.car,
-      values,
-    };
-  });
-}
-
-/** Sort cars by battle score descending; returns ranked with H2H win counts. */
+/** Sort cars by battle score descending (highest CarVibes score first). */
 export function rankForBattle(cars: Car[]): { car: Car; total: number }[] {
   return cars
     .map((c) => ({ car: c, total: battleScore(c).total }))

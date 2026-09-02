@@ -53,11 +53,10 @@ export function getCompareIds(): string[] {
 /**
  * Add a car to compare. Returns:
  *  - "added"     → added successfully
- *  - "removed"   → it was already there, so removed (toggle)
  *  - "full"      → already at MAX_COMPARE and this car isn't in it
  *  - "exists"    → already present (no change)
  */
-export function addToCompare(id: string): "added" | "removed" | "full" | "exists" {
+export function addToCompare(id: string): "added" | "full" | "exists" {
   const ids = read(COMPARE_KEY);
   if (ids.includes(id)) return "exists";
   if (ids.length >= MAX_COMPARE) return "full";
@@ -74,15 +73,6 @@ export function removeFromCompare(id: string) {
 export function clearCompare() {
   write(COMPARE_KEY, []);
   notifyPrefs();
-}
-
-export function toggleCompare(id: string): boolean {
-  const ids = read(COMPARE_KEY);
-  const exists = ids.includes(id);
-  const next = exists ? ids.filter((x) => x !== id) : [...ids, id];
-  write(COMPARE_KEY, next);
-  notifyPrefs();
-  return !exists;
 }
 
 export function isCompared(id: string): boolean {
