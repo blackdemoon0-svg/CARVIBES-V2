@@ -11,24 +11,24 @@ interface FooterProps {
 }
 
 const LINK_GROUPS: {
-  title: string;
-  links: { label: string; to: string; external?: boolean; help?: boolean }[];
+  titleKey: string;
+  links: { labelKey: string; to: string; external?: boolean; help?: boolean }[];
 }[] = [
   {
-    title: "DISCOVER",
+    titleKey: "nav_group_discover",
     links: [
-      { label: "Explore", to: "/explore" },
-      { label: "Find My Car", to: "/find-my-car" },
-      { label: "Stories", to: "/news" },
-      { label: "Favorites", to: "/favorites" },
-      { label: "How to use CarVibes", to: "/#how-to", help: true },
+      { labelKey: "footer_explore", to: "/explore" },
+      { labelKey: "nav_find", to: "/find-my-car" },
+      { labelKey: "nav_stories", to: "/news" },
+      { labelKey: "nav_favorites", to: "/favorites" },
+      { labelKey: "footer_how_to", to: "/#how-to", help: true },
     ],
   },
   {
-    title: "COMPANY",
+    titleKey: "footer_group_company",
     links: [
-      { label: "About", to: "/#top" },
-      { label: "Contact", to: "/contact" },
+      { labelKey: "footer_about", to: "/#top" },
+      { labelKey: "nav_contact", to: "/contact" },
     ],
   },
 ];
@@ -40,15 +40,14 @@ export default function Footer({ lang, onLangChange, onCompare }: FooterProps) {
         <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
           {/* Brand */}
           <div>
-            <Link to="/#top" aria-label="CarVibes home">
+            <Link to="/#top" aria-label={t(lang, "aria_home")}>
               <Logo />
             </Link>
             <p className="mt-4 text-[11px] font-medium tracking-mega text-fog">
-              DISCOVER. FEEL. DRIVE.
+              {t(lang, "footer_tagline")}
             </p>
             <p className="mt-6 max-w-xs text-sm leading-relaxed text-mist">
-              A premium automotive discovery platform. Extraordinary cars,
-              legendary stories, and the machines that define culture.
+              {t(lang, "footer_desc")}
             </p>
             {/* Social */}
             <div className="mt-8 flex gap-3">
@@ -56,20 +55,22 @@ export default function Footer({ lang, onLangChange, onCompare }: FooterProps) {
                 {
                   icon: YouTubeIcon,
                   label: "YouTube",
+                  ariaKey: "aria_youtube",
                   href: "https://www.youtube.com/@CarVibes-m6i",
                 },
                 {
                   icon: InstagramIcon,
                   label: "Instagram",
+                  ariaKey: "aria_instagram",
                   href: "https://www.instagram.com/carvibesinsta/?hl=en",
                 },
-              ].map(({ icon: Icon, label, href }) => (
+              ].map(({ icon: Icon, label, ariaKey, href }) => (
                 <a
                   key={label}
                   href={href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label={`CarVibes on ${label}`}
+                  aria-label={t(lang, ariaKey)}
                   className="group flex h-10 w-10 items-center justify-center border border-line text-mist transition-all duration-300 hover:border-white/40 hover:bg-charcoal hover:text-white"
                 >
                   <Icon className="h-4.5 w-4.5 transition-transform duration-300 group-hover:scale-110" />
@@ -80,13 +81,13 @@ export default function Footer({ lang, onLangChange, onCompare }: FooterProps) {
 
           {/* Link groups */}
           {LINK_GROUPS.map((group) => (
-            <div key={group.title}>
+            <div key={group.titleKey}>
               <h4 className="text-[11px] font-semibold tracking-[0.2em] text-fog">
-                {group.title.toUpperCase()}
+                {t(lang, group.titleKey).toUpperCase()}
               </h4>
               <ul className="mt-5 space-y-3">
                 {group.links.map((link) => (
-                  <li key={link.label}>
+                  <li key={link.labelKey}>
                     {link.help ? (
                       <Link
                         to={link.to}
@@ -104,25 +105,25 @@ export default function Footer({ lang, onLangChange, onCompare }: FooterProps) {
                         }}
                         className="text-sm text-mist transition-colors duration-300 hover:text-white"
                       >
-                        {link.label}
+                        {t(lang, link.labelKey)}
                       </Link>
                     ) : (
                       <Link
                         to={link.to}
                         className="text-sm text-mist transition-colors duration-300 hover:text-white"
                       >
-                        {link.label}
+                        {t(lang, link.labelKey)}
                       </Link>
                     )}
                   </li>
                 ))}
-                {group.title === "DISCOVER" && onCompare && (
+                {group.titleKey === "nav_group_discover" && onCompare && (
                   <li>
                     <button
                       onClick={onCompare}
                       className="text-sm text-mist transition-colors duration-300 hover:text-white"
                     >
-                      Compare
+                      {t(lang, "footer_compare")}
                     </button>
                   </li>
                 )}
@@ -158,8 +159,8 @@ export default function Footer({ lang, onLangChange, onCompare }: FooterProps) {
 
         {/* Bottom bar */}
         <div className="mt-14 flex flex-col gap-3 border-t border-line pt-7 text-xs text-fog sm:flex-row sm:items-center sm:justify-between">
-          <p>© 2026 CarVibes. All rights reserved.</p>
-          <p>DISCOVER. FEEL. DRIVE.</p>
+          <p>{t(lang, "footer_rights")}</p>
+          <p>{t(lang, "footer_tagline")}</p>
         </div>
       </div>
     </footer>

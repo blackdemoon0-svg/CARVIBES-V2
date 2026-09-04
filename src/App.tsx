@@ -110,7 +110,7 @@ function Homepage({
   usePageMeta({ car: detailCar, story: activeStory, notFound, path });
 
   if (notFound) {
-    return <NotFound onHome={() => navigate("/", { replace: true })} />;
+    return <NotFound lang={lang} onHome={() => navigate("/", { replace: true })} />;
   }
 
   return (
@@ -289,7 +289,7 @@ function RoutedApp({
         <Route
           path="*"
           element={
-            <NotFoundPage />
+            <NotFoundPage lang={lang} />
           }
         />
       </Routes>
@@ -308,11 +308,11 @@ function RoutedApp({
   );
 }
 
-function NotFoundPage() {
+function NotFoundPage({ lang }: { lang: Lang }) {
   const navigate = useNavigate();
   const location = useLocation();
   usePageMeta({ notFound: true, path: location.pathname });
-  return <NotFound onHome={() => navigate("/", { replace: true })} />;
+  return <NotFound lang={lang} onHome={() => navigate("/", { replace: true })} />;
 }
 
 export default function App() {

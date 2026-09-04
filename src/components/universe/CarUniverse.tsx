@@ -494,7 +494,7 @@ export default function CarUniverse({
                     ? "border-accent bg-accent text-white"
                     : "border-line text-mist hover:border-white/30 hover:text-white"
                 }`}
-                aria-label={`Page ${i + 1}`}
+                aria-label={`${t(lang, "pagination_page")} ${i + 1}`}
               >
                 {i + 1}
               </button>
@@ -503,9 +503,9 @@ export default function CarUniverse({
               <button
                 onClick={() => setPage((p) => p + 1)}
                 className="ml-2 flex h-10 items-center gap-2 border border-line px-4 text-[11px] font-semibold tracking-[0.14em] text-mist transition-colors hover:border-white/30 hover:text-white"
-                aria-label="Next page"
+                aria-label={t(lang, "aria_next_page")}
               >
-                {lang === "fr" ? "SUIVANT" : lang === "es" ? "SIGUIENTE" : "NEXT"}
+                {t(lang, "pagination_next")}
                 <ArrowRight className="h-4 w-4" />
               </button>
             )}
