@@ -165,10 +165,10 @@ export function BrandsPage(props: ShellProps) {
             {t(props.lang, "universe_eyebrow")}
           </p>
           <h1 className="font-display text-4xl font-bold tracking-tight text-white sm:text-6xl">
-            Brands
+            {t(props.lang, "brands_title")}
           </h1>
           <p className="mt-4 max-w-md text-sm text-mist">
-            {allBrands.length} brands · {cars.length}+ {t(props.lang, "universe_count")}
+            {allBrands.length} {t(props.lang, "brands_count_suffix")} · {cars.length}+ {t(props.lang, "universe_count")}
           </p>
           <div className="mt-12 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
             {allBrands.map((brand) => {
@@ -194,11 +194,8 @@ export function BrandsPage(props: ShellProps) {
 
 export function ContactPage(props: ShellProps) {
   return (
-    <LegalLayout props={props} title="Contact">
-      <p>
-        CarVibes is a premium automotive discovery platform. For questions about
-        the site, partnerships or content, reach us through our social channels.
-      </p>
+    <LegalLayout props={props} title={t(props.lang, "contact_title")}>
+      <p>{t(props.lang, "contact_p1")}</p>
       <p>
         YouTube:{" "}
         <a
@@ -227,34 +224,20 @@ export function ContactPage(props: ShellProps) {
 
 export function PrivacyPage(props: ShellProps) {
   return (
-    <LegalLayout props={props} title="Privacy Policy">
-      <p>
-        CarVibes stores language preference, favorites, compare selections and
-        recently viewed cars locally in your browser. This data never leaves
-        your device.
-      </p>
-      <p>
-        We use Vercel Analytics to understand aggregate traffic. No advertising
-        cookies are set by CarVibes.
-      </p>
-      <p>Last updated: 2026.</p>
+    <LegalLayout props={props} title={t(props.lang, "privacy_title")}>
+      <p>{t(props.lang, "privacy_p1")}</p>
+      <p>{t(props.lang, "privacy_p2")}</p>
+      <p>{t(props.lang, "privacy_updated")}</p>
     </LegalLayout>
   );
 }
 
 export function TermsPage(props: ShellProps) {
   return (
-    <LegalLayout props={props} title="Terms of Use">
-      <p>
-        CarVibes is provided for informational and entertainment purposes.
-        Vehicle specifications are compiled from public sources and may differ
-        from manufacturer data.
-      </p>
-      <p>
-        You may browse, save favorites locally and compare cars for personal
-        use. All trademarks belong to their respective owners.
-      </p>
-      <p>© 2026 CarVibes. All rights reserved.</p>
+    <LegalLayout props={props} title={t(props.lang, "terms_title")}>
+      <p>{t(props.lang, "terms_p1")}</p>
+      <p>{t(props.lang, "terms_p2")}</p>
+      <p>{t(props.lang, "footer_rights")}</p>
     </LegalLayout>
   );
 }

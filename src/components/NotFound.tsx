@@ -1,7 +1,14 @@
 import { Logo } from "./Logo";
 import { ArrowRight } from "./icons";
+import { t, type Lang } from "../lib/i18n";
 
-export default function NotFound({ onHome }: { onHome: () => void }) {
+export default function NotFound({
+  onHome,
+  lang = "en",
+}: {
+  onHome: () => void;
+  lang?: Lang;
+}) {
   return (
     <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-ink px-6 text-center">
       {/* Backdrop accent */}
@@ -21,17 +28,17 @@ export default function NotFound({ onHome }: { onHome: () => void }) {
         404
       </p>
       <p className="relative z-10 mt-5 text-[12px] font-medium tracking-mega text-mist">
-        PAGE NOT FOUND
+        {t(lang, "notfound_title")}
       </p>
       <p className="relative z-10 mt-5 max-w-sm text-sm leading-relaxed text-fog">
-        The page you are looking for doesn&apos;t exist or may have moved.
+        {t(lang, "notfound_desc")}
       </p>
 
       <button
         onClick={onHome}
         className="relative z-10 group mt-10 inline-flex h-12 items-center gap-3 bg-accent px-8 text-[12px] font-semibold tracking-[0.18em] text-white transition-colors hover:bg-accent-soft"
       >
-        BACK HOME
+        {t(lang, "notfound_back")}
         <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
       </button>
     </div>

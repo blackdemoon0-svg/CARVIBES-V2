@@ -194,7 +194,7 @@ export default function Navigation({
             to="/#top"
             onClick={() => handleSectionClick("top")}
             className="flex shrink-0 items-center"
-            aria-label="CarVibes home"
+            aria-label={t(lang, "aria_home")}
           >
             <Logo
               compact={scrolled}
@@ -289,7 +289,7 @@ export default function Navigation({
             {/* Mobile menu toggle */}
             <button
               onClick={() => setMobileOpen((v) => !v)}
-              aria-label="Menu"
+              aria-label={t(lang, "aria_menu")}
               aria-expanded={mobileOpen}
               className="flex h-10 w-10 flex-col items-center justify-center gap-1.5 border border-line text-white lg:hidden"
             >
