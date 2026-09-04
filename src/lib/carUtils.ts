@@ -2,8 +2,24 @@ import type { Car, SortKey, Category } from "./cars";
 
 /** Format a price as a compact, premium-looking string. */
 export function formatPrice(value: number, lang: string): string {
-  const locale = lang === "en" ? "en-US" : lang === "fr" ? "fr-FR" : "es-ES";
-  const currency = lang === "en" ? "USD" : lang === "fr" ? "EUR" : "EUR";
+  // European / Latin-American languages render in EUR; every other language
+  // (English, Japanese, Chinese, Arabic…) uses the site's USD database prices.
+  const eurLangs = new Set(["fr", "es", "de", "it", "pt", "nl"]);
+  const useEur = eurLangs.has(lang);
+  const localeMap: Record<string, string> = {
+    en: "en-US",
+    fr: "fr-FR",
+    es: "es-ES",
+    de: "de-DE",
+    it: "it-IT",
+    pt: "pt-PT",
+    nl: "nl-NL",
+    ar: "ar-MA",
+    ja: "ja-JP",
+    zh: "zh-CN",
+  };
+  const locale = localeMap[lang] ?? "en-US";
+  const currency = useEur ? "EUR" : "USD";
   try {
     return new Intl.NumberFormat(locale, {
       style: "currency",

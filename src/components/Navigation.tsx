@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
-import { Link, NavLink, useLocation } from "react-router-dom";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "../utils/cn";
-import { LANGS, t, type Lang } from "../lib/i18n";
+import { LANGS as LANG_LIST, t, type Lang } from "../lib/i18n";
 import { useBodyScrollLock } from "../lib/useOverlay";
+import { startOnboarding, requestOnboardingAfterNav } from "../lib/onboarding";
 import { Logo } from "./Logo";
-import { SearchIcon, GlobeIcon, ChevronDown, ArrowRight } from "./icons";
+import LanguageSelector from "./LanguageSelector";
+import { SearchIcon, ChevronDown, ArrowRight, HelpIcon } from "./icons";
 
 interface NavProps {
   lang: Lang;
@@ -68,10 +70,31 @@ export default function Navigation({
   onSearch,
 }: NavProps) {
   const [scrolled, setScrolled] = useState(false);
-  const [langOpen, setLangOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+
+  // "How to use CarVibes" — scroll to the guide section (on any page) and
+  // (re)start the interactive tour.
+  const handleHelp = () => {
+    setMoreOpen(false);
+    setMobileOpen(false);
+    if (location.pathname !== "/") {
+      // Tour starts automatically once the homepage mounts.
+      requestOnboardingAfterNav();
+      navigate("/#how-to");
+    } else {
+      window.setTimeout(
+        () =>
+          document
+            .getElementById("how-to")
+            ?.scrollIntoView({ behavior: "smooth", block: "start" }),
+        80
+      );
+      startOnboarding();
+    }
+  };
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -82,7 +105,6 @@ export default function Navigation({
 
   useEffect(() => {
     const close = () => {
-      setLangOpen(false);
       setMoreOpen(false);
     };
     window.addEventListener("click", close);
@@ -91,6 +113,16 @@ export default function Navigation({
 
   // Lock the page behind the mobile menu while it is open.
   useBodyScrollLock(mobileOpen);
+
+  // Close the mobile drawer on Escape (consistent with the other overlays).
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMobileOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [mobileOpen]);
 
   // Scroll to the homepage section named by the URL hash (e.g. /#rankings).
   // React Router does not scroll to hash anchors by itself, so this runs after
@@ -226,6 +258,13 @@ export default function Navigation({
                   <span aria-hidden="true">⚔</span>
                   {t(lang, "cp_compare")}
                 </button>
+                <button
+                  onClick={handleHelp}
+                  className="flex w-full items-center gap-2 border-t border-line px-4 py-3 text-left text-[11px] font-semibold tracking-[0.18em] text-mist transition-colors hover:bg-graphite/60 hover:text-white"
+                >
+                  <HelpIcon className="h-4 w-4" />
+                  {t(lang, "nav_help")}
+                </button>
               </div>
             </div>
           </nav>
@@ -244,66 +283,8 @@ export default function Navigation({
               </span>
             </button>
 
-            {/* Language dropdown */}
-            <div className="relative" onClick={(e) => e.stopPropagation()}>
-              <button
-                onClick={() => setLangOpen((v) => !v)}
-                aria-label={t(lang, "nav_language")}
-                aria-expanded={langOpen}
-                className={cn(
-                  "group flex h-10 items-center gap-2 border px-2.5 text-[11px] font-semibold tracking-[0.18em] transition-colors sm:px-3",
-                  langOpen
-                    ? "border-white/30 text-white"
-                    : "border-line text-mist hover:border-white/25 hover:text-white"
-                )}
-              >
-                <GlobeIcon className="h-4 w-4" />
-                <span className="hidden uppercase min-[380px]:inline">{lang}</span>
-                <ChevronDown
-                  className={cn(
-                    "h-3.5 w-3.5 transition-transform duration-300",
-                    langOpen && "rotate-180"
-                  )}
-                />
-              </button>
-
-              <div
-                className={cn(
-                  "absolute right-0 top-full mt-2 w-44 origin-top-right overflow-hidden border border-line bg-charcoal shadow-2xl shadow-black/50 transition-all duration-200",
-                  langOpen
-                    ? "translate-y-0 opacity-100"
-                    : "pointer-events-none -translate-y-1 opacity-0"
-                )}
-              >
-                {LANGS.map((l) => (
-                  <button
-                    key={l.code}
-                    onClick={() => {
-                      onLangChange(l.code);
-                      setLangOpen(false);
-                    }}
-                    className={cn(
-                      "flex w-full items-center justify-between px-4 py-3 text-left text-sm transition-colors",
-                      l.code === lang
-                        ? "bg-graphite text-white"
-                        : "text-mist hover:bg-graphite/60 hover:text-white"
-                    )}
-                  >
-                    <span className="flex items-center gap-2.5">
-                      <span className="text-base" aria-hidden="true">
-                        {l.flag}
-                      </span>
-                      <span className="font-display text-[13px] font-semibold tracking-[0.08em]">
-                        {l.label}
-                      </span>
-                    </span>
-                    {l.code === lang && (
-                      <span className="h-1.5 w-1.5 rounded-full bg-accent" />
-                    )}
-                  </button>
-                ))}
-              </div>
-            </div>
+            {/* Language selector — visible on every breakpoint */}
+            <LanguageSelector lang={lang} onLangChange={onLangChange} />
 
             {/* Mobile menu toggle */}
             <button
@@ -333,7 +314,9 @@ export default function Navigation({
       <div
         className={cn(
           "fixed inset-0 z-40 flex flex-col overflow-y-auto bg-ink/98 pt-20 backdrop-blur-xl transition-all duration-500 lg:hidden",
-          mobileOpen ? "opacity-100" : "pointer-events-none opacity-0"
+          mobileOpen
+            ? "visible opacity-100"
+            : "invisible pointer-events-none opacity-0"
         )}
       >
         <div className="px-5 pt-6 sm:px-8">
@@ -364,6 +347,26 @@ export default function Navigation({
                 ))}
                 {group.titleKey === "nav_group_tools" && (
                   <button
+                    onClick={handleHelp}
+                    className="flex items-center justify-between border-b border-line py-4 text-left font-display text-xl font-semibold tracking-tight text-white transition-colors hover:text-accent-soft"
+                    style={{
+                      transitionDelay: `${(gi * 5 + group.links.length) * 40}ms`,
+                      ...(mobileOpen
+                        ? { opacity: 1, transform: "translateY(0)" }
+                        : { opacity: 0, transform: "translateY(12px)" }),
+                      transition:
+                        "opacity 0.4s ease, transform 0.4s ease, color 0.3s ease",
+                    }}
+                  >
+                    <span className="flex items-center gap-3">
+                      <HelpIcon className="h-5 w-5 text-fog" />
+                      {t(lang, "nav_help")}
+                    </span>
+                    <ArrowRight className="h-5 w-5 text-fog" />
+                  </button>
+                )}
+                {group.titleKey === "nav_group_tools" && (
+                  <button
                     onClick={() => {
                       setMobileOpen(false);
                       onCompare?.();
@@ -387,13 +390,15 @@ export default function Navigation({
           ))}
         </div>
 
-        {/* Mobile language selector */}
+        {/* Mobile language selector — full list in a compact 2-col grid that
+            scrolls safely inside the drawer on small screens. */}
         <div className="mt-8 px-5 pb-[max(2rem,env(safe-area-inset-bottom))] sm:px-8">
-          <p className="text-[11px] font-medium tracking-mega text-fog">
+          <p className="flex items-center gap-2 text-[11px] font-medium tracking-mega text-fog">
+            <span aria-hidden="true">🌐</span>
             {t(lang, "nav_language")}
           </p>
-          <div className="mt-4 flex gap-2">
-            {LANGS.map((l) => (
+          <div className="mt-4 grid max-h-[38vh] grid-cols-2 gap-2 overflow-y-auto pr-1">
+            {LANG_LIST.map((l) => (
               <button
                 key={l.code}
                 onClick={() => {
@@ -401,13 +406,18 @@ export default function Navigation({
                   setMobileOpen(false);
                 }}
                 className={cn(
-                  "flex-1 border py-3 text-center text-sm font-semibold tracking-[0.12em] transition-colors",
+                  "flex items-center gap-2.5 border px-3.5 py-3 text-left text-sm transition-colors",
                   l.code === lang
                     ? "border-accent bg-accent/10 text-white"
                     : "border-line text-mist hover:border-white/25 hover:text-white"
                 )}
               >
-                {l.code.toUpperCase()}
+                <span className="text-base" aria-hidden="true">
+                  {l.flag}
+                </span>
+                <span className="truncate font-display text-[13px] font-semibold tracking-wide">
+                  {l.label}
+                </span>
               </button>
             ))}
           </div>

@@ -1,23 +1,76 @@
-export type Lang = "fr" | "en" | "es";
+// Fully translated languages have a complete dictionary below. Any other
+// language still works: `t()` falls back to English, so adding a language is
+// a one-line change here plus (optionally) a new dictionary later.
+export type Lang =
+  | "fr"
+  | "en"
+  | "es"
+  | "de"
+  | "it"
+  | "pt"
+  | "nl"
+  | "ar"
+  | "ja"
+  | "zh";
 
-export const LANGS: { code: Lang; label: string; flag: string }[] = [
-  { code: "fr", label: "FRANÇAIS", flag: "🇫🇷" },
-  { code: "en", label: "ENGLISH", flag: "🇬🇧" },
-  { code: "es", label: "ESPAÑOL", flag: "🇪🇸" },
+export interface LangDef {
+  code: Lang;
+  /** Native language name (shown in the selector). */
+  label: string;
+  flag: string;
+  /** Right-to-left script (Arabic). */
+  rtl?: boolean;
+}
+
+// Order matters: English first (default), then Deutsch — Germany is one of
+// the world's most important automotive markets — followed by the rest.
+export const LANGS: LangDef[] = [
+  { code: "en", label: "English", flag: "🇬🇧" },
+  { code: "de", label: "Deutsch", flag: "🇩🇪" },
+  { code: "fr", label: "Français", flag: "🇫🇷" },
+  { code: "es", label: "Español", flag: "🇪🇸" },
+  { code: "it", label: "Italiano", flag: "🇮🇹" },
+  { code: "pt", label: "Português", flag: "🇵🇹" },
+  { code: "nl", label: "Nederlands", flag: "🇳🇱" },
+  { code: "ar", label: "العربية", flag: "🇸🇦", rtl: true },
+  { code: "ja", label: "日本語", flag: "🇯🇵" },
+  { code: "zh", label: "中文", flag: "🇨🇳" },
 ];
+
+const LANG_CODES = new Set<Lang>(LANGS.map((l) => l.code));
+
+export const RTL_LANGS: Lang[] = LANGS.filter((l) => l.rtl).map((l) => l.code);
+
+export function isRtl(lang: Lang): boolean {
+  return RTL_LANGS.includes(lang);
+}
 
 export const LANGUAGE_KEY = "carvibes.lang";
 
 export function getStoredLang(): Lang | null {
   if (typeof window === "undefined") return null;
   const v = localStorage.getItem(LANGUAGE_KEY);
-  if (v === "fr" || v === "en" || v === "es") return v;
-  return null;
+  return v && LANG_CODES.has(v as Lang) ? (v as Lang) : null;
 }
 
 export function storeLang(lang: Lang) {
   if (typeof window === "undefined") return;
   localStorage.setItem(LANGUAGE_KEY, lang);
+}
+
+/**
+ * Pick a sensible default language without ever blocking the visitor:
+ * stored preference first, then the browser language, then English.
+ */
+export function detectLang(): Lang {
+  const stored = getStoredLang();
+  if (stored) return stored;
+  if (typeof navigator !== "undefined" && navigator.language) {
+    const base = navigator.language.toLowerCase().split("-")[0];
+    const match = LANGS.find((l) => l.code === base);
+    if (match) return match.code;
+  }
+  return "en";
 }
 
 type Dict = Record<string, string>;
@@ -38,16 +91,17 @@ const fr: Dict = {
   nav_group_discover: "DÉCOUVRIR",
   nav_group_tools: "OUTILS",
 
-  hero_title_1: "LE MONDE DES VOITURES,",
-  hero_title_2: "RÉINVENTÉ.",
+  hero_title_1: "TROUVEZ LA VOITURE",
+  hero_title_2: "PARFAITE.",
   hero_sub:
-    "Une véritable base de données automobile : voitures réelles, marques, catégories, histoires et classements, tout au même endroit.",
+    "Explorez des milliers de voitures du monde entier, comparez-les et trouvez celle qui vous correspond.",
   hero_explore: "EXPLORER LES VOITURES",
-  hero_search_placeholder:
-    "Rechercher une voiture, une marque ou une catégorie…",
+  hero_search_placeholder: "Rechercher une marque ou un modèle…",
+  hero_search_button: "RECHERCHER",
   hero_brands: "EXPLORER LES MARQUES",
   hero_find: "TROUVER MA VOITURE",
   hero_story: "DÉCOUVRIR UNE HISTOIRE",
+  scroll_hint_2: "Défiler pour découvrir",
 
   stat_cars: "VOITURES",
   stat_brands: "MARQUES",
@@ -418,6 +472,58 @@ const fr: Dict = {
   fav_clear_history: "EFFACER L'HISTORIQUE",
   fav_empty_recent: "Aucune voiture consultée.",
   fav_total: "au total",
+
+  // ---- Nouvelles sections d'accueil / onboarding ----
+  nav_help: "COMMENT UTILISER",
+  budget_eyebrow: "PAR BUDGET",
+  budget_title: "TROUVEZ UNE VOITURE PAR BUDGET",
+  budget_sub:
+    "Parcourez la base par tranche de prix et découvrez ce qui vous correspond.",
+  budget_up_to: "Jusqu'à",
+  features_eyebrow: "LES OUTILS",
+  features_title: "TOUT CE DONT VOUS AVEZ BESOIN",
+  features_sub:
+    "Des outils puissants et précis pour découvrir, comparer et retrouver les voitures que vous aimez.",
+  features_find_desc:
+    "Répondez à quelques questions et obtenez des correspondances sur mesure.",
+  features_compare_desc:
+    "Comparez jusqu'à 3 voitures côte à côte sur toutes leurs caractéristiques.",
+  features_explore_desc:
+    "Parcourez chaque marque, catégorie et tranche de prix de la base.",
+  features_favorites_desc:
+    "Enregistrez les voitures et les histoires que vous aimez, pour plus tard.",
+
+  howto_eyebrow: "POUR COMMENCER",
+  howto_title: "COMMENT UTILISER CARVIBES",
+  howto_sub: "Trouvez votre voiture parfaite en 4 étapes simples.",
+  howto_search_desc: "Recherchez une voiture ou une marque.",
+  howto_explore_desc: "Découvrez des voitures, des marques et des catégories.",
+  howto_compare_desc: "Comparez les modèles et faites le meilleur choix.",
+  howto_save_desc:
+    "Enregistrez vos voitures préférées et revenez les voir plus tard.",
+  howto_full_guide: "VOIR LE GUIDE COMPLET",
+
+  tour_skip: "Passer",
+  tour_next: "Suivant",
+  tour_back: "Retour",
+  tour_done: "Terminé",
+  tour_step: "Étape",
+  tour_of: "sur",
+  tour_s1_title: "Bienvenue sur CarVibes ! 🚗",
+  tour_s1_body:
+    "Découvrez des milliers de voitures et trouvez celle qui vous correspond.",
+  tour_s2_title: "Recherchez une voiture 🔍",
+  tour_s2_body:
+    "Saisissez une marque ou un modèle pour accéder directement à la base.",
+  tour_s3_title: "Explorez les catégories 🚗",
+  tour_s3_body:
+    "Parcourez les voitures par catégorie : sport, luxe, SUV, électrique et plus.",
+  tour_s4_title: "Comparez les voitures ⚖️",
+  tour_s4_body:
+    "Ajoutez jusqu'à 3 voitures et comparez chaque caractéristique côte à côte.",
+  tour_s5_title: "Gardez vos favoris ❤️",
+  tour_s5_body:
+    "Rassemblez en un seul endroit les voitures et les histoires que vous aimez.",
 };
 
 const en: Dict = {
@@ -436,16 +542,17 @@ const en: Dict = {
   nav_group_discover: "DISCOVER",
   nav_group_tools: "TOOLS",
 
-  hero_title_1: "THE WORLD OF CARS,",
-  hero_title_2: "REIMAGINED.",
+  hero_title_1: "FIND YOUR PERFECT",
+  hero_title_2: "CAR.",
   hero_sub:
-    "A real automotive knowledge base: genuine cars, brands, categories, stories and rankings — all in one place.",
+    "Explore thousands of cars from around the world, compare them and find the one that fits you.",
   hero_explore: "EXPLORE CARS",
-  hero_search_placeholder:
-    "Search a car, brand or category…",
+  hero_search_placeholder: "Search for a brand or model…",
+  hero_search_button: "SEARCH",
   hero_brands: "EXPLORE BRANDS",
   hero_find: "FIND MY CAR",
   hero_story: "DISCOVER A STORY",
+  scroll_hint_2: "Scroll to explore",
 
   stat_cars: "CARS",
   stat_brands: "BRANDS",
@@ -822,6 +929,47 @@ const en: Dict = {
   fav_clear_history: "CLEAR HISTORY",
   fav_empty_recent: "No cars viewed yet.",
   fav_total: "total",
+
+  // ---- New homepage sections / onboarding ----
+  nav_help: "HOW TO USE",
+  budget_eyebrow: "BY BUDGET",
+  budget_title: "FIND CARS BY BUDGET",
+  budget_sub: "Browse the database by price range and discover what fits.",
+  budget_up_to: "Up to",
+  features_eyebrow: "THE TOOLKIT",
+  features_title: "EVERYTHING YOU NEED",
+  features_sub:
+    "Powerful, focused tools to discover, compare and keep track of the cars you love.",
+  features_find_desc: "Answer a few questions and get car matches tailored to you.",
+  features_compare_desc: "Line up up to 3 cars and compare every spec head to head.",
+  features_explore_desc: "Browse every brand, category and price range in the database.",
+  features_favorites_desc: "Save the cars and stories you love and come back anytime.",
+
+  howto_eyebrow: "GET STARTED",
+  howto_title: "HOW TO USE CARVIBES",
+  howto_sub: "Find your perfect car in 4 simple steps.",
+  howto_search_desc: "Search for a car or brand.",
+  howto_explore_desc: "Discover cars, brands and categories.",
+  howto_compare_desc: "Compare models and find the best choice.",
+  howto_save_desc: "Save your favorite cars and come back later.",
+  howto_full_guide: "VIEW FULL GUIDE",
+
+  tour_skip: "Skip",
+  tour_next: "Next",
+  tour_back: "Back",
+  tour_done: "Done",
+  tour_step: "Step",
+  tour_of: "of",
+  tour_s1_title: "Welcome to CarVibes! 🚗",
+  tour_s1_body: "Discover thousands of cars and find your perfect one.",
+  tour_s2_title: "Search for any car 🔍",
+  tour_s2_body: "Type a brand or model and jump straight into the database.",
+  tour_s3_title: "Explore categories 🚗",
+  tour_s3_body: "Browse cars by category — sports, luxury, SUV, electric and more.",
+  tour_s4_title: "Compare cars ⚖️",
+  tour_s4_body: "Add up to 3 cars and compare every specification head to head.",
+  tour_s5_title: "Save your favorites ❤️",
+  tour_s5_body: "Keep the cars and stories you love in one place."
 };
 
 const es: Dict = {
@@ -840,16 +988,17 @@ const es: Dict = {
   nav_group_discover: "DESCUBRIR",
   nav_group_tools: "HERRAMIENTAS",
 
-  hero_title_1: "EL MUNDO DE LOS COCHES,",
-  hero_title_2: "REIMAGINADO.",
+  hero_title_1: "ENCUENTRA TU COCHE",
+  hero_title_2: "PERFECTO.",
   hero_sub:
-    "Una base de conocimiento automotriz real: coches, marcas, categorías, historias y rankings, todo en un solo lugar.",
+    "Explora miles de coches de todo el mundo, compáralos y encuentra el que encaja contigo.",
   hero_explore: "EXPLORAR COCHES",
-  hero_search_placeholder:
-    "Busca un coche, una marca o una categoría…",
+  hero_search_placeholder: "Busca una marca o un modelo…",
+  hero_search_button: "BUSCAR",
   hero_brands: "EXPLORAR MARCAS",
   hero_find: "ENCONTRAR MI COCHE",
   hero_story: "DESCUBRIR UNA HISTORIA",
+  scroll_hint_2: "Desplázate para explorar",
 
   stat_cars: "COCHES",
   stat_brands: "MARCAS",
@@ -1223,10 +1372,64 @@ const es: Dict = {
   fav_clear_history: "BORRAR HISTORIAL",
   fav_empty_recent: "Aún no se ha visto ningún coche.",
   fav_total: "en total",
+
+  // ---- Nuevas secciones de inicio / onboarding ----
+  nav_help: "CÓMO USAR",
+  budget_eyebrow: "POR PRESUPUESTO",
+  budget_title: "ENCUENTRA COCHES POR PRESUPUESTO",
+  budget_sub:
+    "Explora la base de datos por rango de precio y descubre lo que encaja.",
+  budget_up_to: "Hasta",
+  features_eyebrow: "LAS HERRAMIENTAS",
+  features_title: "TODO LO QUE NECESITAS",
+  features_sub:
+    "Herramientas potentes y precisas para descubrir, comparar y guardar los coches que te encantan.",
+  features_find_desc:
+    "Responde a unas pocas preguntas y obtén coincidencias hechas a tu medida.",
+  features_compare_desc:
+    "Compara hasta 3 coches lado a lado con todas sus especificaciones.",
+  features_explore_desc:
+    "Explora cada marca, categoría y rango de precio de la base de datos.",
+  features_favorites_desc:
+    "Guarda los coches y las historias que te gustan y vuelve cuando quieras.",
+
+  howto_eyebrow: "PARA EMPEZAR",
+  howto_title: "CÓMO USAR CARVIBES",
+  howto_sub: "Encuentra tu coche perfecto en 4 pasos sencillos.",
+  howto_search_desc: "Busca un coche o una marca.",
+  howto_explore_desc: "Descubre coches, marcas y categorías.",
+  howto_compare_desc: "Compara modelos y encuentra la mejor opción.",
+  howto_save_desc:
+    "Guarda tus coches favoritos y vuelve a verlos más tarde.",
+  howto_full_guide: "VER LA GUÍA COMPLETA",
+
+  tour_skip: "Saltar",
+  tour_next: "Siguiente",
+  tour_back: "Atrás",
+  tour_done: "Hecho",
+  tour_step: "Paso",
+  tour_of: "de",
+  tour_s1_title: "¡Bienvenido a CarVibes! 🚗",
+  tour_s1_body:
+    "Descubre miles de coches y encuentra el perfecto para ti.",
+  tour_s2_title: "Busca cualquier coche 🔍",
+  tour_s2_body:
+    "Escribe una marca o un modelo y entra directamente en la base de datos.",
+  tour_s3_title: "Explora las categorías 🚗",
+  tour_s3_body:
+    "Navega por categoría: deportivos, lujo, SUV, eléctricos y más.",
+  tour_s4_title: "Compara coches ⚖️",
+  tour_s4_body:
+    "Añade hasta 3 coches y compara cada especificación lado a lado.",
+  tour_s5_title: "Guarda tus favoritos ❤️",
+  tour_s5_body:
+    "Mantén en un solo lugar los coches y las historias que te gustan.",
 };
 
-const dicts: Record<Lang, Dict> = { fr, en, es };
+// Only fully translated languages are listed. Any other language falls back
+// to English automatically — the app never renders a raw key.
+const dicts: Partial<Record<Lang, Dict>> = { fr, en, es };
 
 export function t(lang: Lang, key: string): string {
-  return dicts[lang][key] ?? en[key] ?? key;
+  return dicts[lang]?.[key] ?? en[key] ?? key;
 }

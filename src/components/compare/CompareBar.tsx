@@ -17,7 +17,10 @@ export default function CompareBar({
   if (count === 0) return null;
 
   return (
-    <div className="safe-bottom pointer-events-none fixed left-1/2 z-40 w-full max-w-[calc(100vw-2rem)] -translate-x-1/2 px-0">
+    <div
+      data-onboarding="compare-bar"
+      className="safe-bottom pointer-events-none fixed left-1/2 z-40 w-full max-w-[calc(100vw-2rem)] -translate-x-1/2 px-0"
+    >
       <button
         onClick={onOpen}
         className={cn(
