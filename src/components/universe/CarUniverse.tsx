@@ -59,6 +59,11 @@ export default function CarUniverse({
     }
     const q = searchParams.get("q");
     if (q) setQuery(q);
+    // Budget deep links: /explore?maxPrice=120000
+    const maxPrice = Number(searchParams.get("maxPrice"));
+    if (Number.isFinite(maxPrice) && maxPrice > 0) {
+      setFilters((f) => ({ ...f, maxPrice }));
+    }
   }, [searchParams]);
 
   // Reset pagination whenever inputs change

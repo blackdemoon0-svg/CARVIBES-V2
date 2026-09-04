@@ -65,7 +65,10 @@ export default function DiscoverSection({ lang }: { lang: Lang }) {
             {t(lang, "browse_categories")}
           </span>
         </div>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+        <div
+          data-onboarding="categories"
+          className="grid grid-cols-2 gap-3 sm:grid-cols-3"
+        >
           {categoryList.map((cat, i) => (
             <Link
               key={cat.id}

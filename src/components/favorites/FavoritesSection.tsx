@@ -46,7 +46,11 @@ export default function FavoritesSection({
   );
 
   return (
-    <section id="favorites" className="border-t border-line bg-ink py-24 sm:py-32">
+    <section
+      id="favorites"
+      data-onboarding="favorites-section"
+      className="border-t border-line bg-ink py-24 sm:py-32"
+    >
       <div className="mx-auto max-w-[1480px] px-5 sm:px-8 lg:px-16">
         {/* Header */}
         <div className="mb-12">

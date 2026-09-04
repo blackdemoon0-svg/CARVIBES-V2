@@ -136,6 +136,28 @@
     animation: drift 14s ease-out forwards;
   }
 
+  /* Hero scroll indicator — gentle up/down motion inside the mouse shape */
+  @keyframes scroll-dot {
+    0% {
+      transform: translateY(0);
+      opacity: 0;
+    }
+  35% {
+      opacity: 1;
+    }
+    70% {
+      transform: translateY(10px);
+      opacity: 0;
+    }
+    100% {
+      transform: translateY(10px);
+      opacity: 0;
+    }
+  }
+  .scroll-dot {
+    animation: scroll-dot 1.8s ease-in-out infinite;
+  }
+
   /* Nav link underline */
   .nav-link {
     position: relative;
@@ -239,7 +261,8 @@
     }
     .camera-drift,
     .hero-in,
-    .card-in {
+    .card-in,
+    .scroll-dot {
       animation: none;
     }
     .hero-in,

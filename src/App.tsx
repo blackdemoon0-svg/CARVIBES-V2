@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   BrowserRouter,
   Route,
@@ -7,16 +7,19 @@ import {
   useNavigate,
 } from "react-router-dom";
 import type { Lang } from "./lib/i18n";
-import { getStoredLang, storeLang } from "./lib/i18n";
+import { detectLang, isRtl, storeLang } from "./lib/i18n";
 import { useReveal } from "./lib/useReveal";
 import { addToCompare } from "./lib/prefs";
 import { cars } from "./lib/db";
 import { storyById } from "./lib/stories";
 import { usePageMeta } from "./lib/seo";
-import LanguageScreen from "./components/LanguageScreen";
 import Navigation from "./components/Navigation";
 import Hero from "./components/Hero";
 import DiscoverSection from "./components/DiscoverSection";
+import BudgetSection from "./components/BudgetSection";
+import FeaturesSection from "./components/FeaturesSection";
+import HowToSection from "./components/HowToSection";
+import OnboardingTour from "./components/OnboardingTour";
 import PopularCarsSection from "./components/PopularCarsSection";
 import RankingsSection from "./components/RankingsSection";
 import StoriesSection from "./components/stories/StoriesSection";
@@ -125,9 +128,13 @@ function Homepage({
           onSearch={() => setSearchOpen(true)}
           onBrands={() => navigate("/brands")}
         />
-        <PopularCarsSection lang={lang} onOpen={openCar} />
+        {/* Quick categories + popular brands live right after the hero, so
+            the first screen flows straight into useful browse content. */}
         <DiscoverSection lang={lang} />
+        <PopularCarsSection lang={lang} onOpen={openCar} />
+        <BudgetSection lang={lang} />
         <RankingsSection lang={lang} onOpen={openCar} />
+        <FeaturesSection lang={lang} />
         <StoriesSection lang={lang} onOpen={openStory} compact />
         <FindMyCarSection lang={lang} onStart={() => setFinderOpen(true)} />
         <CarUniverse lang={lang} onOpen={openCar} />
@@ -137,6 +144,7 @@ function Homepage({
           onOpenStory={openStory}
           onCompareCar={handleCompareCar}
         />
+        <HowToSection lang={lang} />
       </main>
       <Footer
         lang={lang}
@@ -189,6 +197,9 @@ function Homepage({
           onOpen={openCar}
         />
       )}
+
+      {/* First-time visitor guided tour (homepage only) */}
+      <OnboardingTour lang={lang} />
     </div>
   );
 }
@@ -305,26 +316,28 @@ function NotFoundPage() {
 }
 
 export default function App() {
-  // Initialize synchronously to avoid a language-screen flash on returning visits.
-  const [lang, setLang] = useState<Lang | null>(() => getStoredLang());
-
-  const handleSelect = useCallback((l: Lang) => {
-    storeLang(l);
-    setLang(l);
-  }, []);
+  // Visitors land directly on the homepage — there is no blocking language
+  // screen. The language resolves instantly from the stored preference, the
+  // browser language, or English as the fallback.
+  const [lang, setLang] = useState<Lang>(() => detectLang());
 
   const handleLangChange = useCallback((l: Lang) => {
     storeLang(l);
     setLang(l);
   }, []);
 
+  // Keep the document's text direction in sync (Arabic = RTL) and expose the
+  // active language to assistive tech / search engines.
+  useEffect(() => {
+    const html = document.documentElement;
+    const rtl = isRtl(lang);
+    html.dir = rtl ? "rtl" : "ltr";
+    html.lang = lang;
+  }, [lang]);
+
   return (
     <BrowserRouter>
-      {lang === null ? (
-        <LanguageScreen onSelect={handleSelect} />
-      ) : (
-        <RoutedApp lang={lang} onLangChange={handleLangChange} />
-      )}
+      <RoutedApp lang={lang} onLangChange={handleLangChange} />
     </BrowserRouter>
   );
 }

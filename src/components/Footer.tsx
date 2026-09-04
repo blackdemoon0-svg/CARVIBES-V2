@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { LANGS, t, type Lang } from "../lib/i18n";
+import { startOnboarding, requestOnboardingAfterNav } from "../lib/onboarding";
 import { Logo } from "./Logo";
 import { YouTubeIcon, InstagramIcon } from "./icons";
 
@@ -11,7 +12,7 @@ interface FooterProps {
 
 const LINK_GROUPS: {
   title: string;
-  links: { label: string; to: string; external?: boolean }[];
+  links: { label: string; to: string; external?: boolean; help?: boolean }[];
 }[] = [
   {
     title: "DISCOVER",
@@ -20,6 +21,7 @@ const LINK_GROUPS: {
       { label: "Find My Car", to: "/find-my-car" },
       { label: "Stories", to: "/news" },
       { label: "Favorites", to: "/favorites" },
+      { label: "How to use CarVibes", to: "/#how-to", help: true },
     ],
   },
   {
@@ -85,12 +87,33 @@ export default function Footer({ lang, onLangChange, onCompare }: FooterProps) {
               <ul className="mt-5 space-y-3">
                 {group.links.map((link) => (
                   <li key={link.label}>
-                    <Link
-                      to={link.to}
-                      className="text-sm text-mist transition-colors duration-300 hover:text-white"
-                    >
-                      {link.label}
-                    </Link>
+                    {link.help ? (
+                      <Link
+                        to={link.to}
+                        onClick={() => {
+                          // Same page (homepage): start immediately.
+                          // Other pages: start as soon as the homepage mounts.
+                          if (
+                            typeof window !== "undefined" &&
+                            window.location.pathname === "/"
+                          ) {
+                            startOnboarding();
+                          } else {
+                            requestOnboardingAfterNav();
+                          }
+                        }}
+                        className="text-sm text-mist transition-colors duration-300 hover:text-white"
+                      >
+                        {link.label}
+                      </Link>
+                    ) : (
+                      <Link
+                        to={link.to}
+                        className="text-sm text-mist transition-colors duration-300 hover:text-white"
+                      >
+                        {link.label}
+                      </Link>
+                    )}
                   </li>
                 ))}
                 {group.title === "DISCOVER" && onCompare && (
@@ -109,22 +132,24 @@ export default function Footer({ lang, onLangChange, onCompare }: FooterProps) {
 
           {/* Language */}
           <div>
-            <h4 className="text-[11px] font-semibold tracking-[0.2em] text-fog">
+            <h4 className="flex items-center gap-2 text-[11px] font-semibold tracking-[0.2em] text-fog">
+              <span aria-hidden="true">🌐</span>
               {t(lang, "nav_language").toUpperCase()}
             </h4>
-            <div className="mt-5 inline-flex border border-line">
+            <div className="mt-5 grid grid-cols-2 gap-2">
               {LANGS.map((l) => (
                 <button
                   key={l.code}
                   onClick={() => onLangChange(l.code)}
                   aria-label={l.label}
-                  className={`px-3.5 py-2.5 text-xs font-semibold tracking-[0.12em] transition-colors duration-300 ${
+                  className={`flex items-center gap-2 border px-3 py-2.5 text-left text-xs font-semibold tracking-wide transition-colors duration-300 ${
                     l.code === lang
-                      ? "bg-accent text-white"
-                      : "text-mist hover:bg-charcoal hover:text-white"
+                      ? "border-accent bg-accent/10 text-white"
+                      : "border-line text-mist hover:border-white/25 hover:bg-charcoal hover:text-white"
                   }`}
                 >
-                  {l.code.toUpperCase()}
+                  <span aria-hidden="true">{l.flag}</span>
+                  <span className="truncate">{l.label}</span>
                 </button>
               ))}
             </div>
