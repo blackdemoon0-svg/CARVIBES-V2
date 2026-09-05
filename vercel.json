@@ -2,6 +2,33 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "routes": [
     {
+      "src": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.carvibes.dev"
+        }
+      ],
+      "headers": {
+        "Location": "https://carvibes.dev/$1"
+      },
+      "status": 308
+    },
+    {
+      "src": "/(favicon\\.svg)",
+      "headers": {
+        "Cache-Control": "public, max-age=31536000, immutable"
+      },
+      "continue": true
+    },
+    {
+      "src": "/(sitemap\\.xml|robots\\.txt)",
+      "headers": {
+        "Cache-Control": "public, max-age=0, must-revalidate"
+      },
+      "continue": true
+    },
+    {
       "handle": "filesystem"
     },
     {
@@ -933,8 +960,27 @@
       "status": 404
     },
     {
-      "src": "/(.*)",
-      "dest": "/index.html"
+      "src": "^/car/([^/]+)/?$",
+      "dest": "/car/$1.html"
+    },
+    {
+      "src": "^/story/([^/]+)/?$",
+      "dest": "/story/$1.html"
+    },
+    {
+      "src": "^/(explore|news|brands|find-my-car|contact|privacy-policy|terms|favorites|compare|search)/?$",
+      "dest": "/$1.html"
+    },
+    {
+      "handle": "error"
+    },
+    {
+      "src": "/.*",
+      "status": 404,
+      "dest": "/404.html",
+      "headers": {
+        "X-Robots-Tag": "noindex"
+      }
     }
   ]
 }
