@@ -20,7 +20,25 @@
       name="keywords"
       content="cars, automotive, car database, sports cars, luxury cars, car discovery, car culture, car stories, car rankings, compare cars"
     />
-    <link rel="canonical" href="https://carvibes-coral.vercel.app/" />
+    <!--
+      No static canonical link element here, on purpose.
+
+      This single HTML document is served for all 542 routes, so a
+      hardcoded canonical would be wrong for every URL except "/".
+      Google canonicalises twice — once on the raw HTML, once after
+      rendering — and a raw value that JavaScript later rewrites is the
+      one pattern Google explicitly warns against.
+
+      Per Google's guidance for client-rendered apps: "If you can't set
+      the canonical URL in the HTML source code, leave it out and only
+      set it with JavaScript."
+      https://developers.google.com/search/docs/crawling-indexing/consolidate-duplicate-urls
+
+      With nothing declared here, Google's raw-HTML pass defaults to the
+      self-referencing URL (already correct for every indexable route),
+      and setCanonical() in src/lib/seo.ts injects the matching element
+      on render. Both passes agree; no canonical is ever wrong.
+    -->
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
@@ -30,7 +48,7 @@
       property="og:description"
       content="CarVibes is an automotive knowledge base: real cars, brands, categories, in-depth stories, rankings and compare tools — all searchable in one place."
     />
-    <meta property="og:url" content="https://carvibes-coral.vercel.app/" />
+    <meta property="og:url" content="https://carvibes.dev/" />
     <meta property="og:image" content="https://images.pexels.com/photos/261985/pexels-photo-261985.jpeg?auto=compress&cs=tinysrgb&fit=crop&w=1200&h=630" />
     <meta property="og:locale" content="en_US" />
     <meta property="og:locale:alternate" content="fr_FR" />
@@ -51,7 +69,7 @@
         "@context": "https://schema.org",
         "@type": "WebSite",
         "name": "CarVibes",
-        "url": "https://carvibes-coral.vercel.app",
+        "url": "https://carvibes.dev",
         "slogan": "Discover. Feel. Drive."
       }
     </script>
@@ -60,7 +78,7 @@
         "@context": "https://schema.org",
         "@type": "Organization",
         "name": "CarVibes",
-        "url": "https://carvibes-coral.vercel.app",
+        "url": "https://carvibes.dev",
         "slogan": "Discover. Feel. Drive.",
         "description": "A premium automotive discovery platform.",
         "sameAs": [

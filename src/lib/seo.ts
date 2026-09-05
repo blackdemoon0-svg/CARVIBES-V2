@@ -5,13 +5,15 @@
 // canonical URL, description and Open Graph tags.
 //
 // The single source of truth for URLs is the canonical domain:
-// https://carvibes-coral.vercel.app — no new URLs are invented.
+// https://carvibes.dev — no new URLs are invented. SITE_URL below is
+// also read at build time by scripts/generate-sitemap.mjs, so the
+// sitemap, robots.txt and runtime canonicals can never disagree.
 // ============================================================
 import { useEffect } from "react";
 import type { Car } from "./cars";
 import type { Story } from "./stories";
 
-export const SITE_URL = "https://carvibes-coral.vercel.app";
+export const SITE_URL = "https://carvibes.dev";
 export const SITE_NAME = "CarVibes";
 
 export const DEFAULT_TITLE = "CarVibes — Discover. Feel. Drive.";
