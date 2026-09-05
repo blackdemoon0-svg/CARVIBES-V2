@@ -387,6 +387,40 @@ function carPage(car, siteUrl) {
 function storyPage(story, siteUrl) {
   const url = `${siteUrl}/story/${story.id}`;
   const description = clamp(story.description);
+
+  // stories.ts uses { title, paragraphs: string[], quote? } — the old
+  // code read ch.body/ch.text and produced empty sections for every
+  // chapter. We render each paragraph correctly and surface quotes +
+  // timeline so the prerendered HTML carries real indexable text.
+  const chaptersHtml = Array.isArray(story.chapters)
+    ? story.chapters
+        .map((ch) => {
+          const title = `<h2>${esc(ch.title ?? "")}</h2>`;
+          // Prefer the canonical `paragraphs` field; keep a fallback for
+          // any legacy shape so the build never silently emits blanks.
+          const body = Array.isArray(ch.paragraphs) && ch.paragraphs.length
+            ? ch.paragraphs.map((p) => `<p>${esc(clamp(p, 1200))}</p>`).join("")
+            : `<p>${esc(clamp(ch.body ?? ch.text ?? "", 1200))}</p>`;
+          const quote = ch.quote ? `<blockquote>${esc(ch.quote)}</blockquote>` : "";
+          return `<section>${title}${body}${quote}</section>`;
+        })
+        .join("")
+    : "";
+
+  const timelineHtml =
+    Array.isArray(story.timeline) && story.timeline.length
+      ? `<section><h2>Timeline</h2><ul>` +
+        story.timeline
+          .map((e) => `<li><strong>${esc(e.year)}</strong> — ${esc(e.label)}: ${esc(e.detail)}</li>`)
+          .join("") +
+        `</ul></section>`
+      : "";
+
+  const metaLine =
+    `<p>${esc(String(story.year))} · ${esc(story.brand)}` +
+    (story.creator ? ` · ${esc(story.creator)}` : "") +
+    ` · ${esc(String(story.readTime))} min</p>`;
+
   return {
     file: path.join("story", `${story.id}.html`),
     title: `${story.title} — CarVibes`,
@@ -403,17 +437,12 @@ function storyPage(story, siteUrl) {
       url,
       author: { "@type": "Organization", name: "CarVibes", url: siteUrl },
       publisher: { "@type": "Organization", name: "CarVibes", url: siteUrl },
+      datePublished: String(story.year),
     },
     body:
-      `<article><h1>${esc(story.title)}</h1><p>${esc(description)}</p>` +
-      (Array.isArray(story.chapters)
-        ? story.chapters
-            .map(
-              (ch) =>
-                `<section><h2>${esc(ch.title ?? "")}</h2><p>${esc(clamp(ch.body ?? ch.text ?? "", 1200))}</p></section>`
-            )
-            .join("")
-        : "") +
+      `<article><h1>${esc(story.title)}</h1>${metaLine}<p>${esc(description)}</p>` +
+      chaptersHtml +
+      timelineHtml +
       `</article>` +
       linkList([{ href: "/news", label: "All stories" }], "Continue reading"),
   };
