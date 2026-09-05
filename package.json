@@ -5,11 +5,14 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && node scripts/prerender.mjs",
     "prebuild": "node scripts/generate-sitemap.mjs",
     "generate:sitemap": "node scripts/generate-sitemap.mjs",
     "typecheck": "tsc --noEmit",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "prerender": "node scripts/prerender.mjs",
+    "submit:indexnow": "node scripts/submit-indexnow.mjs",
+    "verify:seo": "node scripts/verify-seo.mjs"
   },
   "dependencies": {
     "@vercel/analytics": "^2.0.1",
