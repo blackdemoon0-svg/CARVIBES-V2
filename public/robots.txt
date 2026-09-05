@@ -1,4 +1,5 @@
+# CarVibes — https://www.robotstxt.org/robotstxt.html
 User-agent: *
 Allow: /
 
-Sitemap: https://carvibes-coral.vercel.app/sitemap.xml
+Sitemap: https://carvibes.dev/sitemap.xml
