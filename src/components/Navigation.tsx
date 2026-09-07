@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "../utils/cn";
 import { LANGS as LANG_LIST, t, type Lang } from "../lib/i18n";
@@ -37,6 +37,12 @@ const PRIMARY_LINKS: Destination[] = [
   { key: "nav_rankings", to: "/#rankings", section: "rankings" },
 ];
 
+/**
+ * CarVibes Quiz — its own accent-styled entry point. Kept out of
+ * PRIMARY_LINKS so the existing navigation order is untouched.
+ */
+const QUIZ_LINK: Destination = { key: "nav_quiz", to: "/car-quiz" };
+
 const SECONDARY_LINKS: Destination[] = [
   { key: "nav_find", to: "/find-my-car" },
   { key: "nav_favorites", to: "/favorites" },
@@ -46,7 +52,11 @@ const SECONDARY_LINKS: Destination[] = [
 const MOBILE_GROUPS: { titleKey: string; links: Destination[] }[] = [
   {
     titleKey: "nav_group_discover",
-    links: [{ key: "nav_home", to: "/#top", section: "top" }, ...PRIMARY_LINKS],
+    links: [
+      { key: "nav_home", to: "/#top", section: "top" },
+      ...PRIMARY_LINKS,
+      QUIZ_LINK,
+    ],
   },
   {
     titleKey: "nav_group_tools",
@@ -203,10 +213,45 @@ export default function Navigation({
           </Link>
 
           {/* Center — primary destinations + "More" menu */}
-          <nav className="hidden items-center gap-8 lg:flex">
-            {PRIMARY_LINKS.map((link) =>
-              renderSectionAwareLink(link, cn(linkClasses, "text-mist"), t(lang, link.key))
-            )}
+          <nav className="hidden items-center gap-5 lg:flex xl:gap-8">
+            {PRIMARY_LINKS.map((link, i) => (
+              <Fragment key={link.key}>
+                {renderSectionAwareLink(
+                  link,
+                  cn(linkClasses, "text-mist"),
+                  t(lang, link.key)
+                )}
+                {/* CarVibes Quiz sits right after EXPLORE — same rhythm as the
+                    other destinations, with a quiet accent treatment so it
+                    reads as a feature, not an ad. */}
+                {i === 0 && (
+                  <NavLink
+                    to={QUIZ_LINK.to}
+                    aria-label={t(lang, "nav_quiz")}
+                    className={({ isActive }) =>
+                      cn(
+                        "quiz-sheen group inline-flex h-8 shrink-0 items-center gap-1.5 border text-[10px] font-bold tracking-[0.16em] transition-all duration-300",
+                        "px-2.5 active:scale-[0.97] xl:h-9 xl:gap-2 xl:px-3.5",
+                        "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
+                        isActive
+                          ? "border-accent bg-accent text-white shadow-[0_0_24px_-8px_rgba(227,38,46,0.9)]"
+                          : "border-accent/40 bg-accent/[0.08] text-white hover:border-accent/80 hover:bg-accent/15 hover:shadow-[0_0_24px_-10px_rgba(227,38,46,0.8)]"
+                      )
+                    }
+                  >
+                    <span
+                      aria-hidden="true"
+                      className="text-[8px] leading-none text-accent-soft transition-transform duration-500 group-hover:rotate-90 xl:text-[10px]"
+                    >
+                      ◆
+                    </span>
+                    {/* Short label below xl so the bar never overflows at 1024px */}
+                    <span className="xl:hidden">{t(lang, "nav_quiz_short")}</span>
+                    <span className="hidden xl:inline">{t(lang, "nav_quiz")}</span>
+                  </NavLink>
+                )}
+              </Fragment>
+            ))}
 
             {/* Secondary destinations */}
             <div className="relative" onClick={(e) => e.stopPropagation()}>
@@ -341,7 +386,14 @@ export default function Navigation({
                         "opacity 0.4s ease, transform 0.4s ease, color 0.3s ease",
                     }}
                   >
-                    {t(lang, link.key)}
+                    <span className="flex items-center gap-3">
+                      {link.key === "nav_quiz" && (
+                        <span aria-hidden="true" className="text-sm text-accent">
+                          ◆
+                        </span>
+                      )}
+                      {t(lang, link.key)}
+                    </span>
                     <ArrowRight className="h-5 w-5 text-fog" />
                   </Link>
                 ))}

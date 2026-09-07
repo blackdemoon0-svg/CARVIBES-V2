@@ -67,7 +67,12 @@ async function loadData() {
     [
       `import { cars } from ${JSON.stringify(path.join(ROOT, "src/lib/db.ts"))};`,
       `import { stories } from ${JSON.stringify(path.join(ROOT, "src/lib/stories.ts"))};`,
-      `export { cars, stories };`,
+      `import { QUESTIONS } from ${JSON.stringify(path.join(ROOT, "src/lib/quiz/data/index.ts"))};`,
+      `import { QUIZZES } from ${JSON.stringify(path.join(ROOT, "src/lib/quiz/quizzes.ts"))};`,
+      `import { QUIZ_CATEGORIES } from ${JSON.stringify(path.join(ROOT, "src/lib/quiz/data/categories.ts"))};`,
+      `import { quizDicts } from ${JSON.stringify(path.join(ROOT, "src/lib/quiz/i18n.ts"))};`,
+      `import { POINTS_PER_CORRECT } from ${JSON.stringify(path.join(ROOT, "src/lib/quiz/economy.ts"))};`,
+      `export { cars, stories, QUESTIONS, QUIZZES, QUIZ_CATEGORIES, quizDicts, POINTS_PER_CORRECT };`,
     ].join("\n"),
     "utf8"
   );
@@ -83,7 +88,17 @@ async function loadData() {
       logLevel: "silent",
     });
     const mod = await import(pathToFileURL(outfile).href);
-    return { cars: mod.cars, stories: mod.stories };
+    return {
+      cars: mod.cars,
+      stories: mod.stories,
+      quiz: {
+        questions: mod.QUESTIONS,
+        quizzes: mod.QUIZZES,
+        categories: mod.QUIZ_CATEGORIES,
+        en: mod.quizDicts.en,
+        points: mod.POINTS_PER_CORRECT,
+      },
+    };
   } finally {
     rmSync(outDir, { recursive: true, force: true });
   }
@@ -218,6 +233,12 @@ const STATIC_PAGES = [
     description: "Answer a few questions and match with your perfect car.",
   },
   {
+    path: "/car-quiz",
+    title: "Car Quiz – Automotive Trivia & Car Knowledge | CarVibes",
+    description:
+      "Play the free CarVibes car quiz: 160+ automotive trivia questions across 10 categories and 5 difficulty levels. Guess the car, test your car knowledge, compare performance figures and guess prices — earn points, unlock quizzes and level up.",
+  },
+  {
     path: "/contact",
     title: "Contact — CarVibes",
     description: "Get in touch with CarVibes.",
@@ -252,7 +273,7 @@ const STATIC_PAGES = [
   },
 ];
 
-function staticBody(routePath, { cars, stories }) {
+function staticBody(routePath, { cars, stories, quiz }) {
   const topCars = cars.slice(0, 60).map((c) => ({
     href: `/car/${c.id}`,
     label: `${c.brand} ${c.model} (${c.year})`,
@@ -302,11 +323,189 @@ function staticBody(routePath, { cars, stories }) {
         `<h1>Stories</h1><p>Automotive stories, legends and hidden machines.</p>` +
         linkList(allStories, "All stories")
       );
+    case "/car-quiz":
+      return quizBody(routePath, { cars, stories: allStories, quiz });
     default: {
       const page = STATIC_PAGES.find((p) => p.path === routePath);
       return `<h1>${esc(page.title.replace(/ — CarVibes$/, ""))}</h1><p>${esc(page.description)}</p>`;
     }
   }
+}
+
+// ------------------------------------------------------------
+// 6b. CarVibes Quiz — static body + structured data
+// Everything below is generated from the real question bank, so the
+// markup a crawler reads can never drift away from the game itself.
+// ------------------------------------------------------------
+const DIFFICULTY_LABEL = {
+  easy: "Easy",
+  medium: "Medium",
+  hard: "Hard",
+  expert: "Expert",
+  insane: "Insane",
+};
+
+function quizBody(routePath, { cars, stories, quiz }) {
+  const en = quiz.en;
+  const total = quiz.questions.length;
+
+  const categoryLis = quiz.categories
+    .map(
+      (c) =>
+        `<li><strong>${esc(en[c.nameKey])}</strong> — ${esc(
+          en[`${c.nameKey}_sub`]
+        )}</li>`
+    )
+    .join("");
+
+  const difficultyLis = Object.keys(quiz.points)
+    .map(
+      (d) =>
+        `<li><strong>${esc(DIFFICULTY_LABEL[d] || d)}</strong> — ${esc(
+          en[`diff_${d}_sub`]
+        )} (+${quiz.points[d]} points per correct answer)</li>`
+    )
+    .join("");
+
+  const quizLis = quiz.quizzes
+    .slice(0, 12)
+    .map(
+      (q) =>
+        `<li><strong>${esc(q.title.en)}</strong> — ${esc(q.blurb.en)} (${
+          q.count
+        } questions, ${esc(DIFFICULTY_LABEL[q.difficulty] || q.difficulty)}${
+          q.premium ? ", premium unlock" : ", free"
+        })</li>`
+    )
+    .join("");
+
+  const faqKeys = Object.keys(en)
+    .filter((k) => /^quiz_faq_\d+_q$/.test(k))
+    .sort((a, b) => Number(a.match(/\d+/)[0]) - Number(b.match(/\d+/)[0]));
+  const faqLis = faqKeys
+    .map(
+      (q) =>
+        `<details><summary>${esc(en[q])}</summary><p>${esc(
+          en[q.replace(/_q$/, "_a")]
+        )}</p></details>`
+    )
+    .join("");
+
+  const sampleQuestions = quiz.questions
+    .slice(0, 5)
+    .map(
+      (q) =>
+        `<li>${esc(q.prompt.en)} <em>Answer: ${esc(
+          q.options[q.answer].en
+        )}</em></li>`
+    )
+    .join("");
+
+  const carLinks = cars.slice(0, 40).map((c) => ({
+    href: `/car/${c.id}`,
+    label: `${c.brand} ${c.model} (${c.year})`,
+  }));
+
+  return (
+    `<h1>${esc(en.quiz_h1)}</h1>` +
+    `<p>${esc(en.quiz_tagline)}</p>` +
+    `<section><h2>${esc(en.quiz_seo_intro_h)}</h2>` +
+    `<p>${esc(en.quiz_seo_intro_p1)}</p><p>${esc(en.quiz_seo_intro_p2)}</p></section>` +
+    `<section><h2>${esc(en.quiz_seo_categories_h)}</h2><p>${esc(
+      en.quiz_seo_categories_p
+    )}</p><ul>${categoryLis}</ul></section>` +
+    `<section><h2>${esc(en.quiz_seo_diff_h)}</h2><ul>${difficultyLis}</ul></section>` +
+    `<section><h2>${esc(en.quiz_seo_featured_h)}</h2><p>${esc(
+      en.quiz_seo_featured_p
+    )}</p><ul>${quizLis}</ul></section>` +
+    `<section><h2>${esc(en.quiz_seo_how_h)}</h2><ol>` +
+    Object.keys(en)
+      .filter((k) => /^quiz_seo_step\d+$/.test(k))
+      .sort((a, b) => Number(a.match(/\d+/)[0]) - Number(b.match(/\d+/)[0]))
+      .map((key) => {
+        const n = key.match(/\d+/)[0];
+        return `<li><strong>${esc(en[key])}</strong> — ${esc(en[`quiz_seo_step${n}_p`])}</li>`;
+      })
+      .join("") +
+    `</ol></section>` +
+    `<section><h2>Example car quiz questions</h2><ul>${sampleQuestions}</ul>` +
+    `<p>${total} questions in the bank, drawn at random for every run.</p></section>` +
+    `<section><h2>${esc(en.quiz_seo_faq_h)}</h2>${faqLis}</section>` +
+    `<section><h2>${esc(en.quiz_seo_explore_h)}</h2><ul>` +
+    [
+      { href: "/explore", label: "Explore cars" },
+      { href: "/find-my-car", label: "Find my car" },
+      { href: "/compare", label: "Compare cars" },
+      { href: "/brands", label: "Brands" },
+      { href: "/news", label: "Stories" },
+    ]
+      .map((l) => `<li><a href="${esc(l.href)}">${esc(l.label)}</a></li>`)
+      .join("") +
+    `</ul></section>` +
+    linkList(stories.slice(0, 10), "Latest stories") +
+    linkList(carLinks, "Cars featured in the quiz")
+  );
+}
+
+function quizSchema(data, siteUrl) {
+  const { quiz } = data;
+  const en = quiz.en;
+  const url = `${siteUrl}/car-quiz`;
+
+  const sampleQuestions = quiz.questions.slice(0, 5).map((q) => ({
+    "@type": "Question",
+    name: q.prompt.en,
+    acceptedAnswer: { "@type": "Answer", text: q.options[q.answer].en },
+  }));
+
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Quiz",
+        "@id": `${url}#quiz`,
+        name: "CarVibes Car Quiz — Automotive Trivia & Car Knowledge",
+        description:
+          "Free automotive trivia quiz with 160+ questions across 10 car categories and 5 difficulty levels. Guess the car, test your car knowledge, compare performance figures and guess prices.",
+        url,
+        inLanguage: "en",
+        educationalUse: "practice",
+        about: [{ "@type": "Thing", name: "Automobiles" }],
+        numberOfItems: quiz.questions.length,
+        hasPart: sampleQuestions,
+      },
+      {
+        "@type": "FAQPage",
+        "@id": `${url}#faq`,
+        mainEntity: Object.keys(en)
+          .filter((k) => /^quiz_faq_\d+_q$/.test(k))
+          .sort((a, b) => Number(a.match(/\d+/)[0]) - Number(b.match(/\d+/)[0]))
+          .map((q) => ({
+            "@type": "Question",
+            name: en[q],
+            acceptedAnswer: { "@type": "Answer", text: en[q.replace(/_q$/, "_a")] },
+          })),
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": `${url}#breadcrumb`,
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: "CarVibes",
+            item: `${siteUrl}/`,
+          },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: "Car Quiz",
+            item: url,
+          },
+        ],
+      },
+    ],
+  };
 }
 
 function carPage(car, siteUrl) {
@@ -471,6 +670,7 @@ async function main() {
       type: "website",
       noindex: p.noindex,
       body: staticBody(p.path, data),
+      schema: p.path === "/car-quiz" ? quizSchema(data, siteUrl) : undefined,
     })),
     ...data.cars.map((c) => carPage(c, siteUrl)),
     ...data.stories.map((s) => storyPage(s, siteUrl)),

@@ -1,6 +1,8 @@
 // Fully translated languages have a complete dictionary below. Any other
 // language still works:  falls back to English, so adding a language is
 // a one-line change here plus (optionally) a new dictionary later.
+import { quizDicts } from "./quiz/i18n";
+
 export type Lang =
   | "fr"
   | "en"
@@ -4355,7 +4357,7 @@ const zh: Dict = {
   aria_menu: "菜单",
 };
 
-const dicts: Record<Lang, Dict> = {
+export const baseDicts: Record<Lang, Dict> = {
   en,
   de,
   fr,
@@ -4368,6 +4370,30 @@ const dicts: Record<Lang, Dict> = {
   zh,
 };
 
-export function t(lang: Lang, key: string): string {
-  return dicts[lang]?.[key] ?? en[key] ?? key;
+// ------------------------------------------------------------
+// Feature dictionaries are merged into this one central lookup, so the
+// whole site — including CarVibes Quiz — still translates through the
+// single `t(lang, key)` function below. There is deliberately no second
+// translation system to keep in sync.
+// ------------------------------------------------------------
+const dicts: Record<Lang, Dict> = (
+  ["en", "de", "fr", "es", "it", "pt", "nl", "ar", "ja", "zh"] as Lang[]
+).reduce((acc, code) => {
+  acc[code] = { ...baseDicts[code], ...quizDicts[code] };
+  return acc;
+}, {} as Record<Lang, Dict>);
+
+export function t(
+  lang: Lang,
+  key: string,
+  params?: Record<string, string | number>
+): string {
+  // Falls back to the *merged* English dictionary, so feature strings
+  // (CarVibes Quiz, …) resolve even in a language that lacks them.
+  const raw = dicts[lang]?.[key] ?? dicts.en?.[key] ?? key;
+  if (!params) return raw;
+  // {token} interpolation for the few dynamic strings (costs, counters).
+  return raw.replace(/\{(\w+)\}/g, (match, token: string) =>
+    params[token] === undefined ? match : String(params[token])
+  );
 }
