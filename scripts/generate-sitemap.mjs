@@ -105,6 +105,7 @@ const STATIC_ROUTES = [
   { path: "/news", changefreq: "weekly", priority: "0.9", group: "stories" },
   { path: "/brands", changefreq: "weekly", priority: "0.8", group: "cars" },
   { path: "/find-my-car", changefreq: "monthly", priority: "0.7", group: "site" },
+  { path: "/car-quiz", changefreq: "daily", priority: "0.9", group: "site" },
   { path: "/contact", changefreq: "yearly", priority: "0.4", group: "site" },
   { path: "/privacy-policy", changefreq: "yearly", priority: "0.2", group: "site" },
   { path: "/terms", changefreq: "yearly", priority: "0.2", group: "site" },

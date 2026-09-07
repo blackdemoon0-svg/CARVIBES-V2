@@ -6,13 +6,15 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build && node scripts/prerender.mjs",
-    "prebuild": "node scripts/generate-sitemap.mjs",
+    "prebuild": "node scripts/generate-sitemap.mjs && node scripts/validate-quiz.mjs",
     "generate:sitemap": "node scripts/generate-sitemap.mjs",
     "typecheck": "tsc --noEmit",
     "preview": "vite preview",
     "prerender": "node scripts/prerender.mjs",
     "submit:indexnow": "node scripts/submit-indexnow.mjs",
-    "verify:seo": "node scripts/verify-seo.mjs"
+    "verify:seo": "node scripts/verify-seo.mjs",
+    "validate:quiz": "node scripts/validate-quiz.mjs",
+    "smoke:quiz": "node scripts/smoke-quiz.mjs"
   },
   "dependencies": {
     "@vercel/analytics": "^2.0.1",

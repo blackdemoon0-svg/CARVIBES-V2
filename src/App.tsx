@@ -39,6 +39,7 @@ import type { Car } from "./lib/cars";
 import {
   BrandsPage,
   ComparePage,
+  CarQuizPage,
   ContactPage,
   ExplorePage,
   FavoritesPage,
@@ -50,7 +51,7 @@ import {
   type ShellProps,
 } from "./pages/RoutePages";
 
-function Homepage({
+export function Homepage({
   lang,
   onLangChange,
 }: {
@@ -282,6 +283,7 @@ function RoutedApp({
             />
           }
         />
+        <Route path="/car-quiz" element={<CarQuizPage {...shell} />} />
         <Route path="/brands" element={<BrandsPage {...shell} />} />
         <Route path="/contact" element={<ContactPage {...shell} />} />
         <Route path="/privacy-policy" element={<PrivacyPage {...shell} />} />

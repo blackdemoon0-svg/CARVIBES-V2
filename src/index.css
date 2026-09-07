@@ -271,3 +271,280 @@
     }
   }
 }
+
+/* ============================================================
+   CARVIBES QUIZ — motion + surface tokens
+   Built on the existing design language (sharp corners, red accent,
+   uppercase micro-labels, Archivo display type). Every animation is
+   transform/opacity only, so it stays smooth on mobile, and all of it
+   is disabled under `prefers-reduced-motion`.
+   ============================================================ */
+@layer utilities {
+  /* Ambient depth behind the quiz hub + player */
+  .quiz-arena {
+    background-image:
+      radial-gradient(90% 55% at 50% -10%, rgba(227, 38, 46, 0.14) 0%, transparent 60%),
+      radial-gradient(60% 40% at 100% 0%, rgba(59, 130, 246, 0.05) 0%, transparent 60%),
+      linear-gradient(180deg, #0b0c11 0%, var(--color-ink) 55%);
+  }
+  /* Fine hairline grid — subtle "technical dashboard" texture */
+  .quiz-grid {
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.028) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.028) 1px, transparent 1px);
+    background-size: 56px 56px;
+    mask-image: radial-gradient(75% 60% at 50% 0%, #000 0%, transparent 75%);
+  }
+  .quiz-glow {
+    box-shadow: 0 0 0 1px rgba(227, 38, 46, 0.18), 0 24px 60px -30px rgba(227, 38, 46, 0.55);
+  }
+  .quiz-sheen {
+    position: relative;
+    overflow: hidden;
+  }
+  .quiz-sheen::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      105deg,
+      transparent 35%,
+      rgba(255, 255, 255, 0.08) 50%,
+      transparent 65%
+    );
+    transform: translateX(-100%);
+  }
+  .quiz-sheen:hover::after {
+    animation: quiz-sheen 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* ---- keyframes ---- */
+  @keyframes quiz-sheen {
+    to {
+      transform: translateX(100%);
+    }
+  }
+  @keyframes quiz-in {
+    from {
+      opacity: 0;
+      transform: translateY(14px) scale(0.995);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+  .quiz-in {
+    animation: quiz-in 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  @keyframes quiz-option-in {
+    from {
+      opacity: 0;
+      transform: translateX(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  .quiz-option-in {
+    animation: quiz-option-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  @keyframes quiz-pop {
+    0% {
+      transform: scale(1);
+    }
+    40% {
+      transform: scale(1.015);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  .quiz-pop {
+    animation: quiz-pop 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @keyframes quiz-shake {
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+    20% {
+      transform: translateX(-5px);
+    }
+    45% {
+      transform: translateX(4px);
+    }
+    70% {
+      transform: translateX(-2px);
+    }
+  }
+  .quiz-shake {
+    animation: quiz-shake 0.34s ease-in-out;
+  }
+  /* Points flying from the answer toward the HUD balance */
+  @keyframes quiz-fly {
+    0% {
+      opacity: 0;
+      transform: translate(0, 6px) scale(0.9);
+    }
+    18% {
+      opacity: 1;
+      transform: translate(0, -4px) scale(1);
+    }
+    100% {
+      opacity: 0;
+      transform: translate(0, -64px) scale(0.94);
+    }
+  }
+  .quiz-fly {
+    animation: quiz-fly 1.1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  @keyframes quiz-streak {
+    0% {
+      opacity: 0;
+      transform: translateY(10px) scale(0.94);
+    }
+    20% {
+      opacity: 1;
+      transform: translateY(0) scale(1.04);
+    }
+    80% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(-14px) scale(0.98);
+    }
+  }
+  .quiz-streak {
+    animation: quiz-streak 1.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  /* HUD balance flash when points land */
+  @keyframes quiz-balance {
+    0% {
+      transform: scale(1);
+      color: inherit;
+    }
+    35% {
+      transform: scale(1.12);
+      color: #ffd166;
+    }
+    100% {
+      transform: scale(1);
+      color: inherit;
+    }
+  }
+  .quiz-balance {
+    animation: quiz-balance 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  /* Level-up overlay */
+  @keyframes quiz-level-in {
+    from {
+      opacity: 0;
+      transform: scale(0.9) translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
+  .quiz-level-in {
+    animation: quiz-level-in 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  @keyframes quiz-burst {
+    from {
+      opacity: 0;
+      transform: scale(0.4);
+    }
+    40% {
+      opacity: 0.9;
+    }
+    to {
+      opacity: 0;
+      transform: scale(2.4);
+    }
+  }
+  .quiz-burst {
+    animation: quiz-burst 1.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  @keyframes quiz-spark {
+    0% {
+      opacity: 0;
+      transform: translate(0, 0) scale(0.4);
+    }
+    15% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      transform: translate(var(--dx), var(--dy)) scale(0.2);
+    }
+  }
+  .quiz-spark {
+    animation: quiz-spark 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  /* Unlock: padlock opening + card flip-in */
+  @keyframes quiz-unlock {
+    0% {
+      transform: scale(1);
+    }
+    35% {
+      transform: scale(1.06);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  .quiz-unlock {
+    animation: quiz-unlock 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  /* Slow pulse for the daily-quiz accent + locked CTAs */
+  @keyframes quiz-pulse {
+    0%,
+    100% {
+      opacity: 0.55;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+  .quiz-pulse {
+    animation: quiz-pulse 2.6s ease-in-out infinite;
+  }
+  /* Segmented progress bar fill */
+  .quiz-bar-fill {
+    transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  /* Number roll for the points balance */
+  .quiz-tabular {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* Accessibility: keep the game playable without motion. */
+@media (prefers-reduced-motion: reduce) {
+  .quiz-in,
+  .quiz-option-in,
+  .quiz-pop,
+  .quiz-shake,
+  .quiz-fly,
+  .quiz-streak,
+  .quiz-balance,
+  .quiz-level-in,
+  .quiz-burst,
+  .quiz-spark,
+  .quiz-unlock,
+  .quiz-pulse,
+  .quiz-sheen::after {
+    animation: none !important;
+  }
+  .quiz-bar-fill {
+    transition: none;
+  }
+  .quiz-fly,
+  .quiz-streak {
+    opacity: 1 !important;
+  }
+}

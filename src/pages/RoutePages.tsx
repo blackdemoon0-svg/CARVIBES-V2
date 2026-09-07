@@ -12,6 +12,7 @@ import FavoritesSection from "../components/favorites/FavoritesSection";
 import FindMyCar from "../components/findmycar/FindMyCar";
 import CompareModal from "../components/compare/CompareModal";
 import GlobalSearch from "../components/GlobalSearch";
+import QuizPage from "../components/quiz/QuizPage";
 import CompareBar from "../components/compare/CompareBar";
 
 export interface ShellProps {
@@ -239,5 +240,17 @@ export function TermsPage(props: ShellProps) {
       <p>{t(props.lang, "terms_p2")}</p>
       <p>{t(props.lang, "footer_rights")}</p>
     </LegalLayout>
+  );
+}
+
+/**
+ * /car-quiz — CarVibes Quiz. Uses the same shell as every other page
+ * (navigation, footer, compare bar) so the site stays one product.
+ */
+export function CarQuizPage(props: ShellProps) {
+  return (
+    <Chrome {...props}>
+      <QuizPage lang={props.lang} />
+    </Chrome>
   );
 }

@@ -59,6 +59,11 @@ function setRobots(content: string | null) {
 }
 
 const ROUTE_META: Record<string, { title: string; description: string }> = {
+  "/car-quiz": {
+    title: "Car Quiz – Automotive Trivia & Car Knowledge | CarVibes",
+    description:
+      "Play the free CarVibes car quiz: 160+ automotive trivia questions across 10 categories and 5 difficulty levels. Guess the car, test your car knowledge, compare performance figures and guess prices — earn points, unlock quizzes and level up.",
+  },
   "/explore": {
     title: "Explore cars — CarVibes",
     description: "Browse and filter the CarVibes universe of cars.",

@@ -20,6 +20,7 @@ const LINK_GROUPS: {
       { labelKey: "footer_explore", to: "/explore" },
       { labelKey: "nav_find", to: "/find-my-car" },
       { labelKey: "nav_stories", to: "/news" },
+      { labelKey: "nav_quiz", to: "/car-quiz" },
       { labelKey: "nav_favorites", to: "/favorites" },
       { labelKey: "footer_how_to", to: "/#how-to", help: true },
     ],
