@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { t, type Lang } from "../lib/i18n";
 import { cars, allBrands } from "../lib/db";
 import { stories } from "../lib/stories";
@@ -139,38 +139,61 @@ export default function Hero({
             />
             <button
               type="submit"
-              className="h-10 shrink-0 bg-accent px-5 text-[11px] font-semibold tracking-[0.18em] text-white transition-all duration-300 hover:bg-accent-soft hover:shadow-[0_0_24px_-6px_rgba(227,38,46,0.7)]"
+              className="cv-btn cv-btn-sm cv-btn-primary h-10 shrink-0 px-5 text-[11px] font-semibold tracking-[0.18em]"
             >
               {t(lang, "hero_search_button")}
             </button>
           </form>
 
-          {/* Buttons */}
+          {/* Main actions — EXPLORE · FIND YOUR CAR · USED CARS */}
           <div
-            className="hero-in mt-6 flex flex-col items-stretch gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4"
+            className="hero-in mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-stretch"
             style={{ animationDelay: "920ms" }}
           >
             <a
               href="#discover"
-              className="group inline-flex h-13 items-center justify-center gap-3 bg-accent px-7 text-[12px] font-semibold tracking-[0.18em] text-white transition-all duration-300 hover:bg-accent-soft hover:shadow-[0_0_40px_-8px_rgba(227,38,46,0.6)] sm:w-auto"
+              className="cv-btn cv-btn-primary group inline-flex h-13 items-center justify-center gap-3 whitespace-nowrap px-7 text-[12px] font-semibold tracking-[0.18em] sm:min-w-[11rem]"
             >
-              {t(lang, "hero_explore")}
+              {t(lang, "hero_action_explore")}
               <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
             </a>
             <button
               type="button"
+              onClick={onFind}
+              className="cv-btn cv-btn-ghost group inline-flex h-13 items-center justify-center gap-3 whitespace-nowrap px-7 text-[12px] font-semibold tracking-[0.18em] sm:min-w-[11rem]"
+            >
+              {t(lang, "hero_action_find")}
+            </button>
+            <Link
+              to="/used-cars"
+              className="cv-btn cv-btn-ghost group inline-flex h-13 items-center justify-center gap-3 whitespace-nowrap px-7 text-[12px] font-semibold tracking-[0.18em] sm:min-w-[11rem]"
+            >
+              <span
+                aria-hidden="true"
+                className="h-1.5 w-1.5 rounded-full bg-accent shadow-[0_0_10px_rgba(227,38,46,0.9)] transition-colors duration-300 group-hover:bg-ink"
+              />
+              {t(lang, "hero_action_used")}
+            </Link>
+          </div>
+
+          {/* Secondary: brands directory */}
+          <div
+            className="hero-in mt-5 flex flex-wrap items-center gap-x-6 gap-y-2"
+            style={{ animationDelay: "1000ms" }}
+          >
+            <button
+              type="button"
               onClick={onBrands}
-              className="group inline-flex h-13 items-center justify-center gap-3 border border-white/30 px-7 text-[12px] font-semibold tracking-[0.18em] text-white transition-all duration-300 hover:border-white/70 hover:bg-white hover:text-ink sm:w-auto"
+              className="group inline-flex items-center gap-2 text-[11px] font-medium tracking-[0.18em] text-fog underline decoration-line underline-offset-8 transition-colors duration-300 hover:text-white"
             >
               {t(lang, "hero_brands")}
             </button>
-            <button
-              type="button"
-              onClick={onFind}
-              className="group inline-flex h-13 items-center justify-center gap-2 px-1 text-[11px] font-medium tracking-[0.18em] text-fog underline decoration-line underline-offset-8 transition-colors duration-300 hover:text-white sm:w-auto"
+            <Link
+              to="/used-cars"
+              className="group inline-flex items-center gap-2 text-[11px] font-medium tracking-[0.18em] text-fog underline decoration-line underline-offset-8 transition-colors duration-300 hover:text-white"
             >
-              {t(lang, "hero_find")}
-            </button>
+              {t(lang, "hero_action_used_sub").toUpperCase()}
+            </Link>
           </div>
         </div>
       </div>

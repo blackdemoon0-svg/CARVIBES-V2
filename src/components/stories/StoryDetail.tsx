@@ -332,7 +332,7 @@ export default function StoryDetail({
                   <div className="mt-8 flex flex-wrap gap-3">
                     <button
                       onClick={() => onOpenCar(linkedCar)}
-                      className="group inline-flex h-13 items-center gap-3 border border-white/25 px-7 text-[12px] font-semibold tracking-[0.18em] text-white transition-colors hover:border-accent hover:bg-accent"
+                      className="cv-btn cv-btn-ghost group inline-flex h-13 items-center gap-3 px-7 text-[12px] font-semibold tracking-[0.18em] transition-colors hover:border-accent hover:bg-accent"
                     >
                       {t(lang, "st_explore_car")}
                       <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -340,7 +340,7 @@ export default function StoryDetail({
                     {onCompareCar && (
                       <button
                         onClick={() => onCompareCar(linkedCar)}
-                        className="inline-flex h-13 items-center gap-2 border border-white/25 px-7 text-[12px] font-semibold tracking-[0.18em] text-mist transition-colors hover:border-accent hover:text-white"
+                        className="cv-btn cv-btn-subtle inline-flex h-13 items-center gap-2 px-7 text-[12px] font-semibold tracking-[0.18em] transition-colors hover:border-accent hover:text-white"
                       >
                         ⚔ {t(lang, "cp_compare")}
                       </button>

@@ -64,6 +64,11 @@ const ROUTE_META: Record<string, { title: string; description: string }> = {
     description:
       "Play the free CarVibes car quiz: 160+ automotive trivia questions across 10 categories and 5 difficulty levels. Guess the car, test your car knowledge, compare performance figures and guess prices — earn points, unlock quizzes and level up.",
   },
+  "/used-cars": {
+    title: "Best Used Cars to Buy in 2026–2027 — Used Cars Guide | CarVibes",
+    description:
+      "Discover the best used cars to buy in 2026–2027, ranked by reliability, value, maintenance, fuel economy and performance. Most reliable used cars, budget picks, SUVs, sports cars, luxury, family, hybrids and EVs — each with a CarVibes Score.",
+  },
   "/explore": {
     title: "Explore cars — CarVibes",
     description: "Browse and filter the CarVibes universe of cars.",

@@ -228,7 +228,7 @@ function EmptyState({ message, cta, to }: { message: string; cta: string; to: st
       <p className="max-w-sm text-sm text-mist">{message}</p>
       <Link
         to={to}
-        className="group mt-6 inline-flex h-12 items-center gap-3 border border-accent bg-accent px-7 text-[11px] font-semibold tracking-[0.18em] text-white transition-colors hover:bg-accent-soft"
+        className="cv-btn cv-btn-primary group mt-6 inline-flex h-12 items-center gap-3 px-7 text-[11px] font-semibold tracking-[0.18em] text-white transition-colors hover:bg-accent-soft"
       >
         {cta}
         <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />

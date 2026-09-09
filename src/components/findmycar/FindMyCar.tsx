@@ -285,14 +285,14 @@ export default function FindMyCar({
               <div className="mt-10 flex items-center justify-between">
                 <button
                   onClick={back}
-                  className="border border-line px-6 py-3.5 text-[11px] font-semibold tracking-[0.18em] text-mist transition-colors hover:border-white/30 hover:text-white"
+                  className="cv-btn cv-btn-subtle px-6 py-3.5 text-[11px] font-semibold tracking-[0.18em] hover:text-white"
                 >
                   {t(lang, "fmc_back")}
                 </button>
                 <button
                   onClick={next}
                   disabled={!canNext()}
-                  className={`group inline-flex items-center gap-3 bg-accent px-8 py-3.5 text-[11px] font-semibold tracking-[0.18em] text-white transition-all duration-300 ${
+                  className={`cv-btn cv-btn-primary group inline-flex items-center gap-3 px-8 py-3.5 text-[11px] font-semibold tracking-[0.18em] transition-all duration-300 ${
                     canNext() ? "hover:bg-accent-soft" : "cursor-not-allowed opacity-40"
                   }`}
                 >
@@ -347,7 +347,7 @@ function Intro({ lang, onStart }: { lang: Lang; onStart: () => void }) {
       </p>
       <button
         onClick={onStart}
-        className="hero-in group mt-12 inline-flex h-16 max-w-full items-center gap-3 bg-accent px-8 text-[13px] font-semibold tracking-[0.2em] text-white transition-all duration-300 hover:bg-accent-soft hover:shadow-[0_0_60px_-10px_rgba(227,38,46,0.7)] sm:px-12"
+        className="cv-btn cv-btn-primary hero-in group mt-12 inline-flex h-16 max-w-full items-center gap-3 px-8 text-[13px] font-semibold tracking-[0.2em] text-white transition-all duration-300 hover:shadow-[0_0_60px_-10px_rgba(227,38,46,0.7)] sm:px-12"
         style={{ animationDelay: "300ms" }}
       >
         {t(lang, "fmc_start")}
@@ -735,14 +735,14 @@ function ResultCard({ lang, result, index, onExplore, onToggleFav, onToggleCmp }
         <div className="mt-5 flex flex-wrap items-center gap-2">
           <button
             onClick={() => onExplore(car)}
-            className="group inline-flex h-11 items-center gap-2 bg-accent px-5 text-[11px] font-semibold tracking-[0.14em] text-white transition-colors hover:bg-accent-soft"
+            className="cv-btn cv-btn-primary group inline-flex h-11 items-center gap-2 px-5 text-[11px] font-semibold tracking-[0.14em] hover:bg-accent-soft"
           >
             {t(lang, "fmc_explore")}
             <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
           </button>
           <button
             onClick={() => onToggleCmp(car.id)}
-            className={`h-11 border px-5 text-[11px] font-semibold tracking-[0.14em] transition-colors ${
+            className={`cv-btn h-11 border px-5 text-[11px] font-semibold tracking-[0.14em] ${
               cmp ? "border-accent bg-accent/10 text-white" : "border-white/25 text-mist hover:border-white/50 hover:text-white"
             }`}
           >
@@ -751,7 +751,7 @@ function ResultCard({ lang, result, index, onExplore, onToggleFav, onToggleCmp }
           <button
             onClick={() => onToggleFav(car.id)}
             aria-label={t(lang, "fmc_save")}
-            className={`h-11 border px-4 text-[11px] font-semibold tracking-[0.14em] transition-colors ${
+            className={`cv-btn h-11 border px-4 text-[11px] font-semibold tracking-[0.14em] ${
               fav ? "border-accent bg-accent/10 text-white" : "border-white/25 text-mist hover:border-white/50 hover:text-white"
             }`}
           >

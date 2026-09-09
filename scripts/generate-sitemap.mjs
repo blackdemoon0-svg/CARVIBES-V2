@@ -102,6 +102,7 @@ function normalizeOrigin(value, source) {
 const STATIC_ROUTES = [
   { path: "/", changefreq: "daily", priority: "1.0", group: "site" },
   { path: "/explore", changefreq: "daily", priority: "0.9", group: "cars" },
+  { path: "/used-cars", changefreq: "weekly", priority: "0.9", group: "cars" },
   { path: "/news", changefreq: "weekly", priority: "0.9", group: "stories" },
   { path: "/brands", changefreq: "weekly", priority: "0.8", group: "cars" },
   { path: "/find-my-car", changefreq: "monthly", priority: "0.7", group: "site" },

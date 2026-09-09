@@ -92,6 +92,141 @@
   }
 }
 
+/* ============================================================
+   CARVIBES BUTTONS — futuristic "rectangular + circular corner" shape.
+   A controlled refinement of the existing sharp CTAs: same colours,
+   type and sizing tokens, but with an asymmetric geometry (two round
+   corners, two tight corners), a light sheen sweep, a soft lift and a
+   contained glow. Apply `cv-btn` + one variant to any CTA.
+   ============================================================ */
+@layer components {
+  .cv-btn {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    /* Rectangular body, circular top-left / bottom-right corners,
+       tight top-right / bottom-left corners. */
+    border-radius: 1.35rem 0.4rem 1.35rem 0.4rem;
+    transition:
+      transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+      box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+      background-color 0.3s ease,
+      border-color 0.3s ease,
+      color 0.3s ease,
+      border-radius 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: transform;
+  }
+  .cv-btn:hover {
+    transform: translateY(-1px);
+    /* Corners bloom slightly on hover — signals interactivity without
+       changing the layout. */
+    border-radius: 1.6rem 0.55rem 1.6rem 0.55rem;
+  }
+  .cv-btn:active {
+    transform: translateY(0) scale(0.985);
+    transition-duration: 0.12s;
+  }
+  /* Light sheen sweep */
+  .cv-btn::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(
+      105deg,
+      transparent 30%,
+      rgba(255, 255, 255, 0.14) 50%,
+      transparent 70%
+    );
+    transform: translateX(-120%);
+    pointer-events: none;
+  }
+  .cv-btn:hover::after {
+    animation: cv-sheen 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  /* Small (h-9 / h-10) buttons use a tighter geometry */
+  .cv-btn-sm {
+    border-radius: 0.95rem 0.3rem 0.95rem 0.3rem;
+  }
+  .cv-btn-sm:hover {
+    border-radius: 1.1rem 0.4rem 1.1rem 0.4rem;
+  }
+  /* Symmetric variant for icon-only / square buttons */
+  .cv-btn-square {
+    border-radius: 0.85rem 0.3rem 0.85rem 0.3rem;
+  }
+
+  /* Primary — accent fill + red glow */
+  .cv-btn-primary {
+    background-color: var(--color-accent);
+    color: #fff;
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.08) inset,
+      0 10px 30px -14px rgba(227, 38, 46, 0.55);
+  }
+  .cv-btn-primary:hover {
+    background-color: var(--color-accent-soft);
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.14) inset,
+      0 16px 42px -14px rgba(227, 38, 46, 0.8),
+      0 0 34px -10px rgba(227, 38, 46, 0.6);
+  }
+
+  /* Ghost — hairline border, fills white on hover */
+  .cv-btn-ghost {
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    color: #fff;
+    background-color: rgba(255, 255, 255, 0.02);
+  }
+  .cv-btn-ghost:hover {
+    border-color: rgba(255, 255, 255, 0.7);
+    background-color: #fff;
+    color: var(--color-ink);
+    box-shadow: 0 14px 36px -18px rgba(255, 255, 255, 0.45);
+  }
+
+  /* Outline — hairline that turns accent (used on cards + secondary actions) */
+  .cv-btn-outline {
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+  }
+  .cv-btn-outline:hover {
+    border-color: var(--color-accent);
+    background-color: var(--color-accent);
+    box-shadow: 0 10px 30px -12px rgba(227, 38, 46, 0.7);
+  }
+
+  /* Subtle — line border, muted text; brightens on hover */
+  .cv-btn-subtle {
+    border: 1px solid var(--color-line);
+    color: var(--color-mist);
+    background-color: rgba(16, 18, 24, 0.6);
+  }
+  .cv-btn-subtle:hover {
+    border-color: rgba(255, 255, 255, 0.3);
+    color: #fff;
+    background-color: var(--color-graphite);
+  }
+
+  @keyframes cv-sheen {
+    to {
+      transform: translateX(120%);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cv-btn,
+    .cv-btn:hover,
+    .cv-btn:active {
+      transform: none;
+      transition: none;
+    }
+    .cv-btn::after {
+      display: none;
+    }
+  }
+}
+
 @layer utilities {
   /* Reveal-on-scroll */
   .reveal {

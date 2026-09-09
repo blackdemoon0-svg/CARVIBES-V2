@@ -470,7 +470,7 @@ export default function CarUniverse({
             </p>
             <button
               onClick={clearAll}
-              className="mt-6 w-full border border-white/30 px-6 py-3 text-[11px] font-semibold tracking-[0.18em] text-white transition-colors hover:border-accent hover:bg-accent sm:w-auto"
+              className="cv-btn cv-btn-outline mt-6 w-full px-6 py-3 text-[11px] font-semibold tracking-[0.18em] sm:w-auto"
             >
               {t(lang, "filter_clear").toUpperCase()}
             </button>
@@ -502,7 +502,7 @@ export default function CarUniverse({
             {page < totalPages - 1 && (
               <button
                 onClick={() => setPage((p) => p + 1)}
-                className="ml-2 flex h-10 items-center gap-2 border border-line px-4 text-[11px] font-semibold tracking-[0.14em] text-mist transition-colors hover:border-white/30 hover:text-white"
+                className="cv-btn cv-btn-sm cv-btn-subtle ml-2 flex h-10 items-center gap-2 px-4 text-[11px] font-semibold tracking-[0.14em] hover:border-white/30 hover:text-white"
                 aria-label={t(lang, "aria_next_page")}
               >
                 {t(lang, "pagination_next")}

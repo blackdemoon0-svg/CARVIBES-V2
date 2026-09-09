@@ -36,7 +36,7 @@ export default function NotFound({
 
       <button
         onClick={onHome}
-        className="relative z-10 group mt-10 inline-flex h-12 items-center gap-3 bg-accent px-8 text-[12px] font-semibold tracking-[0.18em] text-white transition-colors hover:bg-accent-soft"
+        className="cv-btn cv-btn-primary relative z-10 group mt-10 inline-flex h-12 items-center gap-3 px-8 text-[12px] font-semibold tracking-[0.18em]"
       >
         {t(lang, "notfound_back")}
         <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />

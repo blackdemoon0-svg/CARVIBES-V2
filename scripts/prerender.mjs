@@ -72,7 +72,8 @@ async function loadData() {
       `import { QUIZ_CATEGORIES } from ${JSON.stringify(path.join(ROOT, "src/lib/quiz/data/categories.ts"))};`,
       `import { quizDicts } from ${JSON.stringify(path.join(ROOT, "src/lib/quiz/i18n.ts"))};`,
       `import { POINTS_PER_CORRECT } from ${JSON.stringify(path.join(ROOT, "src/lib/quiz/economy.ts"))};`,
-      `export { cars, stories, QUESTIONS, QUIZZES, QUIZ_CATEGORIES, quizDicts, POINTS_PER_CORRECT };`,
+      `import { USED_CATEGORIES, USED_CAR_ENTRIES, usedCarsForCategory } from ${JSON.stringify(path.join(ROOT, "src/lib/usedCars.ts"))};`,
+      `export { cars, stories, QUESTIONS, QUIZZES, QUIZ_CATEGORIES, quizDicts, POINTS_PER_CORRECT, USED_CATEGORIES, USED_CAR_ENTRIES, usedCarsForCategory };`,
     ].join("\n"),
     "utf8"
   );
@@ -97,6 +98,11 @@ async function loadData() {
         categories: mod.QUIZ_CATEGORIES,
         en: mod.quizDicts.en,
         points: mod.POINTS_PER_CORRECT,
+      },
+      used: {
+        categories: mod.USED_CATEGORIES,
+        entries: mod.USED_CAR_ENTRIES,
+        forCategory: mod.usedCarsForCategory,
       },
     };
   } finally {
@@ -218,6 +224,12 @@ const STATIC_PAGES = [
     description: "Browse and filter the CarVibes universe of cars.",
   },
   {
+    path: "/used-cars",
+    title: "Best Used Cars to Buy in 2026–2027 — Used Cars Guide | CarVibes",
+    description:
+      "Discover the best used cars to buy in 2026–2027, ranked by reliability, value, maintenance, fuel economy and performance. Most reliable used cars, budget picks, SUVs, sports cars, luxury, family, hybrids and EVs — each with a CarVibes Score.",
+  },
+  {
     path: "/news",
     title: "Stories — CarVibes",
     description: "Automotive stories, legends and hidden machines.",
@@ -273,7 +285,7 @@ const STATIC_PAGES = [
   },
 ];
 
-function staticBody(routePath, { cars, stories, quiz }) {
+function staticBody(routePath, { cars, stories, quiz, used }) {
   const topCars = cars.slice(0, 60).map((c) => ({
     href: `/car/${c.id}`,
     label: `${c.brand} ${c.model} (${c.year})`,
@@ -292,6 +304,7 @@ function staticBody(routePath, { cars, stories, quiz }) {
         linkList(
           [
             { href: "/explore", label: "Explore cars" },
+            { href: "/used-cars", label: "Best used cars to buy in 2026–2027" },
             { href: "/brands", label: "Brands" },
             { href: "/news", label: "Stories" },
             { href: "/find-my-car", label: "Find my car" },
@@ -325,11 +338,102 @@ function staticBody(routePath, { cars, stories, quiz }) {
       );
     case "/car-quiz":
       return quizBody(routePath, { cars, stories: allStories, quiz });
+    case "/used-cars":
+      return usedCarsBody(used);
     default: {
       const page = STATIC_PAGES.find((p) => p.path === routePath);
       return `<h1>${esc(page.title.replace(/ — CarVibes$/, ""))}</h1><p>${esc(page.description)}</p>`;
     }
   }
+}
+
+// ------------------------------------------------------------
+// 6a. Used Cars guide — static body + structured data
+// Generated from src/lib/usedCars.ts so the crawlable HTML always
+// mirrors what the React page renders.
+// ------------------------------------------------------------
+const usd = (n) => `$${Number(n).toLocaleString("en-US")}`;
+
+function usedCarsBody(used) {
+  const sections = used.categories
+    .map((cat) => {
+      const items = used
+        .forCategory(cat.id)
+        .map(
+          (e) =>
+            `<li><a href="/car/${esc(e.car.id)}">${esc(e.car.brand)} ${esc(e.car.model)}</a> ` +
+            `(${esc(e.years)}) — est. ${usd(e.priceMin)}–${usd(e.priceMax)} used · ` +
+            `Reliability ${e.reliability}/100 · Maintenance ${e.maintenance}/100 · ` +
+            `Fuel economy ${esc(e.fuelLabel)} · Performance ${e.performance}/100 · ` +
+            `CarVibes Score ${e.score}/100. ${esc(e.why)}</li>`
+        )
+        .join("");
+      return `<section id="${esc(cat.id)}"><h2>${esc(cat.title)}</h2><p>${esc(cat.description)}</p><ol>${items}</ol></section>`;
+    })
+    .join("");
+
+  return (
+    `<article><h1>Best Used Cars to Buy in 2026–2027</h1>` +
+    `<p>CarVibes helps you discover the best used cars based on reliability, value, performance, maintenance costs and fuel economy. ` +
+    `Every pick below is scored 0–100 and linked to its full specification page.</p>` +
+    `<p><em>Editorial guide: prices are CarVibes estimates for good-condition examples on the 2026–2027 used market, not live listings, and vary by mileage, region and trim. Scores are editorial ratings.</em></p>` +
+    `<nav aria-label="Categories"><ul>` +
+    used.categories.map((c) => `<li><a href="#${esc(c.id)}">${esc(c.title)}</a></li>`).join("") +
+    `</ul></nav>` +
+    sections +
+    `<section><h2>How the CarVibes Score works</h2><p>The CarVibes used-car score blends reliability (30%), maintenance cost (20%), fuel economy (20%), performance (15%) and value for money (15%) into a single 0–100 figure. Prices are estimates for good-condition examples on the 2026–2027 used market and vary by mileage, region and trim.</p></section>` +
+    `</article>` +
+    linkList(
+      [
+        { href: "/explore", label: "Explore all cars" },
+        { href: "/find-my-car", label: "Find my car" },
+        { href: "/compare", label: "Compare cars" },
+        { href: "/brands", label: "Brands" },
+      ],
+      "Continue browsing"
+    )
+  );
+}
+
+function usedCarsSchema(used, siteUrl) {
+  const url = `${siteUrl}/used-cars`;
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "CollectionPage",
+        "@id": `${url}#page`,
+        name: "Best Used Cars to Buy in 2026–2027",
+        url,
+        inLanguage: "en",
+        description:
+          "The best used cars to buy in 2026–2027, ranked by reliability, value, maintenance, fuel economy and performance.",
+        isPartOf: { "@type": "WebSite", name: "CarVibes", url: `${siteUrl}/` },
+        hasPart: used.categories.map((cat) => ({
+          "@type": "ItemList",
+          "@id": `${url}#${cat.id}`,
+          name: cat.title,
+          description: cat.description,
+          itemListOrder: "https://schema.org/ItemListOrderDescending",
+          numberOfItems: used.forCategory(cat.id).length,
+          itemListElement: used.forCategory(cat.id).map((e, i) => ({
+            "@type": "ListItem",
+            position: i + 1,
+            name: `${e.car.brand} ${e.car.model} (${e.years})`,
+            url: `${siteUrl}/car/${e.car.id}`,
+          })),
+        })),
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": `${url}#breadcrumb`,
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "CarVibes", item: `${siteUrl}/` },
+          { "@type": "ListItem", position: 2, name: "Used Cars", item: url },
+        ],
+      },
+    ],
+  };
 }
 
 // ------------------------------------------------------------
@@ -670,7 +774,12 @@ async function main() {
       type: "website",
       noindex: p.noindex,
       body: staticBody(p.path, data),
-      schema: p.path === "/car-quiz" ? quizSchema(data, siteUrl) : undefined,
+      schema:
+        p.path === "/car-quiz"
+          ? quizSchema(data, siteUrl)
+          : p.path === "/used-cars"
+            ? usedCarsSchema(data.used, siteUrl)
+            : undefined,
     })),
     ...data.cars.map((c) => carPage(c, siteUrl)),
     ...data.stories.map((s) => storyPage(s, siteUrl)),

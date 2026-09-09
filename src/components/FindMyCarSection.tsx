@@ -54,7 +54,7 @@ export default function FindMyCarSection({
         <div className="reveal mt-12" data-delay="220">
           <button
             onClick={onStart}
-            className="group inline-flex h-16 max-w-full items-center gap-3 bg-accent px-8 text-[13px] font-semibold tracking-[0.2em] text-white transition-all duration-300 hover:bg-accent-soft hover:shadow-[0_0_60px_-10px_rgba(227,38,46,0.7)] sm:px-12"
+            className="cv-btn cv-btn-primary group inline-flex h-16 max-w-full items-center gap-3 px-8 text-[13px] font-semibold tracking-[0.2em] sm:px-12"
           >
             {t(lang, "findmine_cta")}
             <ArrowRight className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1.5" />
