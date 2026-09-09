@@ -48,6 +48,7 @@ import {
   PrivacyPage,
   SearchPage,
   TermsPage,
+  UsedCarsRoutePage,
   type ShellProps,
 } from "./pages/RoutePages";
 
@@ -266,6 +267,7 @@ function RoutedApp({
           element={<Homepage lang={lang} onLangChange={onLangChange} />}
         />
         <Route path="/explore" element={<ExplorePage {...shell} />} />
+        <Route path="/used-cars" element={<UsedCarsRoutePage {...shell} />} />
         <Route path="/news" element={<NewsPage {...shell} />} />
         <Route path="/favorites" element={<FavoritesPage {...shell} />} />
         <Route

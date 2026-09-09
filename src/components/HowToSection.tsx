@@ -91,7 +91,7 @@ export default function HowToSection({ lang }: { lang: Lang }) {
           <button
             type="button"
             onClick={startOnboarding}
-            className="group inline-flex h-14 items-center gap-3 bg-accent px-8 text-[12px] font-semibold tracking-[0.18em] text-white transition-all duration-300 hover:bg-accent-soft hover:shadow-[0_0_50px_-10px_rgba(227,38,46,0.6)]"
+            className="cv-btn cv-btn-primary group inline-flex h-14 items-center gap-3 px-8 text-[12px] font-semibold tracking-[0.18em]"
           >
             {t(lang, "howto_full_guide")}
             <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />

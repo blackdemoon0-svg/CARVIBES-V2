@@ -112,7 +112,7 @@ export default function QuizCard({
               </PrimaryButton>
               <a
                 href="#quiz-seo-how"
-                className="inline-flex h-11 items-center justify-center border border-line px-5 text-[11px] font-bold tracking-[0.18em] text-mist transition-all duration-300 hover:border-white/30 hover:text-white"
+                className="cv-btn cv-btn-subtle inline-flex h-11 items-center justify-center px-5 text-[11px] font-bold tracking-[0.18em] transition-all duration-300 hover:border-white/30 hover:text-white"
               >
                 {t(lang, "quiz_seo_how_h")}
               </a>

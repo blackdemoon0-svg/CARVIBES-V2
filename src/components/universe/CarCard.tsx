@@ -77,7 +77,7 @@ export default function CarCard({
         {/* CTA */}
         <button
           onClick={() => onOpen(car)}
-          className="group/btn mt-4 flex h-11 items-center justify-between border border-white/20 px-4 text-[11px] font-semibold tracking-[0.2em] text-white transition-all duration-300 hover:border-accent hover:bg-accent hover:shadow-[0_8px_26px_-10px_rgba(227,38,46,0.7)]"
+          className="cv-btn cv-btn-outline group/btn mt-4 flex h-11 items-center justify-between px-4 text-[11px] font-semibold tracking-[0.2em]"
         >
           {t(lang, "card_explore")}
           <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5" />

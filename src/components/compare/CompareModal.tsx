@@ -292,7 +292,7 @@ export default function CompareModal({
             {ids.length < 3 && (
               <button
                 onClick={() => setSearchOpen((v) => !v)}
-                className="flex h-[60px] items-center gap-2 border border-dashed border-white/25 px-5 text-[11px] font-semibold tracking-[0.14em] text-mist transition-colors hover:border-accent hover:text-white"
+                className="cv-btn flex h-[60px] items-center gap-2 border border-dashed border-white/25 px-5 text-[11px] font-semibold tracking-[0.14em] text-mist hover:border-accent hover:text-white"
               >
                 + {t(lang, "cp_add")}
               </button>
@@ -345,7 +345,7 @@ export default function CompareModal({
               </p>
               <button
                 onClick={() => setSearchOpen(true)}
-                className="mt-6 border border-accent bg-accent px-6 py-3 text-[11px] font-semibold tracking-[0.18em] text-white transition-colors hover:bg-accent-soft"
+                className="cv-btn cv-btn-primary mt-6 inline-flex h-12 items-center px-7 text-[11px] font-semibold tracking-[0.18em]"
               >
                 {t(lang, "cp_search")}
               </button>
@@ -472,7 +472,7 @@ export default function CompareModal({
                   <div>
                     <button
                       onClick={handleReveal}
-                      className="group flex h-14 w-full items-center justify-center gap-3 bg-accent px-6 text-[12px] font-semibold tracking-[0.2em] text-white transition-colors hover:bg-accent-soft sm:inline-flex sm:w-auto sm:px-9"
+                      className="cv-btn cv-btn-primary group flex h-14 w-full items-center justify-center gap-3 px-6 text-[12px] font-semibold tracking-[0.2em] sm:inline-flex sm:w-auto sm:px-9"
                     >
                       {t(lang, "cp_winner_revealed")}
                       <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />

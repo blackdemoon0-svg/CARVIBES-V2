@@ -14,6 +14,7 @@ import CompareModal from "../components/compare/CompareModal";
 import GlobalSearch from "../components/GlobalSearch";
 import QuizPage from "../components/quiz/QuizPage";
 import CompareBar from "../components/compare/CompareBar";
+import UsedCarsPage from "../components/usedcars/UsedCarsPage";
 
 export interface ShellProps {
   lang: Lang;
@@ -51,6 +52,18 @@ export function ExplorePage(props: ShellProps) {
   return (
     <Chrome {...props}>
       <CarUniverse lang={props.lang} onOpen={props.onOpenCar} />
+    </Chrome>
+  );
+}
+
+/**
+ * /used-cars — Best Used Cars to Buy in 2026–2027. Fully indexable
+ * editorial guide built on the real database; same shell as every page.
+ */
+export function UsedCarsRoutePage(props: ShellProps) {
+  return (
+    <Chrome {...props}>
+      <UsedCarsPage lang={props.lang} onOpenCar={props.onOpenCar} />
     </Chrome>
   );
 }

@@ -266,7 +266,7 @@ export default function GlobalSearch({
             <button
               type="button"
               onClick={clear}
-              className="mt-6 border border-white/30 px-6 py-3 text-[11px] font-semibold tracking-[0.18em] text-white transition-colors hover:border-accent hover:bg-accent"
+              className="cv-btn cv-btn-outline mt-6 px-6 py-3 text-[11px] font-semibold tracking-[0.18em]"
             >
               {t(lang, "filter_clear").toUpperCase()}
             </button>

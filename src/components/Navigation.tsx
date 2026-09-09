@@ -44,6 +44,7 @@ const PRIMARY_LINKS: Destination[] = [
 const QUIZ_LINK: Destination = { key: "nav_quiz", to: "/car-quiz" };
 
 const SECONDARY_LINKS: Destination[] = [
+  { key: "nav_used_cars", to: "/used-cars" },
   { key: "nav_find", to: "/find-my-car" },
   { key: "nav_favorites", to: "/favorites" },
   { key: "nav_contact", to: "/contact" },
@@ -260,7 +261,7 @@ export default function Navigation({
                 aria-label={t(lang, "nav_more")}
                 aria-expanded={moreOpen}
                 className={cn(
-                  "group flex h-9 items-center gap-2 border px-3 text-[11px] font-semibold tracking-[0.18em] transition-colors",
+                  "cv-btn cv-btn-sm group flex h-9 items-center gap-2 border px-3 text-[11px] font-semibold tracking-[0.18em]",
                   moreOpen
                     ? "border-white/30 text-white"
                     : "border-line text-mist hover:border-white/25 hover:text-white"
@@ -320,7 +321,7 @@ export default function Navigation({
             <button
               onClick={onSearch}
               aria-label={t(lang, "nav_search")}
-              className="group flex h-10 items-center gap-2 bg-accent px-2.5 text-white transition-all duration-300 hover:bg-accent-soft hover:shadow-[0_0_24px_-6px_rgba(227,38,46,0.6)] sm:px-4"
+              className="cv-btn cv-btn-sm cv-btn-primary group flex h-10 items-center gap-2 px-3 sm:px-4"
             >
               <SearchIcon className="h-4.5 w-4.5" />
               <span className="hidden text-[11px] font-semibold tracking-[0.18em] md:inline">
@@ -336,7 +337,7 @@ export default function Navigation({
               onClick={() => setMobileOpen((v) => !v)}
               aria-label={t(lang, "aria_menu")}
               aria-expanded={mobileOpen}
-              className="flex h-10 w-10 flex-col items-center justify-center gap-1.5 border border-line text-white lg:hidden"
+              className="cv-btn cv-btn-square flex h-10 w-10 flex-col items-center justify-center gap-1.5 border border-line text-white lg:hidden"
             >
               <span
                 className={cn(

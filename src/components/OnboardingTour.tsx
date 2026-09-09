@@ -320,7 +320,7 @@ export default function OnboardingTour({ lang }: { lang: Lang }) {
           <button
             type="button"
             onClick={() => goToStep(step + 1)}
-            className="group inline-flex h-10 items-center gap-2 bg-accent px-5 text-[11px] font-semibold tracking-[0.16em] text-white transition-all duration-300 hover:bg-accent-soft"
+            className="cv-btn cv-btn-sm cv-btn-primary group inline-flex h-10 items-center gap-2 px-5 text-[11px] font-semibold tracking-[0.16em] hover:bg-accent-soft"
           >
             {step === STEPS.length - 1
               ? t(lang, "tour_done")

@@ -474,7 +474,7 @@ export default function QuizPage({ lang }: { lang: Lang }) {
                       .getElementById("quiz-collection")
                       ?.scrollIntoView({ behavior: "smooth" });
                   }}
-                  className="group inline-flex h-11 items-center gap-2.5 border border-line bg-charcoal px-4 text-[11px] font-bold tracking-[0.16em] text-mist transition-all duration-300 hover:-translate-y-0.5 hover:border-accent/40 hover:text-white"
+                  className="cv-btn cv-btn-subtle group inline-flex h-11 items-center gap-2.5 px-4 text-[11px] font-bold tracking-[0.16em] text-mist transition-all duration-300 hover:-translate-y-0.5 hover:border-accent/40 hover:text-white"
                 >
                   <span aria-hidden="true" className="text-base transition-transform duration-300 group-hover:scale-110">
                     {category.icon}

@@ -18,6 +18,7 @@ const LINK_GROUPS: {
     titleKey: "nav_group_discover",
     links: [
       { labelKey: "footer_explore", to: "/explore" },
+      { labelKey: "nav_used_cars", to: "/used-cars" },
       { labelKey: "nav_find", to: "/find-my-car" },
       { labelKey: "nav_stories", to: "/news" },
       { labelKey: "nav_quiz", to: "/car-quiz" },

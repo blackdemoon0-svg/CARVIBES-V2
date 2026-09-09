@@ -968,7 +968,7 @@
       "dest": "/story/$1.html"
     },
     {
-      "src": "^/(explore|news|brands|find-my-car|car-quiz|contact|privacy-policy|terms|favorites|compare|search)/?$",
+      "src": "^/(explore|used-cars|news|brands|find-my-car|car-quiz|contact|privacy-policy|terms|favorites|compare|search)/?$",
       "dest": "/$1.html"
     },
     {
