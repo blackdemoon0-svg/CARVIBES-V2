@@ -1,6 +1,7 @@
 import { t, type Lang } from "../../lib/i18n";
 import { formatPrice, formatStat } from "../../lib/carUtils";
 import { categoryKey, type Car } from "../../lib/cars";
+import { carAltText } from "../../lib/carSeo";
 import { ArrowUpRight } from "../icons";
 import ImageWithFallback from "../ImageWithFallback";
 import { SaveButton, CompareButton } from "../compare/ActionButtons";
@@ -25,8 +26,8 @@ export default function CarCard({
       <div className="relative aspect-[16/11] overflow-hidden bg-graphite">
         <ImageWithFallback
           src={car.image}
-          alt={`${car.brand} ${car.model}`}
-          title={`${car.brand} ${car.model}`}
+          alt={carAltText(car)}
+          title={carAltText(car)}
           className="absolute inset-0"
           imgClassName="transition-transform duration-[1100ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.08]"
         />

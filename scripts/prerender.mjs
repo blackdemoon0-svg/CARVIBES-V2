@@ -73,7 +73,9 @@ async function loadData() {
       `import { quizDicts } from ${JSON.stringify(path.join(ROOT, "src/lib/quiz/i18n.ts"))};`,
       `import { POINTS_PER_CORRECT } from ${JSON.stringify(path.join(ROOT, "src/lib/quiz/economy.ts"))};`,
       `import { USED_CATEGORIES, USED_CAR_ENTRIES, usedCarsForCategory } from ${JSON.stringify(path.join(ROOT, "src/lib/usedCars.ts"))};`,
-      `export { cars, stories, QUESTIONS, QUIZZES, QUIZ_CATEGORIES, quizDicts, POINTS_PER_CORRECT, USED_CATEGORIES, USED_CAR_ENTRIES, usedCarsForCategory };`,
+      `import { carTitle, carMetaDescription, carOverviewText, carFaq, carAltText, carJsonLd, carCanonicalPath, categoryWords, engineBreakdown } from ${JSON.stringify(path.join(ROOT, "src/lib/carSeo.ts"))};`,
+      `import { battleScore } from ${JSON.stringify(path.join(ROOT, "src/lib/compare.ts"))};`,
+      `export { cars, stories, QUESTIONS, QUIZZES, QUIZ_CATEGORIES, quizDicts, POINTS_PER_CORRECT, USED_CATEGORIES, USED_CAR_ENTRIES, usedCarsForCategory, carTitle, carMetaDescription, carOverviewText, carFaq, carAltText, carJsonLd, carCanonicalPath, categoryWords, engineBreakdown, battleScore };`,
     ].join("\n"),
     "utf8"
   );
@@ -103,6 +105,21 @@ async function loadData() {
         categories: mod.USED_CATEGORIES,
         entries: mod.USED_CAR_ENTRIES,
         forCategory: mod.usedCarsForCategory,
+      },
+      // Shared car-page builders (src/lib/carSeo.ts) + the deterministic
+      // CarVibes score engine — the exact functions the runtime uses, so
+      // prerendered HTML and post-hydration DOM can never disagree.
+      seo: {
+        carTitle: mod.carTitle,
+        carMetaDescription: mod.carMetaDescription,
+        carOverviewText: mod.carOverviewText,
+        carFaq: mod.carFaq,
+        carAltText: mod.carAltText,
+        carJsonLd: mod.carJsonLd,
+        carCanonicalPath: mod.carCanonicalPath,
+        categoryWords: mod.categoryWords,
+        engineBreakdown: mod.engineBreakdown,
+        battleScore: mod.battleScore,
       },
     };
   } finally {
@@ -170,9 +187,16 @@ function renderHead(html, page) {
   }
 
   if (page.schema) {
+    // Car-page schema gets a stable id + data-owner so the runtime
+    // usePageMeta() hook can update it in place on client-side car
+    // switches (and so hydration never duplicates the script block).
+    const attrs =
+      page.schemaOwner === "car"
+        ? ' id="carvibes-jsonld" data-owner="car"'
+        : ' data-owner="static"';
     out = out.replace(
       "</head>",
-      `    <script type="application/ld+json">\n${jsonLd(page.schema)}\n    </script>\n  </head>`
+      `    <script type="application/ld+json"${attrs}>\n${jsonLd(page.schema)}\n    </script>\n  </head>`
     );
   }
 
@@ -612,75 +636,113 @@ function quizSchema(data, siteUrl) {
   };
 }
 
-function carPage(car, siteUrl) {
-  const url = `${siteUrl}/car/${car.id}`;
+function carPage(car, siteUrl, data) {
+  const seo = data.seo;
+  const url = `${siteUrl}${seo.carCanonicalPath(car)}`;
   const name = `${car.brand} ${car.model}`;
-  const description = clamp(
-    car.overview ||
-      car.tagline ||
-      `${name} (${car.year}): ${car.engine}, ${car.hp} hp.`
-  );
+
+  // Title / description / overview / FAQ / alt texts come from
+  // src/lib/carSeo.ts — the exact same builders the runtime applies
+  // after hydration, so both indexing passes agree.
+  const title = seo.carTitle(car);
+  const description = seo.carMetaDescription(car);
+  const overview = seo.carOverviewText(car);
+  const faq = seo.carFaq(car);
+  const alt = seo.carAltText(car);
 
   const spec = (label, value) =>
     value === undefined || value === null || value === 0 || value === "N/A"
       ? ""
       : `<tr><th>${esc(label)}</th><td>${esc(value)}</td></tr>`;
 
+  const table = (rows) => `<table><tbody>${rows.join("")}</tbody></table>`;
+
+  // ---- Engine group: the real engine string + its structured facts ----
+  const { displacement, cylinders, aspiration } = seo.engineBreakdown(car.engine);
+  const engineRows = [
+    spec("Engine", car.engine && car.engine !== "N/A" ? car.engine : null),
+    spec("Displacement", displacement),
+    spec("Cylinders", cylinders),
+    spec("Aspiration", aspiration),
+    spec("Horsepower", car.hp ? `${car.hp} hp` : null),
+    spec("Torque", car.torque ? `${car.torque} Nm` : null),
+  ];
+
+  // ---- Performance group: only values that exist ----
+  const powerToWeight =
+    car.weight && car.hp ? `${Math.round((car.hp / car.weight) * 1000)} hp/t` : null;
+  const performanceRows = [
+    spec("0–100 km/h", car.zeroToHundred ? `${car.zeroToHundred} s` : null),
+    spec("Top speed", car.topSpeed ? `${car.topSpeed} km/h` : null),
+    spec("Transmission", car.transmission),
+    spec("Drivetrain", car.drivetrain),
+    spec("Power-to-weight", powerToWeight),
+  ];
+
+  const dimensionsRows = [spec("Kerb weight", car.weight ? `${car.weight} kg` : null)];
+  const efficiencyRows = [spec("Fuel", car.fuel)];
+  const pricePerPower =
+    car.price && car.hp
+      ? `$${Math.round(car.price / car.hp).toLocaleString("en-US")} / hp`
+      : null;
+  const pricingRows = [
+    spec("Retail price (approx. MSRP)", car.price ? `$${car.price.toLocaleString("en-US")}` : null),
+    spec("Price per horsepower", pricePerPower),
+  ];
+
+  const group = (heading, rows) =>
+    rows.some(Boolean) ? `<h3>${esc(heading)}</h3>${table(rows.filter(Boolean))}` : "";
+
+  // ---- CarVibes Score: deterministic editorial rating from this page's
+  // own data (never a manufacturer figure) — mirrors the runtime section.
+  const score = seo.battleScore(car);
+  const scoreBits = score.breakdown
+    .map((b) => `${esc(b.label.replace(/_/g, " "))} ${Math.round(b.value)}/${b.max}`)
+    .join(" · ");
+
+  const faqHtml = faq.length
+    ? `<section><h2>FAQ</h2>${faq
+        .map((f) => `<h3>${esc(f.q)}</h3><p>${esc(f.a)}</p>`)
+        .join("")}</section>`
+    : "";
+
   return {
     file: path.join("car", `${car.id}.html`),
-    title: `${name} (${car.year}) — CarVibes`,
+    title,
     description,
     url,
     image: car.image,
     type: "article",
-    schema: {
-      "@context": "https://schema.org",
-      "@type": "Vehicle",
-      name: `${name} ${car.year}`,
-      brand: { "@type": "Brand", name: car.brand },
-      model: car.model,
-      vehicleModelDate: String(car.year),
-      bodyType: car.body,
-      fuelType: car.fuel,
-      vehicleTransmission: car.transmission,
-      ...(car.hp
-        ? {
-            vehicleEngine: {
-              "@type": "EngineSpecification",
-              name: car.engine,
-              enginePower: { "@type": "QuantitativeValue", value: car.hp, unitCode: "BHP" },
-            },
-          }
-        : {}),
-      ...(car.topSpeed
-        ? { speed: { "@type": "QuantitativeValue", value: car.topSpeed, unitCode: "KMH" } }
-        : {}),
-      image: car.image,
-      url,
-      description,
-    },
+    schemaOwner: "car",
+    schema: seo.carJsonLd(car, siteUrl),
     body:
-      `<article><h1>${esc(name)} (${esc(car.year)})</h1>` +
-      `<p>${esc(description)}</p>` +
-      `<table><tbody>` +
-      spec("Brand", car.brand) +
-      spec("Model", car.model) +
-      spec("Year", car.year) +
-      spec("Body", car.body) +
-      spec("Engine", car.engine) +
-      spec("Fuel", car.fuel) +
-      spec("Horsepower", car.hp ? `${car.hp} hp` : null) +
-      spec("Torque", car.torque ? `${car.torque} Nm` : null) +
-      spec("Transmission", car.transmission) +
-      spec("Drivetrain", car.drivetrain) +
-      spec("0–100 km/h", car.zeroToHundred ? `${car.zeroToHundred} s` : null) +
-      spec("Top speed", car.topSpeed ? `${car.topSpeed} km/h` : null) +
-      spec("Weight", car.weight ? `${car.weight} kg` : null) +
-      `</tbody></table></article>` +
+      `<article>` +
+      `<h1>${esc(name)} (${esc(car.year)})</h1>` +
+      (car.tagline ? `<p><em>“${esc(car.tagline)}”</em></p>` : "") +
+      `<img src="${esc(car.image)}" alt="${esc(alt)}" />` +
+      `<section><h2>Overview</h2><p>${esc(overview)}</p>` +
+      (car.categories && car.categories.length
+        ? `<p>CarVibes categories: ${esc(seo.categoryWords(car).join(", "))}.</p>`
+        : "") +
+      `</section>` +
+      `<section><h2>Engine &amp; specifications</h2>` +
+      group("Engine", engineRows) +
+      group("Performance", performanceRows) +
+      group("Dimensions", dimensionsRows) +
+      group("Efficiency", efficiencyRows) +
+      group("Pricing", pricingRows) +
+      `</section>` +
+      `<section><h2>CarVibes Score</h2>` +
+      `<p>The CarVibes Score is a deterministic editorial rating derived from the specifications on this page — not a manufacturer figure.</p>` +
+      `<p><strong>${score.total}/100</strong> — ${scoreBits}.</p></section>` +
+      faqHtml +
+      `<p><small>Specifications are indicative and may vary by market.</small></p>` +
+      `</article>` +
       linkList(
         [
           { href: "/explore", label: "Explore all cars" },
           { href: "/brands", label: "All brands" },
+          { href: "/used-cars", label: "Best used cars to buy" },
         ],
         "Continue browsing"
       ),
@@ -781,7 +843,7 @@ async function main() {
             ? usedCarsSchema(data.used, siteUrl)
             : undefined,
     })),
-    ...data.cars.map((c) => carPage(c, siteUrl)),
+    ...data.cars.map((c) => carPage(c, siteUrl, data)),
     ...data.stories.map((s) => storyPage(s, siteUrl)),
   ];
 

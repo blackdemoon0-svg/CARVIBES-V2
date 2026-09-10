@@ -4,43 +4,20 @@ import { formatPrice, formatStat, recommendCars } from "../../lib/carUtils";
 import { cars } from "../../lib/db";
 import { battleScore } from "../../lib/compare";
 import { categoryKey, type Car } from "../../lib/cars";
+import {
+  carAltText,
+  carFaq,
+  carName,
+  carOverviewText,
+  engineBreakdown,
+} from "../../lib/carSeo";
 import { addRecent } from "../../lib/prefs";
 import { useOverlay } from "../../lib/useOverlay";
 import { ArrowRight } from "../icons";
 import { SaveButton, CompareButton } from "../compare/ActionButtons";
 import CarCard from "./CarCard";
 
-/**
- * Extract structured engine facts from the existing engine string.
- * Values are derived only from real data already in the database;
- * anything unrecognized is omitted (never guessed).
- */
-function engineBreakdown(engine: string) {
-  let displacement: string | undefined;
-  let cylinders: string | undefined;
-  let aspiration: string | undefined;
-
-  const d = engine.match(/(\d+(?:\.\d+)?)L\b/);
-  if (d) displacement = `${d[1]} L`;
-
-  const block = engine.match(/\b([VWI])(\d{1,2})\b/);
-  if (block) cylinders = `${block[1]}${block[2]}`;
-  else {
-    const flat = engine.match(/Flat-(\d{1,2})\b/i);
-    if (flat) cylinders = `Flat-${flat[1]}`;
-    else if (/rotary/i.test(engine)) cylinders = "Rotary";
-  }
-
-  if (/twin-turbo/i.test(engine)) aspiration = "Twin-turbo";
-  else if (/quad-turbo/i.test(engine)) aspiration = "Quad-turbo";
-  else if (/turbo/i.test(engine)) aspiration = "Turbocharged";
-  else if (/supercharged/i.test(engine)) aspiration = "Supercharged";
-  else if (/\bNA\b|naturally aspirated/i.test(engine)) aspiration = "Naturally aspirated";
-
-  return { displacement, cylinders, aspiration };
-}
-
-/** Compact specification-group card: strong group label + scannable rows. */
+/** Compact specification-group card: real h3 heading + scannable rows. */
 function SpecGroup({
   title,
   rows,
@@ -50,9 +27,9 @@ function SpecGroup({
 }) {
   return (
     <div className="border border-line bg-charcoal">
-      <p className="border-b border-line px-4 py-3 text-[11px] font-semibold tracking-mega text-white">
+      <h3 className="border-b border-line px-4 py-3 text-[11px] font-semibold tracking-mega text-white">
         {title}
-      </p>
+      </h3>
       <dl className="divide-y divide-line">
         {rows.map((r) => (
           <div key={r.label} className="flex items-baseline justify-between gap-3 px-4 py-2.5">
@@ -65,12 +42,16 @@ function SpecGroup({
   );
 }
 
+// Top-level sections of a car page are real h2 headings (the h1 is the
+// vehicle name in the hero). h3 is reserved for genuine sub-structure
+// (the specification groups). SectionTitle renders as h2 while keeping
+// the established visual rhythm.
 function SectionTitle({ children }: { children: string }) {
   return (
-    <h3 className="mb-4 flex items-center gap-3 text-[11px] font-semibold tracking-mega text-fog">
+    <h2 className="mb-4 flex items-center gap-3 text-[11px] font-semibold tracking-mega text-fog">
       <span className="h-px w-6 bg-accent" />
       {children}
-    </h3>
+    </h2>
   );
 }
 
@@ -110,6 +91,11 @@ export default function CarDetail({
   );
 
   const gallery = car.gallery?.length ? car.gallery : [car.image];
+
+  // FAQ answers are generated from real database values only (carSeo.ts)
+  // — the exact same list the prerendered HTML and the FAQPage JSON-LD
+  // expose, so both indexing passes agree.
+  const faq = carFaq(car);
 
   const powerToWeight =
     car.weight && car.hp
@@ -218,7 +204,7 @@ export default function CarDetail({
       className="fixed inset-0 z-[60] overflow-y-auto bg-ink/95 backdrop-blur-md"
       role="dialog"
       aria-modal="true"
-      aria-label={`${car.brand} ${car.model}`}
+      aria-label={carName(car)}
     >
       <div className="min-h-full py-6 sm:py-10">
         <div className="mx-auto max-w-6xl px-4 sm:px-8">
@@ -244,7 +230,7 @@ export default function CarDetail({
           <div className="relative aspect-[4/3] overflow-hidden border border-line bg-graphite sm:aspect-[16/9]">
             <img
               src={gallery[activeImage]}
-              alt={`${car.brand} ${car.model}`}
+              alt={carAltText(car, activeImage, gallery.length)}
               className="h-full w-full object-cover"
               loading="eager"
               decoding="async"
@@ -262,9 +248,11 @@ export default function CarDetail({
                   <p className="text-xs font-medium tracking-[0.2em] text-mist">
                     {car.brand.toUpperCase()}
                   </p>
-                  <h2 className="mt-1 font-display text-3xl font-bold text-white sm:text-5xl">
-                    {car.model}
-                  </h2>
+                  {/* Exactly one h1 per car page: brand + model, as the
+                      prerendered HTML does — natural phrasing, no stuffing. */}
+                  <h1 className="mt-1 font-display text-3xl font-bold text-white sm:text-5xl">
+                    {car.brand} {car.model}
+                  </h1>
                   <p className="mt-2 text-sm text-mist">
                     {[String(car.year), car.body, car.generation].filter(Boolean).join(" · ")}
                   </p>
@@ -307,7 +295,7 @@ export default function CarDetail({
                 >
                   <img
                     src={g}
-                    alt={`${car.brand} ${car.model} view ${i + 1}`}
+                    alt={carAltText(car, i, gallery.length)}
                     loading="lazy"
                     decoding="async"
                     className="h-full w-full object-cover"
@@ -348,8 +336,7 @@ export default function CarDetail({
               </p>
             )}
             <p className="mt-4 max-w-3xl text-[15px] leading-relaxed text-mist">
-              {car.overview ||
-                `The ${car.brand} ${car.model} (${car.year}) is a ${car.body.toLowerCase()} powered by a ${car.engine} producing ${car.hp} hp.`}
+              {carOverviewText(car)}
             </p>
           </section>
 
@@ -457,6 +444,30 @@ export default function CarDetail({
               </div>
             </div>
           </section>
+
+          {/* FAQ — every answer is backed by a real database value; the
+              section only renders when at least one answer can be given. */}
+          {faq.length > 0 && (
+            <section className="mt-10">
+              <SectionTitle>{t(lang, "detail_faq").toUpperCase()}</SectionTitle>
+              <div className="divide-y divide-line border border-line bg-ink">
+                {faq.map((f) => (
+                  <details key={f.q} className="group px-4 py-3.5 sm:px-5 sm:py-4">
+                    <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-[13px] font-semibold text-white transition-colors hover:text-accent">
+                      {f.q}
+                      <span
+                        aria-hidden="true"
+                        className="shrink-0 text-accent transition-transform duration-300 group-open:rotate-45"
+                      >
+                        +
+                      </span>
+                    </summary>
+                    <p className="mt-3 text-[13px] leading-relaxed text-mist">{f.a}</p>
+                  </details>
+                ))}
+              </div>
+            </section>
+          )}
 
           <p className="mt-6 text-[11px] leading-relaxed text-fog">
             {t(lang, "detail_notice")}
