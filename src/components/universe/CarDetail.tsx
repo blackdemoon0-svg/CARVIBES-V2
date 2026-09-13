@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import { t, type Lang } from "../../lib/i18n";
 import { formatPrice, formatStat, recommendCars } from "../../lib/carUtils";
 import { cars } from "../../lib/db";
@@ -11,7 +12,7 @@ import {
   carOverviewText,
   engineBreakdown,
 } from "../../lib/carSeo";
-import { addRecent } from "../../lib/prefs";
+import { addRecent, addToCompare } from "../../lib/prefs";
 import { useOverlay } from "../../lib/useOverlay";
 import { ArrowRight } from "../icons";
 import { SaveButton, CompareButton } from "../compare/ActionButtons";
@@ -89,6 +90,19 @@ export default function CarDetail({
         .slice(0, 3),
     [car, similar]
   );
+
+  // Deterministic compare partner: first similar, then same brand, then any other car
+  const comparePartner = useMemo(() => {
+    if (similar.length > 0) return similar[0];
+    if (sameBrand.length > 0) return sameBrand[0];
+    // fallback: first car of same primary category
+    const primaryCat = car.categories[0];
+    if (primaryCat) {
+      const fallback = cars.find((c) => c.id !== car.id && c.categories.includes(primaryCat));
+      if (fallback) return fallback;
+    }
+    return cars.find((c) => c.id !== car.id) ?? null;
+  }, [car, similar, sameBrand]);
 
   const gallery = car.gallery?.length ? car.gallery : [car.image];
 
@@ -199,6 +213,9 @@ export default function CarDetail({
     technology: "cp_tech",
   };
 
+  const primaryCategory = car.categories[0];
+  const compareHref = comparePartner ? `/compare?cars=${car.id},${comparePartner.id}` : "/compare";
+
   return (
     <div
       className="fixed inset-0 z-[60] overflow-y-auto bg-ink/95 backdrop-blur-md"
@@ -248,8 +265,6 @@ export default function CarDetail({
                   <p className="text-xs font-medium tracking-[0.2em] text-mist">
                     {car.brand.toUpperCase()}
                   </p>
-                  {/* Exactly one h1 per car page: brand + model, as the
-                      prerendered HTML does — natural phrasing, no stuffing. */}
                   <h1 className="mt-1 font-display text-3xl font-bold text-white sm:text-5xl">
                     {car.brand} {car.model}
                   </h1>
@@ -259,12 +274,13 @@ export default function CarDetail({
                   {/* Categories */}
                   <div className="mt-3 flex flex-wrap gap-2">
                     {car.categories.map((cat) => (
-                      <span
+                      <Link
                         key={cat}
-                        className="border border-white/20 bg-ink/40 px-2.5 py-1 text-[9px] font-semibold tracking-[0.18em] text-white backdrop-blur-sm"
+                        to={`/explore?category=${encodeURIComponent(cat)}`}
+                        className="border border-white/20 bg-ink/40 px-2.5 py-1 text-[9px] font-semibold tracking-[0.18em] text-white backdrop-blur-sm transition-colors hover:border-accent hover:bg-accent/20"
                       >
                         {t(lang, categoryKey(cat))}
-                      </span>
+                      </Link>
                     ))}
                   </div>
                 </div>
@@ -362,17 +378,18 @@ export default function CarDetail({
             </div>
           </section>
 
-          {/* CATEGORIES — real category tags */}
+          {/* CATEGORIES — real category tags with crawlable links */}
           <section className="mt-8">
             <SectionTitle>{t(lang, "detail_categories")}</SectionTitle>
             <div className="flex flex-wrap gap-2 border-y border-line py-4">
               {car.categories.map((cat) => (
-                <span
+                <Link
                   key={cat}
-                  className="border border-line px-3 py-1.5 text-[10px] font-semibold tracking-[0.16em] text-mist"
+                  to={`/explore?category=${encodeURIComponent(cat)}`}
+                  className="border border-line px-3 py-1.5 text-[10px] font-semibold tracking-[0.16em] text-mist transition-colors hover:border-white/30 hover:text-white"
                 >
                   {t(lang, categoryKey(cat))}
-                </span>
+                </Link>
               ))}
             </div>
           </section>
@@ -445,6 +462,103 @@ export default function CarDetail({
             </div>
           </section>
 
+          {/* EXPLORE MORE — internal linking hub */}
+          <section className="mt-10">
+            <SectionTitle>{t(lang, "detail_explore_more") ?? "EXPLORE MORE"}</SectionTitle>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              <Link
+                to={`/explore?brand=${encodeURIComponent(car.brand)}`}
+                className="group flex items-center justify-between border border-line bg-charcoal px-4 py-4 text-left transition-colors hover:border-white/25 hover:bg-graphite"
+              >
+                <div>
+                  <p className="text-[10px] font-medium tracking-[0.18em] text-fog">BRAND</p>
+                  <p className="mt-1 font-display text-sm font-semibold text-white">
+                    Explore {car.brand}
+                  </p>
+                  <p className="mt-1 text-xs text-mist">All {car.brand} cars</p>
+                </div>
+                <ArrowRight className="h-4 w-4 text-fog transition-transform group-hover:translate-x-1 group-hover:text-white" />
+              </Link>
+
+              {primaryCategory && (
+                <Link
+                  to={`/explore?category=${encodeURIComponent(primaryCategory)}`}
+                  className="group flex items-center justify-between border border-line bg-charcoal px-4 py-4 text-left transition-colors hover:border-white/25 hover:bg-graphite"
+                >
+                  <div>
+                    <p className="text-[10px] font-medium tracking-[0.18em] text-fog">CATEGORY</p>
+                    <p className="mt-1 font-display text-sm font-semibold text-white">
+                      {t(lang, categoryKey(primaryCategory))}
+                    </p>
+                    <p className="mt-1 text-xs text-mist">Explore {primaryCategory}</p>
+                  </div>
+                  <ArrowRight className="h-4 w-4 text-fog transition-transform group-hover:translate-x-1 group-hover:text-white" />
+                </Link>
+              )}
+
+              <Link
+                to="/brands"
+                className="group flex items-center justify-between border border-line bg-charcoal px-4 py-4 text-left transition-colors hover:border-white/25 hover:bg-graphite"
+              >
+                <div>
+                  <p className="text-[10px] font-medium tracking-[0.18em] text-fog">BRANDS</p>
+                  <p className="mt-1 font-display text-sm font-semibold text-white">All brands</p>
+                  <p className="mt-1 text-xs text-mist">Browse 66 brands</p>
+                </div>
+                <ArrowRight className="h-4 w-4 text-fog transition-transform group-hover:translate-x-1 group-hover:text-white" />
+              </Link>
+
+              <Link
+                to="/explore"
+                className="group flex items-center justify-between border border-line bg-charcoal px-4 py-4 text-left transition-colors hover:border-white/25 hover:bg-graphite"
+              >
+                <div>
+                  <p className="text-[10px] font-medium tracking-[0.18em] text-fog">EXPLORE</p>
+                  <p className="mt-1 font-display text-sm font-semibold text-white">All cars</p>
+                  <p className="mt-1 text-xs text-mist">509 cars</p>
+                </div>
+                <ArrowRight className="h-4 w-4 text-fog transition-transform group-hover:translate-x-1 group-hover:text-white" />
+              </Link>
+            </div>
+          </section>
+
+          {/* COMPARE — prefilled deep link */}
+          {comparePartner && (
+            <section className="mt-10">
+              <SectionTitle>{t(lang, "detail_compare_title") ?? "COMPARE"}</SectionTitle>
+              <div className="border border-line bg-charcoal p-5">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex items-center gap-3">
+                    <img src={car.image} alt={car.model} className="h-14 w-20 object-cover" />
+                    <span className="text-fog">vs</span>
+                    <img src={comparePartner.image} alt={comparePartner.model} className="h-14 w-20 object-cover" />
+                    <div className="ml-2">
+                      <p className="font-display text-sm font-semibold text-white">
+                        {car.brand} {car.model} vs {comparePartner.brand} {comparePartner.model}
+                      </p>
+                      <p className="mt-1 text-xs text-fog">
+                        {car.year} vs {comparePartner.year} · {comparePartner.hp} hp
+                      </p>
+                    </div>
+                  </div>
+                  <Link
+                    to={compareHref}
+                    onClick={() => {
+                      addToCompare(car.id);
+                      addToCompare(comparePartner.id);
+                    }}
+                    className="cv-btn cv-btn-primary group inline-flex h-11 items-center justify-center gap-2 px-6 text-[11px] font-semibold tracking-[0.2em] transition-colors"
+                  >
+                    {t(lang, "cp_compare")} →
+                  </Link>
+                </div>
+                <p className="mt-4 text-[11px] leading-relaxed text-fog">
+                  Compare {carName(car)} with {carName(comparePartner)} — power, price, 0–100 and full specs.
+                </p>
+              </div>
+            </section>
+          )}
+
           {/* FAQ — every answer is backed by a real database value; the
               section only renders when at least one answer can be given. */}
           {faq.length > 0 && (
@@ -473,7 +587,7 @@ export default function CarDetail({
             {t(lang, "detail_notice")}
           </p>
 
-          {/* Similar cars */}
+          {/* Similar cars — crawlable via CarCard Link */}
           {similar.length > 0 && (
             <section className="mt-14 border-t border-line pt-10">
               <SectionTitle>{t(lang, "detail_similar").toUpperCase()}</SectionTitle>
@@ -485,14 +599,15 @@ export default function CarDetail({
             </section>
           )}
 
-          {/* Related vehicles — same brand, real data */}
+          {/* Related vehicles — same brand, crawlable Links */}
           {sameBrand.length > 0 && (
             <section className="mt-12 border-t border-line pt-10">
               <SectionTitle>{t(lang, "detail_related")}</SectionTitle>
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                 {sameBrand.map((c) => (
-                  <button
+                  <Link
                     key={c.id}
+                    to={`/car/${c.id}`}
                     onClick={() => onOpen(c)}
                     className="group flex items-center justify-between gap-3 border border-line bg-charcoal px-4 py-4 text-left transition-colors hover:border-white/25 hover:bg-graphite"
                   >
@@ -510,7 +625,7 @@ export default function CarDetail({
                       </p>
                       <ArrowRight className="ml-auto mt-1 h-4 w-4 text-fog transition-transform duration-300 group-hover:translate-x-1 group-hover:text-white" />
                     </div>
-                  </button>
+                  </Link>
                 ))}
               </div>
             </section>

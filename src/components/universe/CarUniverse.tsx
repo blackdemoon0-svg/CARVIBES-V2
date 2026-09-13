@@ -46,16 +46,35 @@ export default function CarUniverse({
   const [showFilters, setShowFilters] = useState(true);
   const [searchParams] = useSearchParams();
 
-  // Deep links: /explore?cat=sports, ?brand=BMW or ?q=911 preselect filters
+  // Deep links: /explore?cat=sports, ?category=Sports, ?brand=BMW or ?q=911 preselect filters
+  // Supports both `cat` and `category` params, case-insensitive, and brand case-insensitive fallback.
   useEffect(() => {
-    const cat = searchParams.get("cat");
-    if (cat && categoryList.some((c) => c.id === cat)) {
-      setActiveCat(cat as Category);
+    const catRaw = searchParams.get("cat") ?? searchParams.get("category");
+    if (catRaw) {
+      const catNorm = catRaw.trim().toLowerCase();
+      const found = categoryList.find((c) => c.id.toLowerCase() === catNorm);
+      if (found) {
+        setActiveCat(found.id as Category);
+      }
     }
-    const brand = searchParams.get("brand");
-    if (brand) {
-      setFilters((f) => ({ ...f, brand }));
-      setActiveCat(null);
+    const brandRaw = searchParams.get("brand");
+    if (brandRaw) {
+      const brandTrim = brandRaw.trim();
+      // Exact match first, then case-insensitive fallback against real DB brands
+      let matchedBrand = allBrands.find((b) => b === brandTrim) ?? null;
+      if (!matchedBrand) {
+        const lower = brandTrim.toLowerCase();
+        matchedBrand = allBrands.find((b) => b.toLowerCase() === lower) ?? null;
+      }
+      if (matchedBrand) {
+        setFilters((f) => ({ ...f, brand: matchedBrand! }));
+        // Don't clear activeCat if category also present — keep both
+        if (!catRaw) setActiveCat(null);
+      } else {
+        // If brand not found in DB, still set filter so UI shows no results (don't invent)
+        // But we prefer to ignore unknown brand to avoid empty state confusion? We set it to show empty.
+        setFilters((f) => ({ ...f, brand: brandTrim }));
+      }
     }
     const q = searchParams.get("q");
     if (q) setQuery(q);

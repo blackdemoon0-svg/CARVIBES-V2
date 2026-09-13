@@ -636,8 +636,30 @@ function quizSchema(data, siteUrl) {
   };
 }
 
+// ---- Deterministic similar cars — mirrors src/lib/carUtils.ts recommendCars ----
+function recommendCars(all, car, limit = 3) {
+  const priceBand = (c) => Math.floor(c.price / 30000);
+  const hpBand = (c) => Math.floor(c.hp / 100);
+  return all
+    .filter((c) => c.id !== car.id)
+    .map((c) => {
+      let score = 0;
+      if (c.brand === car.brand) score += 4;
+      score += c.categories.filter((x) => car.categories.includes(x)).length * 2;
+      if (c.body === car.body) score += 2;
+      if (priceBand(c) === priceBand(car)) score += 1;
+      if (hpBand(c) === hpBand(car)) score += 1;
+      return { car: c, score };
+    })
+    .filter((x) => x.score > 0)
+    .sort((a, b) => b.score - a.score || Math.abs(a.car.hp - car.hp) - Math.abs(b.car.hp - car.hp))
+    .slice(0, limit)
+    .map((x) => x.car);
+}
+
 function carPage(car, siteUrl, data) {
   const seo = data.seo;
+  const allCars = data.cars;
   const url = `${siteUrl}${seo.carCanonicalPath(car)}`;
   const name = `${car.brand} ${car.model}`;
 
@@ -706,6 +728,53 @@ function carPage(car, siteUrl, data) {
         .join("")}</section>`
     : "";
 
+  // ---- Internal linking — same logic as runtime CarDetail.tsx ----
+  const similar = recommendCars(allCars, car, 3);
+  const sameBrand = allCars
+    .filter((c) => c.brand === car.brand && c.id !== car.id && !similar.some((s) => s.id === c.id))
+    .slice(0, 3);
+
+  let comparePartner = null;
+  if (similar.length > 0) comparePartner = similar[0];
+  else if (sameBrand.length > 0) comparePartner = sameBrand[0];
+  else {
+    const primaryCat = car.categories[0];
+    if (primaryCat) {
+      comparePartner = allCars.find((c) => c.id !== car.id && c.categories.includes(primaryCat)) || null;
+    }
+    if (!comparePartner) comparePartner = allCars.find((c) => c.id !== car.id) || null;
+  }
+
+  const primaryCategory = car.categories[0] || "sports";
+  const brandParam = encodeURIComponent(car.brand);
+  const categoryParam = encodeURIComponent(primaryCategory);
+
+  const similarLinks = similar.map((c) => ({
+    href: `/car/${c.id}`,
+    label: `${c.brand} ${c.model} (${c.year}) — similar to ${name}`,
+  }));
+
+  const brandLinks = sameBrand.map((c) => ({
+    href: `/car/${c.id}`,
+    label: `${c.brand} ${c.model} (${c.year}) — more ${car.brand}`,
+  }));
+
+  const exploreLinks = [
+    { href: `/explore?brand=${brandParam}`, label: `Explore ${car.brand} cars — all ${car.brand} models` },
+    { href: `/explore?category=${categoryParam}`, label: `Explore ${primaryCategory} cars — ${primaryCategory} category` },
+    { href: "/brands", label: "All brands — browse 66 brands" },
+    { href: "/explore", label: "Explore all cars — 509 cars" },
+  ];
+
+  const compareLinks = comparePartner
+    ? [
+        {
+          href: `/compare?cars=${car.id},${comparePartner.id}`,
+          label: `Compare ${name} vs ${comparePartner.brand} ${comparePartner.model} — head-to-head`,
+        },
+      ]
+    : [];
+
   return {
     file: path.join("car", `${car.id}.html`),
     title,
@@ -738,6 +807,10 @@ function carPage(car, siteUrl, data) {
       faqHtml +
       `<p><small>Specifications are indicative and may vary by market.</small></p>` +
       `</article>` +
+      linkList(exploreLinks, "Explore more") +
+      linkList(compareLinks, "Compare") +
+      linkList(similarLinks, "Similar cars") +
+      linkList(brandLinks, `More ${esc(car.brand)} cars`) +
       linkList(
         [
           { href: "/explore", label: "Explore all cars" },

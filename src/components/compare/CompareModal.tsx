@@ -1,9 +1,17 @@
 import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { t, type Lang } from "../../lib/i18n";
 import { cn } from "../../utils/cn";
 import { cars } from "../../lib/db";
 import type { Car } from "../../lib/cars";
-import { getCompareIds, removeFromCompare, clearCompare, addToCompare, subscribePrefs } from "../../lib/prefs";
+import {
+  getCompareIds,
+  removeFromCompare,
+  clearCompare,
+  addToCompare,
+  subscribePrefs,
+  MAX_COMPARE,
+} from "../../lib/prefs";
 import { useOverlay } from "../../lib/useOverlay";
 import { rankForBattle } from "../../lib/compare";
 import { formatPrice, formatStat } from "../../lib/carUtils";
@@ -138,8 +146,50 @@ export default function CompareModal({
   const [query, setQuery] = useState("");
   const [warning, setWarning] = useState(false);
   const [revealed, setRevealed] = useState(false);
+  const [searchParams] = useSearchParams();
 
   useEffect(() => subscribePrefs(() => setIds(getCompareIds())), []);
+
+  // --- Deep link support: /compare?cars=id1,id2 ---
+  // Reads `cars` param, validates each ID exists in DB, respects MAX_COMPARE,
+  // merges with existing localStorage (does not clear), works on direct open + refresh.
+  useEffect(() => {
+    const param = searchParams.get("cars") ?? searchParams.get("ids");
+    if (!param) return;
+    const rawIds = param
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean)
+      .slice(0, MAX_COMPARE);
+
+    if (rawIds.length === 0) return;
+
+    const carIdSet = new Set(cars.map((c) => c.id));
+    const validIds = rawIds.filter((id) => carIdSet.has(id));
+
+    if (validIds.length === 0) return;
+
+    // Merge with existing, up to MAX_COMPARE
+    let added = 0;
+    for (const id of validIds) {
+      const res = addToCompare(id);
+      if (res === "full") {
+        // If full and id not already present, stop adding
+        const current = getCompareIds();
+        if (!current.includes(id)) {
+          setWarning(true);
+          break;
+        }
+      } else if (res === "added") {
+        added++;
+      }
+    }
+    // Ensure state reflects merged list (subscribePrefs will also trigger, but set immediately for responsiveness)
+    if (added > 0) {
+      setIds(getCompareIds());
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
 
   // Body scroll lock + Escape-to-close for the battle overlay.
   useOverlay(onClose);
@@ -292,16 +342,17 @@ export default function CompareModal({
             {ids.length < 3 && (
               <button
                 onClick={() => setSearchOpen((v) => !v)}
-                className="cv-btn flex h-[60px] items-center gap-2 border border-dashed border-white/25 px-5 text-[11px] font-semibold tracking-[0.14em] text-mist hover:border-accent hover:text-white"
+                className="flex items-center gap-2 border border-line bg-charcoal px-4 py-2 text-[11px] font-semibold tracking-[0.14em] text-mist transition-colors hover:border-white/30 hover:text-white"
               >
-                + {t(lang, "cp_add")}
+                <SearchIcon className="h-4 w-4" />
+                {t(lang, "cp_select")}
               </button>
             )}
           </div>
 
-          {/* Search panel */}
+          {/* Search dropdown */}
           {searchOpen && (
-            <div className="card-in mt-4 border border-line bg-charcoal p-4">
+            <div className="relative mt-4 max-w-md">
               <div className="relative">
                 <SearchIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-fog" />
                 <input
@@ -310,22 +361,25 @@ export default function CompareModal({
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder={t(lang, "cp_search")}
-                  aria-label={t(lang, "cp_search")}
-                  className="h-11 w-full border border-line bg-ink pl-9 pr-3 text-sm text-white placeholder:text-fog focus:border-white/30 focus:outline-none"
+                  className="h-11 w-full border border-line bg-charcoal pl-10 pr-4 text-sm text-white placeholder:text-fog focus:border-accent/60 focus:outline-none"
                 />
               </div>
               {searchResults.length > 0 && (
-                <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                <div className="absolute z-10 mt-2 max-h-72 w-full overflow-y-auto border border-line bg-charcoal">
                   {searchResults.map((c) => (
                     <button
                       key={c.id}
                       onClick={() => addCar(c.id)}
-                      className="flex items-center gap-3 border border-line bg-ink px-3 py-2 text-left transition-colors hover:border-accent"
+                      className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-graphite"
                     >
-                      <img src={c.image} alt={c.model} className="h-10 w-14 object-cover" loading="lazy"  decoding="async" onError={(e) => { (e.currentTarget as HTMLImageElement).onerror = null; (e.currentTarget as HTMLImageElement).src = "https://images.pexels.com/photos/261985/pexels-photo-261985.jpeg?auto=compress&cs=tinysrgb&fit=crop&w=200&h=140"; }} />
+                      <img src={c.image} alt={c.model} className="h-10 w-14 object-cover" loading="lazy" />
                       <div>
-                        <p className="text-sm font-semibold text-white">{c.brand} {c.model}</p>
-                        <p className="text-[11px] text-fog">{c.year} · {formatStat(c.hp)} hp</p>
+                        <p className="text-sm font-semibold text-white">
+                          {c.brand} {c.model}
+                        </p>
+                        <p className="text-[11px] text-fog">
+                          {c.year} · {c.body} · {c.hp} hp
+                        </p>
                       </div>
                     </button>
                   ))}
@@ -336,47 +390,40 @@ export default function CompareModal({
 
           {/* Empty state */}
           {selectedCars.length === 0 && (
-            <div className="mt-16 flex flex-col items-center justify-center border border-line py-24 text-center">
+            <div className="mt-16 border border-line bg-charcoal p-10 text-center">
               <p className="font-display text-2xl font-semibold text-white">
-                {t(lang, "cp_compare_cars")}
+                {t(lang, "cp_select")}
               </p>
-              <p className="mt-3 max-w-sm text-sm text-mist">
-                {t(lang, "cp_intro")}
-              </p>
-              <button
-                onClick={() => setSearchOpen(true)}
-                className="cv-btn cv-btn-primary mt-6 inline-flex h-12 items-center px-7 text-[11px] font-semibold tracking-[0.18em]"
-              >
-                {t(lang, "cp_search")}
-              </button>
+              <p className="mx-auto mt-3 max-w-md text-sm text-mist">{t(lang, "cp_intro")}</p>
             </div>
           )}
 
-          {/* Comparison */}
+          {/* Comparison table + editorial score */}
           {selectedCars.length > 0 && (
             <div className="mt-12">
-              {/* Objective leaders */}
-              {selectedCars.length > 1 && (
-                <div className="mb-10">
-                  <h2 className="mb-4 flex items-center gap-3 text-[11px] font-semibold tracking-mega text-fog">
+              {/* Objective leaders chips */}
+              {leaders.length > 0 && (
+                <div className="mb-8 border border-line bg-charcoal p-5">
+                  <h2 className="mb-4 flex items-center gap-3 text-[11px] font-semibold tracking-mega text-accent">
                     <span className="h-px w-6 bg-accent" />
-                    {t(lang, "cp_obj_title")}
+                    {t(lang, "cp_obj_title").toUpperCase()}
                   </h2>
-                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                  <div className="flex flex-wrap gap-2">
                     {leaders.map((l) => (
-                      <div key={l.row.id} className="border border-line bg-charcoal px-4 py-3">
-                        <p className="text-[10px] font-medium tracking-[0.16em] text-fog">
-                          {l.label.toUpperCase()}
-                        </p>
-                        <p className="mt-1 text-sm font-semibold text-white">
-                          {l.car ? (
-                            <span className="text-accent-soft">
-                              {l.car.brand} {l.car.model}
-                            </span>
-                          ) : (
-                            <span className="text-fog">{t(lang, "cp_tie")}</span>
-                          )}
-                        </p>
+                      <div
+                        key={l.row.id}
+                        className="flex items-center gap-2 border border-line bg-ink px-3 py-2 text-[11px]"
+                      >
+                        <span className="font-medium tracking-[0.12em] text-fog">
+                          {l.label.toUpperCase()}:
+                        </span>
+                        {l.car ? (
+                          <span className="font-semibold text-white">
+                            {l.car.brand} {l.car.model}
+                          </span>
+                        ) : (
+                          <span className="text-fog">{t(lang, "cp_tie")}</span>
+                        )}
                       </div>
                     ))}
                   </div>

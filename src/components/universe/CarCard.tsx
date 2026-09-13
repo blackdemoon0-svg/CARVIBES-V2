@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { t, type Lang } from "../../lib/i18n";
 import { formatPrice, formatStat } from "../../lib/carUtils";
 import { categoryKey, type Car } from "../../lib/cars";
@@ -17,13 +18,14 @@ export default function CarCard({
   onOpen: (car: Car) => void;
   index: number;
 }) {
+  const href = `/car/${car.id}`;
   return (
     <article
       className="card-in edge-light group relative flex flex-col overflow-hidden border border-line bg-charcoal transition-all duration-500 ease-out hover:-translate-y-1.5 hover:border-white/25 hover:shadow-[0_30px_70px_-24px_rgba(0,0,0,0.95),0_0_0_1px_rgba(227,38,46,0.15)]"
       style={{ animationDelay: `${Math.min(index, 8) * 60}ms` }}
     >
-      {/* Image */}
-      <div className="relative aspect-[16/11] overflow-hidden bg-graphite">
+      {/* Image — crawlable link */}
+      <Link to={href} onClick={() => onOpen(car)} className="relative block aspect-[16/11] overflow-hidden bg-graphite">
         <ImageWithFallback
           src={car.image}
           alt={carAltText(car)}
@@ -39,7 +41,7 @@ export default function CarCard({
         <span className="absolute left-4 top-4 border border-white/15 bg-ink/50 px-2.5 py-1 text-[10px] font-semibold tracking-[0.2em] text-white backdrop-blur-sm">
           {t(lang, categoryKey(car.categories[0]))}
         </span>
-      </div>
+      </Link>
 
       {/* Body */}
       <div className="flex flex-1 flex-col border-t border-line p-5">
@@ -75,14 +77,15 @@ export default function CarCard({
           </div>
         </div>
 
-        {/* CTA */}
-        <button
+        {/* CTA — real <a> via Link for crawlability */}
+        <Link
+          to={href}
           onClick={() => onOpen(car)}
           className="cv-btn cv-btn-outline group/btn mt-4 flex h-11 items-center justify-between px-4 text-[11px] font-semibold tracking-[0.2em]"
         >
           {t(lang, "card_explore")}
           <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5" />
-        </button>
+        </Link>
 
         {/* Save + Compare */}
         <div className="mt-2 flex gap-2">
