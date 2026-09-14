@@ -4,6 +4,7 @@ import { cars } from "../lib/db";
 import { applySort, formatPrice } from "../lib/carUtils";
 import { categoryKey, type Car } from "../lib/cars";
 import ImageWithFallback from "./ImageWithFallback";
+import { pexelsResize } from "../lib/images";
 import { ArrowRight } from "./icons";
 
 const LIMIT = 6;
@@ -64,7 +65,7 @@ export default function PopularCarsSection({
               >
                 <div className="relative aspect-[16/10] overflow-hidden bg-graphite">
                   <ImageWithFallback
-                    src={car.image}
+                    src={pexelsResize(car.image, 640, 400)}
                     alt={`${car.brand} ${car.model}`}
                     title={`${car.brand} ${car.model}`}
                     className="absolute inset-0"

@@ -2,6 +2,7 @@ import { t, type Lang } from "../../lib/i18n";
 import type { Story } from "../../lib/stories";
 import { ArrowRight } from "../icons";
 import StoryImage from "./StoryImage";
+import { pexelsResize } from "../../lib/images";
 
 export default function StoryCard({
   story,
@@ -32,7 +33,7 @@ export default function StoryCard({
       {/* Image */}
       <div className="relative aspect-[16/11] overflow-hidden bg-graphite">
         <StoryImage
-          src={story.image}
+          src={pexelsResize(story.image, 800, 550)}
           alt={story.title}
           title={story.title}
           accent={story.accent}

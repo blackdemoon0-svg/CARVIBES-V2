@@ -4,6 +4,7 @@ import { t, type Lang } from "../../lib/i18n";
 import { stories, featuredStory, storyCategories, type Story, type StoryCategory } from "../../lib/stories";
 import StoryCard from "./StoryCard";
 import StoryImage from "./StoryImage";
+import { pexelsResize } from "../../lib/images";
 import { ArrowRight, SearchIcon } from "../icons";
 
 const COMPACT_COUNT = 6;
@@ -85,7 +86,7 @@ export default function StoriesSection({
             >
               <div className="relative aspect-[16/9] overflow-hidden sm:aspect-[21/9]">
                 <StoryImage
-                  src={featured.image}
+                  src={pexelsResize(featured.image, 1280, 880)}
                   alt={featured.title}
                   title={featured.title}
                   accent={featured.accent}
@@ -204,7 +205,7 @@ export default function StoriesSection({
                 >
                   {/* Muted silhouette until hover */}
                   <StoryImage
-                    src={s.image}
+                    src={pexelsResize(s.image, 800, 600)}
                     alt={s.car}
                     title={s.car}
                     accent={s.accent}

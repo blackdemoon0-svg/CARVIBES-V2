@@ -5,9 +5,12 @@ import { cars, allBrands } from "../lib/db";
 import { stories } from "../lib/stories";
 import { categoryList } from "../lib/cars";
 import { ArrowRight, SearchIcon } from "./icons";
-
-const HERO_IMG =
-  "https://images.pexels.com/photos/261985/pexels-photo-261985.jpeg?auto=compress&cs=tinysrgb&fit=crop&w=2200&h=1400";
+import {
+  HERO_FALLBACK_SRC,
+  HERO_JPEG_SRCSET,
+  HERO_SIZES,
+  HERO_WEBP_SRCSET,
+} from "../lib/images";
 
 export default function Hero({
   lang,
@@ -55,19 +58,34 @@ export default function Hero({
       id="top"
       className="relative flex min-h-[100svh] flex-col overflow-hidden"
     >
-      {/* Background image with slow camera drift */}
+      {/* Background image with slow camera drift.
+          <picture> asks the Pexels CDN for the exact crop each device
+          needs (640 px on phones → 1920 px on large desktops) and
+          prefers WebP; the JPEG <img> keeps a hard fallback so the
+          visual can never break. The matching <link rel="preload"> for
+          the homepage is injected by scripts/prerender.mjs so the
+          download starts with the HTML, not after React boots. */}
       <div className="absolute inset-0 overflow-hidden">
-        <img
-          src={HERO_IMG}
-          alt="Black luxury coupe in a dark studio"
-          className="camera-drift h-full w-full object-cover object-center"
-          fetchPriority="high"
-          decoding="async"
-          onError={(e) => {
-            (e.currentTarget as HTMLImageElement).onerror = null;
-            (e.currentTarget as HTMLImageElement).style.display = "none";
-          }}
-        />
+        <picture>
+          <source
+            type="image/webp"
+            srcSet={HERO_WEBP_SRCSET}
+            sizes={HERO_SIZES}
+          />
+          <img
+            src={HERO_FALLBACK_SRC}
+            srcSet={HERO_JPEG_SRCSET}
+            sizes={HERO_SIZES}
+            alt="Black luxury coupe in a dark studio"
+            className="camera-drift h-full w-full object-cover object-center"
+            fetchPriority="high"
+            decoding="async"
+            onError={(e) => {
+              (e.currentTarget as HTMLImageElement).onerror = null;
+              (e.currentTarget as HTMLImageElement).style.display = "none";
+            }}
+          />
+        </picture>
         {/* Cinematic vignettes + legibility overlays */}
         <div className="absolute inset-0 bg-gradient-to-b from-ink/80 via-ink/30 to-ink" />
         <div className="absolute inset-0 bg-gradient-to-r from-ink/85 via-transparent to-ink/40" />

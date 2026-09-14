@@ -4,6 +4,7 @@ import { t, type Lang } from "../../lib/i18n";
 import { cars } from "../../lib/db";
 import type { Car } from "../../lib/cars";
 import { stories, type Story } from "../../lib/stories";
+import { pexelsResize } from "../../lib/images";
 import {
   getFavoriteIds,
   getSavedStoryIds,
@@ -95,7 +96,7 @@ export default function FavoritesSection({
                   <div key={c.id} className="card-in group flex flex-col border border-line bg-charcoal" style={{ animationDelay: `${i * 70}ms` }}>
                     <div className="relative aspect-[16/11] overflow-hidden bg-graphite">
                       <img
-                        src={c.image}
+                        src={pexelsResize(c.image, 640, 440)}
                         alt={c.model}
                         loading="lazy"
                         className="h-full w-full object-cover transition-transform duration-[1100ms] group-hover:scale-[1.07]"
@@ -147,7 +148,7 @@ export default function FavoritesSection({
                 {favStories.map((s, i) => (
                   <div key={s.id} className="card-in group relative flex flex-col border border-line bg-charcoal" style={{ animationDelay: `${i * 70}ms` }}>
                     <div className="relative aspect-[16/10] overflow-hidden bg-graphite">
-                      <img src={s.image} alt={s.title} loading="lazy" className="h-full w-full object-cover transition-transform duration-[1100ms] group-hover:scale-[1.07]"  decoding="async" onError={(e) => { (e.currentTarget as HTMLImageElement).onerror = null; (e.currentTarget as HTMLImageElement).src = "https://images.pexels.com/photos/261985/pexels-photo-261985.jpeg?auto=compress&cs=tinysrgb&fit=crop&w=200&h=140"; }} />
+                      <img src={pexelsResize(s.image, 640, 400)} alt={s.title} loading="lazy" className="h-full w-full object-cover transition-transform duration-[1100ms] group-hover:scale-[1.07]"  decoding="async" onError={(e) => { (e.currentTarget as HTMLImageElement).onerror = null; (e.currentTarget as HTMLImageElement).src = "https://images.pexels.com/photos/261985/pexels-photo-261985.jpeg?auto=compress&cs=tinysrgb&fit=crop&w=200&h=140"; }} />
                       <div className="absolute inset-0 bg-gradient-to-t from-ink/80 to-transparent" />
                     </div>
                     <div className="flex flex-1 flex-col p-4">
@@ -203,7 +204,7 @@ export default function FavoritesSection({
                     className="group flex w-40 flex-col border border-line bg-charcoal text-left transition-colors hover:border-white/25"
                   >
                     <div className="aspect-[16/10] overflow-hidden bg-graphite">
-                      <img src={c.image} alt={c.model} loading="lazy" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.06]"  decoding="async" onError={(e) => { (e.currentTarget as HTMLImageElement).onerror = null; (e.currentTarget as HTMLImageElement).src = "https://images.pexels.com/photos/261985/pexels-photo-261985.jpeg?auto=compress&cs=tinysrgb&fit=crop&w=200&h=140"; }} />
+                      <img src={pexelsResize(c.image, 400, 250)} alt={c.model} loading="lazy" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.06]"  decoding="async" onError={(e) => { (e.currentTarget as HTMLImageElement).onerror = null; (e.currentTarget as HTMLImageElement).src = "https://images.pexels.com/photos/261985/pexels-photo-261985.jpeg?auto=compress&cs=tinysrgb&fit=crop&w=200&h=140"; }} />
                     </div>
                     <div className="p-3">
                       <p className="truncate font-display text-sm font-semibold text-white">{c.brand} {c.model}</p>

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { cn } from "../../utils/cn";
+import { pexelsResize } from "../../lib/images";
 import { t, type Lang } from "../../lib/i18n";
 import { HINT_COST, STREAK_BONUSES } from "../../lib/quiz/economy";
 import { getPlayer, spendPoints } from "../../lib/quiz/progress";
@@ -314,7 +315,7 @@ export default function QuizPlayer({
           {question.image ? (
             <div className="relative h-44 overflow-hidden border-b border-line sm:h-72">
               <img
-                src={question.image}
+                src={pexelsResize(question.image, 900, 500)}
                 alt={imageAlt}
                 loading="lazy"
                 decoding="async"

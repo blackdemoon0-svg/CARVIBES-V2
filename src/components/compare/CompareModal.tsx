@@ -4,6 +4,7 @@ import { t, type Lang } from "../../lib/i18n";
 import { cn } from "../../utils/cn";
 import { cars } from "../../lib/db";
 import type { Car } from "../../lib/cars";
+import { pexelsResize } from "../../lib/images";
 import {
   getCompareIds,
   removeFromCompare,
@@ -372,7 +373,7 @@ export default function CompareModal({
                       onClick={() => addCar(c.id)}
                       className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-graphite"
                     >
-                      <img src={c.image} alt={c.model} className="h-10 w-14 object-cover" loading="lazy" />
+                      <img src={pexelsResize(c.image, 320, 220)} alt={c.model} className="h-10 w-14 object-cover" loading="lazy" />
                       <div>
                         <p className="text-sm font-semibold text-white">
                           {c.brand} {c.model}

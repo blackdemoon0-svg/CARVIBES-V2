@@ -5,6 +5,7 @@ import { categoryKey, type Car } from "../../lib/cars";
 import { carAltText } from "../../lib/carSeo";
 import { ArrowUpRight } from "../icons";
 import ImageWithFallback from "../ImageWithFallback";
+import { pexelsResize } from "../../lib/images";
 import { SaveButton, CompareButton } from "../compare/ActionButtons";
 
 export default function CarCard({
@@ -27,7 +28,7 @@ export default function CarCard({
       {/* Image — crawlable link */}
       <Link to={href} onClick={() => onOpen(car)} className="relative block aspect-[16/11] overflow-hidden bg-graphite">
         <ImageWithFallback
-          src={car.image}
+          src={pexelsResize(car.image, 800, 550)}
           alt={carAltText(car)}
           title={carAltText(car)}
           className="absolute inset-0"

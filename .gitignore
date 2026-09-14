@@ -9,6 +9,7 @@ out/
 # Vite / tooling caches
 .vite/
 *.tsbuildinfo
+.smoke-tmp/
 
 # Logs
 logs/

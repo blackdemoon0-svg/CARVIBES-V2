@@ -14,7 +14,8 @@
     "submit:indexnow": "node scripts/submit-indexnow.mjs",
     "verify:seo": "node scripts/verify-seo.mjs",
     "validate:quiz": "node scripts/validate-quiz.mjs",
-    "smoke:quiz": "node scripts/smoke-quiz.mjs"
+    "smoke:quiz": "node scripts/smoke-quiz.mjs",
+    "smoke:perf": "node scripts/smoke-perf.mjs"
   },
   "dependencies": {
     "@vercel/analytics": "^2.0.1",
@@ -31,6 +32,7 @@
     "@types/react-dom": "19.2.3",
     "@vitejs/plugin-react": "5.1.1",
     "esbuild": "0.27.7",
+    "jsdom": "^30.0.1",
     "tailwindcss": "4.1.17",
     "typescript": "5.9.3",
     "vite": "7.3.2",

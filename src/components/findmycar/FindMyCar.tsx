@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { t, type Lang } from "../../lib/i18n";
 import { cars } from "../../lib/db";
+import { pexelsResize } from "../../lib/images";
 import {
   rankCars,
   formatEuro,
@@ -649,7 +650,7 @@ function ResultCard({ lang, result, index, onExplore, onToggleFav, onToggleCmp }
       {/* Image */}
       <div className="relative aspect-video w-full shrink-0 overflow-hidden bg-graphite sm:aspect-auto sm:w-64">
         <img
-          src={car.image}
+          src={pexelsResize(car.image, 640, 400)}
           alt={`${car.brand} ${car.model}`}
           loading="lazy"
           decoding="async"
