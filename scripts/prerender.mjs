@@ -3,11 +3,11 @@
 //
 // Why this exists
 // ---------------
-// `vite build` produces exactly ONE HTML document (dist/index.html) that
-// Vercel's SPA rewrite serves for all 542 routes. That single document
-// carries the homepage <title>, the homepage description, the homepage
-// og:url and NO <link rel="canonical">. Every per-route value is written
-// later, by JavaScript, from src/lib/seo.ts.
+// `vite build` produces ONE HTML shell (dist/index.html) plus shared,
+// hashed JS/CSS chunks under dist/assets/. That single shell carries the
+// homepage <title>, the homepage description, the homepage og:url and NO
+// <link rel="canonical">. Every per-route value is written later, by
+// JavaScript, from src/lib/seo.ts.
 //
 // Google indexes in two waves. The first wave reads the raw HTML; the
 // second wave (rendering) can be delayed by days or weeks. Until that
@@ -21,8 +21,12 @@
 // block — all present in the RAW HTML, no JavaScript required.
 //
 // The React app still boots and takes over exactly as before; the
-// prerendered markup inside #root is simply replaced on hydration, and
+// prerendered markup inside #root is hidden behind the boot splash
+// until React commits, then simply replaced (see src/lib/boot.ts), and
 // src/lib/seo.ts rewrites the same head values to the same strings.
+// Every stamped page keeps referencing the same shared /assets/*
+// chunks — the shell is ~15 KB, the bundles download once and are
+// cached immutably (see vercel.json).
 //
 // Runs automatically as part of `npm run build`.
 // ============================================================
@@ -225,9 +229,11 @@ function renderHead(html, page) {
 // ------------------------------------------------------------
 // 5. Crawlable body content
 // ------------------------------------------------------------
-// React replaces this on hydration. Its only job is to give the
-// first-wave crawler real text and real <a href> links to follow, so
-// discovery does not depend on JavaScript execution.
+// React replaces this once it commits (it stays hidden behind the boot
+// splash until then, so visitors never see a static -> loader -> app
+// flash). Its only job is to give the first-wave crawler real text and
+// real <a href> links to follow, so discovery does not depend on
+// JavaScript execution.
 function renderBody(html, content) {
   return html.replace(
     '<div id="root"></div>',
