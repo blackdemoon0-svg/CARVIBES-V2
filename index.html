@@ -1,7 +1,44 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1472273822866661" crossorigin="anonymous"></script>
+    <!--
+      AdSense — deferred on purpose.
+      The library is injected only after `load` + idle time, so it can
+      never compete with the hero image, the app bundle or the first
+      paint for bandwidth (the previous <script> in <head> started the
+      download immediately on every page). `window.adsbygoogle` is
+      created up-front so any push() call stays safe, and if an ad
+      blocker / private DNS refuses the request the failure is silently
+      contained — nothing else on the page depends on this script.
+    -->
+    <script>
+      window.adsbygoogle = window.adsbygoogle || [];
+      (function () {
+        var injected = false;
+        function inject() {
+          if (injected) return;
+          injected = true;
+          var s = document.createElement("script");
+          s.async = true;
+          s.crossOrigin = "anonymous";
+          s.src =
+            "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1472273822866661";
+          s.onerror = function () {
+            /* Blocked (ad blocker / private DNS): the page goes on. */
+          };
+          document.head.appendChild(s);
+        }
+        function schedule() {
+          if (window.requestIdleCallback) {
+            window.requestIdleCallback(inject, { timeout: 4000 });
+          } else {
+            setTimeout(inject, 2500);
+          }
+        }
+        if (document.readyState === "complete") schedule();
+        else window.addEventListener("load", schedule, { once: true });
+      })();
+    </script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#090909" />
@@ -10,6 +47,11 @@
       content="Q9IY-30MOLsIMVPW3h8IKngR6DfnOZYC8vP09WKBwcY"
     />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- Every photo is served by images.pexels.com: warm the connection
+         early so the hero crop and the first cards don't pay DNS+TLS. -->
+    <link rel="preconnect" href="https://images.pexels.com" />
+    <link rel="dns-prefetch" href="https://images.pexels.com" />
 
     <title>CarVibes — Discover. Feel. Drive.</title>
     <meta
@@ -89,13 +131,31 @@
       }
     </script>
 
-    <!-- Fonts -->
+    <!-- Fonts — loaded without blocking first paint.
+         The stylesheet is applied via the print-media swap so the HTML
+         can render immediately with system fallbacks; `display=swap`
+         (already in the CSS2 URL) swaps the real faces in once they
+         arrive. <noscript> keeps the blocking behavior for crawlers
+         without JS. -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
+      rel="preload"
+      as="style"
+      href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap"
+    />
+    <link
       href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap"
       rel="stylesheet"
+      media="print"
+      onload="this.media='all';this.onload=null"
     />
+    <noscript>
+      <link
+        href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet"
+      />
+    </noscript>
   </head>
   <body>
     <div id="root"></div>

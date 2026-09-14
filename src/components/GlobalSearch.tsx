@@ -8,6 +8,7 @@ import { categoryKey, categoryList, type Car } from "../lib/cars";
 import type { Story } from "../lib/stories";
 import { useOverlay } from "../lib/useOverlay";
 import { ArrowRight, SearchIcon } from "./icons";
+import { pexelsResize } from "../lib/images";
 
 const MAX_CARS = 8;
 const MAX_STORIES = 4;
@@ -173,7 +174,7 @@ export default function GlobalSearch({
                     className="flex w-full items-center gap-3 border-b border-line py-3 text-left transition-colors hover:bg-ink"
                   >
                     <img
-                      src={c.image}
+                      src={pexelsResize(c.image, 320, 220)}
                       alt={c.model}
                       className="h-14 w-20 shrink-0 object-cover"
                       loading="lazy"
@@ -218,7 +219,7 @@ export default function GlobalSearch({
                     className="flex w-full items-center gap-3 border-b border-line py-3 text-left transition-colors hover:bg-ink"
                   >
                     <img
-                      src={s.image}
+                      src={pexelsResize(s.image, 320, 220)}
                       alt={s.title}
                       className="h-14 w-20 shrink-0 object-cover"
                       loading="lazy"

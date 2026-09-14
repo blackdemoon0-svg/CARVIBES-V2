@@ -17,6 +17,7 @@ import { useOverlay } from "../../lib/useOverlay";
 import { ArrowRight } from "../icons";
 import { SaveButton, CompareButton } from "../compare/ActionButtons";
 import CarCard from "./CarCard";
+import { pexelsResize } from "../../lib/images";
 
 /** Compact specification-group card: real h3 heading + scannable rows. */
 function SpecGroup({
@@ -529,9 +530,9 @@ export default function CarDetail({
               <div className="border border-line bg-charcoal p-5">
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                   <div className="flex items-center gap-3">
-                    <img src={car.image} alt={car.model} className="h-14 w-20 object-cover" />
+                    <img src={pexelsResize(car.image, 320, 220)} alt={car.model} className="h-14 w-20 object-cover" />
                     <span className="text-fog">vs</span>
-                    <img src={comparePartner.image} alt={comparePartner.model} className="h-14 w-20 object-cover" />
+                    <img src={pexelsResize(comparePartner.image, 320, 220)} alt={comparePartner.model} className="h-14 w-20 object-cover" />
                     <div className="ml-2">
                       <p className="font-display text-sm font-semibold text-white">
                         {car.brand} {car.model} vs {comparePartner.brand} {comparePartner.model}

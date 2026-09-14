@@ -13,6 +13,7 @@ export default function StoryImage({
   accent = "#e3262e",
   className,
   imgClassName,
+  eager = false,
 }: {
   src: string;
   alt: string;
@@ -20,6 +21,8 @@ export default function StoryImage({
   accent?: string;
   className?: string;
   imgClassName?: string;
+  /** Set for full-screen hero images that must load immediately. */
+  eager?: boolean;
 }) {
   const [failed, setFailed] = useState(false);
 
@@ -48,7 +51,7 @@ export default function StoryImage({
       <img
         src={src}
         alt={alt}
-        loading="lazy"
+        loading={eager ? "eager" : "lazy"}
         decoding="async"
         onError={() => setFailed(true)}
         className={cn("h-full w-full object-cover", imgClassName)}

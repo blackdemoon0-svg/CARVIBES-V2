@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import type { Lang } from "../../lib/i18n";
 import type { Car } from "../../lib/cars";
+import { pexelsResize } from "../../lib/images";
 import { cn } from "../../utils/cn";
 import {
   USED_CATEGORIES,
@@ -524,7 +525,7 @@ function UsedCarCard({
       {/* Image */}
       <div className="relative aspect-[16/10] overflow-hidden bg-graphite">
         <ImageWithFallback
-          src={car.image}
+          src={pexelsResize(car.image, 800, 550)}
           alt={`${car.brand} ${car.model} — used ${entry.years}`}
           title={`${car.brand} ${car.model}`}
           className="absolute inset-0"

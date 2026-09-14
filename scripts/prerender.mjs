@@ -75,7 +75,8 @@ async function loadData() {
       `import { USED_CATEGORIES, USED_CAR_ENTRIES, usedCarsForCategory } from ${JSON.stringify(path.join(ROOT, "src/lib/usedCars.ts"))};`,
       `import { carTitle, carMetaDescription, carOverviewText, carFaq, carAltText, carJsonLd, carCanonicalPath, categoryWords, engineBreakdown } from ${JSON.stringify(path.join(ROOT, "src/lib/carSeo.ts"))};`,
       `import { battleScore } from ${JSON.stringify(path.join(ROOT, "src/lib/compare.ts"))};`,
-      `export { cars, stories, QUESTIONS, QUIZZES, QUIZ_CATEGORIES, quizDicts, POINTS_PER_CORRECT, USED_CATEGORIES, USED_CAR_ENTRIES, usedCarsForCategory, carTitle, carMetaDescription, carOverviewText, carFaq, carAltText, carJsonLd, carCanonicalPath, categoryWords, engineBreakdown, battleScore };`,
+      `import { HERO_WEBP_SRCSET } from ${JSON.stringify(path.join(ROOT, "src/lib/images.ts"))};`,
+      `export { cars, stories, QUESTIONS, QUIZZES, QUIZ_CATEGORIES, quizDicts, POINTS_PER_CORRECT, USED_CATEGORIES, USED_CAR_ENTRIES, usedCarsForCategory, carTitle, carMetaDescription, carOverviewText, carFaq, carAltText, carJsonLd, carCanonicalPath, categoryWords, engineBreakdown, battleScore, HERO_WEBP_SRCSET };`,
     ].join("\n"),
     "utf8"
   );
@@ -94,6 +95,7 @@ async function loadData() {
     return {
       cars: mod.cars,
       stories: mod.stories,
+      heroWebpSrcset: mod.HERO_WEBP_SRCSET,
       quiz: {
         questions: mod.QUESTIONS,
         quizzes: mod.QUIZZES,
@@ -178,6 +180,22 @@ function renderHead(html, page) {
     "</head>",
     `    <link rel="canonical" href="${esc(page.url)}" />\n  </head>`
   );
+
+  // Homepage only: start the hero image download together with the
+  // HTML. The raw document carries no <img> (React mounts it after the
+  // bundle runs), so without this hint mobile visitors would pay
+  // bundle-download + parse before the LCP image even begins. The
+  // srcset here is generated from src/lib/images.ts — the exact same
+  // constants the Hero component renders — so the preload and the
+  // <picture> element always agree.
+  if (page.heroPreload) {
+    out = out.replace(
+      "</head>",
+      `    <link rel="preload" as="image" type="image/webp" imagesrcset="${esc(
+        page.heroPreload
+      )}" imagesizes="100vw" fetchpriority="high" />\n  </head>`
+    );
+  }
 
   if (page.noindex) {
     out = out.replace(
@@ -908,6 +926,7 @@ async function main() {
       image: DEFAULT_IMAGE,
       type: "website",
       noindex: p.noindex,
+      heroPreload: p.path === "/" ? data.heroWebpSrcset : undefined,
       body: staticBody(p.path, data),
       schema:
         p.path === "/car-quiz"

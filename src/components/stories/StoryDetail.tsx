@@ -12,6 +12,7 @@ import {
   subscribePrefs,
 } from "../../lib/prefs";
 import { useOverlay } from "../../lib/useOverlay";
+import { pexelsResize } from "../../lib/images";
 import { ArrowRight } from "../icons";
 import StoryImage from "./StoryImage";
 
@@ -192,6 +193,7 @@ export default function StoryDetail({
             title={story.title}
             accent={story.accent}
             className="absolute inset-0 h-full w-full"
+            eager
           />
           <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/50 to-ink/20" />
           <div className="absolute inset-0 bg-gradient-to-r from-ink/60 via-transparent to-transparent" />
@@ -307,7 +309,7 @@ export default function StoryDetail({
                 <>
                   <div className="mb-8 aspect-[16/9]">
                     <StoryImage
-                      src={linkedCar.image}
+                      src={pexelsResize(linkedCar.image, 800, 450)}
                       alt={linkedCar.model}
                       title={linkedCar.model}
                       accent={story.accent}
@@ -411,7 +413,7 @@ export default function StoryDetail({
                     data-delay={i * 100}
                   >
                     <StoryImage
-                      src={s.image}
+                      src={pexelsResize(s.image, 800, 550)}
                       alt={s.title}
                       title={s.title}
                       accent={s.accent}
