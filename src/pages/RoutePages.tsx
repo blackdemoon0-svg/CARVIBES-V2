@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { Suspense, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { t, type Lang } from "../lib/i18n";
 import { cars, allBrands } from "../lib/db";
@@ -9,12 +9,15 @@ import Footer from "../components/Footer";
 import CarUniverse from "../components/universe/CarUniverse";
 import StoriesSection from "../components/stories/StoriesSection";
 import FavoritesSection from "../components/favorites/FavoritesSection";
-import FindMyCar from "../components/findmycar/FindMyCar";
-import CompareModal from "../components/compare/CompareModal";
-import GlobalSearch from "../components/GlobalSearch";
-import QuizPage from "../components/quiz/QuizPage";
 import CompareBar from "../components/compare/CompareBar";
-import UsedCarsPage from "../components/usedcars/UsedCarsPage";
+import { PageLoader } from "../components/Loader";
+import {
+  LazyCompareModal,
+  LazyFindMyCar,
+  LazyGlobalSearch,
+  LazyQuizPage,
+  LazyUsedCarsPage,
+} from "../components/lazy";
 
 export interface ShellProps {
   lang: Lang;
@@ -63,7 +66,9 @@ export function ExplorePage(props: ShellProps) {
 export function UsedCarsRoutePage(props: ShellProps) {
   return (
     <Chrome {...props}>
-      <UsedCarsPage lang={props.lang} onOpenCar={props.onOpenCar} />
+      <Suspense fallback={<PageLoader />}>
+        <LazyUsedCarsPage lang={props.lang} onOpenCar={props.onOpenCar} />
+      </Suspense>
     </Chrome>
   );
 }
@@ -98,13 +103,23 @@ export function FindMyCarPage({
 }) {
   const navigate = useNavigate();
   return (
-    <FindMyCar lang={lang} onClose={() => navigate("/")} onOpenCar={onOpenCar} />
+    <Suspense fallback={<PageLoader />}>
+      <LazyFindMyCar
+        lang={lang}
+        onClose={() => navigate("/")}
+        onOpenCar={onOpenCar}
+      />
+    </Suspense>
   );
 }
 
 export function ComparePage({ lang }: { lang: Lang }) {
   const navigate = useNavigate();
-  return <CompareModal lang={lang} onClose={() => navigate("/")} />;
+  return (
+    <Suspense fallback={<PageLoader />}>
+      <LazyCompareModal lang={lang} onClose={() => navigate("/")} />
+    </Suspense>
+  );
 }
 
 export function SearchPage({
@@ -118,12 +133,14 @@ export function SearchPage({
 }) {
   const navigate = useNavigate();
   return (
-    <GlobalSearch
-      lang={lang}
-      onClose={() => navigate("/")}
-      onOpenCar={onOpenCar}
-      onOpenStory={onOpenStory}
-    />
+    <Suspense fallback={<PageLoader />}>
+      <LazyGlobalSearch
+        lang={lang}
+        onClose={() => navigate("/")}
+        onOpenCar={onOpenCar}
+        onOpenStory={onOpenStory}
+      />
+    </Suspense>
   );
 }
 
@@ -263,7 +280,9 @@ export function TermsPage(props: ShellProps) {
 export function CarQuizPage(props: ShellProps) {
   return (
     <Chrome {...props}>
-      <QuizPage lang={props.lang} />
+      <Suspense fallback={<PageLoader />}>
+        <LazyQuizPage lang={props.lang} />
+      </Suspense>
     </Chrome>
   );
 }

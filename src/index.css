@@ -271,6 +271,31 @@
     animation: drift 14s ease-out forwards;
   }
 
+  /* CarVibes loader (React Suspense fallback — mirrors #boot-splash). */
+  @keyframes cv-boot-bar {
+    0% {
+      transform: translateX(-110%);
+    }
+    100% {
+      transform: translateX(260%);
+    }
+  }
+  .cv-boot-bar {
+    animation: cv-boot-bar 1.1s ease-in-out infinite;
+  }
+  @keyframes cv-boot-glow {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.55;
+    }
+  }
+  .cv-boot-glow {
+    animation: cv-boot-glow 1.6s ease-in-out infinite;
+  }
+
   /* Hero scroll indicator — gentle up/down motion inside the mouse shape */
   @keyframes scroll-dot {
     0% {
@@ -397,7 +422,9 @@
     .camera-drift,
     .hero-in,
     .card-in,
-    .scroll-dot {
+    .scroll-dot,
+    .cv-boot-bar,
+    .cv-boot-glow {
       animation: none;
     }
     .hero-in,

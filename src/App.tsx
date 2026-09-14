@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useState } from "react";
 import {
   BrowserRouter,
   Route,
@@ -23,34 +23,63 @@ import OnboardingTour from "./components/OnboardingTour";
 import PopularCarsSection from "./components/PopularCarsSection";
 import RankingsSection from "./components/RankingsSection";
 import StoriesSection from "./components/stories/StoriesSection";
-import StoryDetail from "./components/stories/StoryDetail";
 import FindMyCarSection from "./components/FindMyCarSection";
 import CarUniverse from "./components/universe/CarUniverse";
-import CarDetail from "./components/universe/CarDetail";
 import FavoritesSection from "./components/favorites/FavoritesSection";
 import CompareBar from "./components/compare/CompareBar";
-import CompareModal from "./components/compare/CompareModal";
-import GlobalSearch from "./components/GlobalSearch";
 import Footer from "./components/Footer";
-import FindMyCar from "./components/findmycar/FindMyCar";
 import NotFound from "./components/NotFound";
+import { BootSignal, PageLoader } from "./components/Loader";
+import {
+  LazyCarDetail,
+  LazyCompareModal,
+  LazyFindMyCar,
+  LazyGlobalSearch,
+  LazyStoryDetail,
+} from "./components/lazy";
 import type { Story } from "./lib/stories";
 import type { Car } from "./lib/cars";
-import {
-  BrandsPage,
-  ComparePage,
-  CarQuizPage,
-  ContactPage,
-  ExplorePage,
-  FavoritesPage,
-  FindMyCarPage,
-  NewsPage,
-  PrivacyPage,
-  SearchPage,
-  TermsPage,
-  UsedCarsRoutePage,
-  type ShellProps,
-} from "./pages/RoutePages";
+import type { ShellProps } from "./pages/RoutePages";
+
+// Secondary routes — one shared async chunk (plus one chunk per heavy
+// leaf inside RoutePages), downloaded on demand. Everything above stays
+// in the entry chunk so the homepage paints instantly.
+const ExplorePage = lazy(() =>
+  import("./pages/RoutePages").then((m) => ({ default: m.ExplorePage })),
+);
+const UsedCarsRoutePage = lazy(() =>
+  import("./pages/RoutePages").then((m) => ({ default: m.UsedCarsRoutePage })),
+);
+const NewsPage = lazy(() =>
+  import("./pages/RoutePages").then((m) => ({ default: m.NewsPage })),
+);
+const FavoritesPage = lazy(() =>
+  import("./pages/RoutePages").then((m) => ({ default: m.FavoritesPage })),
+);
+const FindMyCarPage = lazy(() =>
+  import("./pages/RoutePages").then((m) => ({ default: m.FindMyCarPage })),
+);
+const ComparePage = lazy(() =>
+  import("./pages/RoutePages").then((m) => ({ default: m.ComparePage })),
+);
+const SearchPage = lazy(() =>
+  import("./pages/RoutePages").then((m) => ({ default: m.SearchPage })),
+);
+const CarQuizPage = lazy(() =>
+  import("./pages/RoutePages").then((m) => ({ default: m.CarQuizPage })),
+);
+const BrandsPage = lazy(() =>
+  import("./pages/RoutePages").then((m) => ({ default: m.BrandsPage })),
+);
+const ContactPage = lazy(() =>
+  import("./pages/RoutePages").then((m) => ({ default: m.ContactPage })),
+);
+const PrivacyPage = lazy(() =>
+  import("./pages/RoutePages").then((m) => ({ default: m.PrivacyPage })),
+);
+const TermsPage = lazy(() =>
+  import("./pages/RoutePages").then((m) => ({ default: m.TermsPage })),
+);
 
 export function Homepage({
   lang,
@@ -154,50 +183,60 @@ export function Homepage({
         onCompare={() => setCompareOpen(true)}
       />
 
-      {/* Floating compare bar + battle modal */}
+      {/* Floating compare bar + battle modal (lazy: own chunk) */}
       <CompareBar lang={lang} onOpen={() => setCompareOpen(true)} />
       {compareOpen && (
-        <CompareModal lang={lang} onClose={() => setCompareOpen(false)} />
+        <Suspense fallback={<PageLoader />}>
+          <LazyCompareModal lang={lang} onClose={() => setCompareOpen(false)} />
+        </Suspense>
       )}
 
-      {/* Global search */}
+      {/* Global search (lazy: own chunk) */}
       {searchOpen && (
-        <GlobalSearch
-          lang={lang}
-          onClose={() => setSearchOpen(false)}
-          onOpenCar={openCar}
-          onOpenStory={openStory}
-        />
+        <Suspense fallback={<PageLoader />}>
+          <LazyGlobalSearch
+            lang={lang}
+            onClose={() => setSearchOpen(false)}
+            onOpenCar={openCar}
+            onOpenStory={openStory}
+          />
+        </Suspense>
       )}
 
       {finderOpen && (
-        <FindMyCar
-          lang={lang}
-          onClose={() => setFinderOpen(false)}
-          onOpenCar={openCar}
-        />
+        <Suspense fallback={<PageLoader />}>
+          <LazyFindMyCar
+            lang={lang}
+            onClose={() => setFinderOpen(false)}
+            onOpenCar={openCar}
+          />
+        </Suspense>
       )}
 
       {activeStory && (
-        <StoryDetail
-          key={activeStory.id}
-          story={activeStory}
-          lang={lang}
-          onClose={closeDetail}
-          onOpenStory={openStory}
-          onOpenCar={openCar}
-          onCompareCar={handleCompareCar}
-        />
+        <Suspense fallback={<PageLoader />}>
+          <LazyStoryDetail
+            key={activeStory.id}
+            story={activeStory}
+            lang={lang}
+            onClose={closeDetail}
+            onOpenStory={openStory}
+            onOpenCar={openCar}
+            onCompareCar={handleCompareCar}
+          />
+        </Suspense>
       )}
 
       {detailCar && (
-        <CarDetail
-          key={detailCar.id}
-          car={detailCar}
-          lang={lang}
-          onClose={closeDetail}
-          onOpen={openCar}
-        />
+        <Suspense fallback={<PageLoader />}>
+          <LazyCarDetail
+            key={detailCar.id}
+            car={detailCar}
+            lang={lang}
+            onClose={closeDetail}
+            onOpen={openCar}
+          />
+        </Suspense>
       )}
 
       {/* First-time visitor guided tour (homepage only) */}
@@ -253,6 +292,8 @@ function RoutedApp({
 
   return (
     <>
+      {/* Secondary routes stream in on demand (see lazy() above). */}
+      <Suspense fallback={<PageLoader />}>
       <Routes>
         <Route
           path="/"
@@ -297,16 +338,21 @@ function RoutedApp({
           }
         />
       </Routes>
+      </Suspense>
       {compareOpen && location.pathname !== "/compare" && (
-        <CompareModal lang={lang} onClose={() => setCompareOpen(false)} />
+        <Suspense fallback={<PageLoader />}>
+          <LazyCompareModal lang={lang} onClose={() => setCompareOpen(false)} />
+        </Suspense>
       )}
       {searchOpen && location.pathname !== "/search" && (
-        <GlobalSearch
-          lang={lang}
-          onClose={() => setSearchOpen(false)}
-          onOpenCar={openCar}
-          onOpenStory={openStory}
-        />
+        <Suspense fallback={<PageLoader />}>
+          <LazyGlobalSearch
+            lang={lang}
+            onClose={() => setSearchOpen(false)}
+            onOpenCar={openCar}
+            onOpenStory={openStory}
+          />
+        </Suspense>
       )}
     </>
   );
@@ -341,6 +387,9 @@ export default function App() {
 
   return (
     <BrowserRouter>
+      {/* Outside every Suspense boundary: retires the static boot splash
+          on the very first commit, even while a lazy chunk downloads. */}
+      <BootSignal />
       <RoutedApp lang={lang} onLangChange={handleLangChange} />
     </BrowserRouter>
   );
