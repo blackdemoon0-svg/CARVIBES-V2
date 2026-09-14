@@ -149,7 +149,8 @@ const clamp = (text, max = 300) => {
 // 4. Head rewriting
 // ------------------------------------------------------------
 // We operate on the built index.html rather than re-templating it, so
-// the inlined script/style bundle and everything else stay byte-identical.
+// the hashed asset references (module scripts, modulepreload, CSS) and
+// everything else stay byte-identical.
 function renderHead(html, page) {
   let out = html;
 
