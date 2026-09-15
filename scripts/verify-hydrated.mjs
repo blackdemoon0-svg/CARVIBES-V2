@@ -7,7 +7,10 @@
 //
 //   A. /car/:id   — dedicated page: exactly 1 H1 (the car), NO
 //                    homepage behind it, no dialog role, no body
-//                    scroll lock, self-referencing canonical.
+//                    scroll lock, self-referencing canonical. The H1
+//                    must be STRICTLY equal (same text) to the
+//                    prerendered one — "brand model", no year.
+//   A2/A3. same contract on a BMW sample and an electric car sample.
 //   B. /story/:id — same contract for the story reader.
 //   C. /car/not-a-real-car and /this-route-does-not-exist —
 //                    real 404: noindex, NO canonical, 1 H1, no
@@ -217,6 +220,7 @@ async function runWorker(spec) {
       elementCount: doc.querySelectorAll("*").length,
       rootElementCount: root ? root.querySelectorAll("*").length : 0,
       textLength: bodyText.length,
+      bodyText: bodyText.slice(0, 20000),
       canonicals,
       robots,
       dialogCount: doc.querySelectorAll('[role="dialog"]').length,
@@ -308,6 +312,16 @@ async function main() {
     process.exit(1);
   }
 
+  // The prerenderer escapes entity characters (& < > " ') — decode so
+  // all comparisons are against real text, not markup.
+  const decodeHtml = (s) =>
+    String(s)
+      .replace(/&amp;/g, "&")
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">")
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'");
+
   // ------------------------------------------------------------------
   // [1] Static (prerendered) checks (skipped in measure mode)
   // ------------------------------------------------------------------
@@ -319,16 +333,56 @@ async function main() {
     assert(carFiles.length === 509, `exactly 509 car pages prerendered (${carFiles.length})`);
     assert(storyFiles.length > 0, `${storyFiles.length} story pages prerendered`);
 
-    // H1 text content is validated per-entity in scenarios A/B against
-    // the real database values; here we enforce the structural rule:
-    // exactly one <h1> in every prerendered detail page.
+    // Read every prerendered detail page once; the raw HTML is reused by
+    // the static checks below AND by the hydrated-scenario assertions.
+    const detailHtml = new Map();
+    for (const f of carFiles) detailHtml.set(`car/${f}`, readFileSync(path.join(DIST, "car", f), "utf8"));
+    for (const f of storyFiles) detailHtml.set(`story/${f}`, readFileSync(path.join(DIST, "story", f), "utf8"));
+
+    const h1Of = (html) => html.match(/<h1>([\s\S]*?)<\/h1>/)?.[1] ?? "";
+    const titleOf = (html) => html.match(/<title>([\s\S]*?)<\/title>/)?.[1] ?? "";
+
+    // Structural rule: exactly one <h1> in every prerendered detail page.
     const badH1 = [];
-    for (const f of [...carFiles.map((f) => path.join("car", f)), ...storyFiles.map((f) => path.join("story", f))]) {
-      const html = readFileSync(path.join(DIST, f), "utf8");
+    for (const [f, html] of detailHtml) {
       const n = [...html.matchAll(/<h1>/g)].length;
       if (n !== 1) badH1.push(`${f}: ${n} H1`);
     }
     assert(badH1.length === 0, `every car/story prerendered page has exactly 1 H1${badH1.length ? ` — ${badH1.slice(0, 5).join(" | ")}` : ""}`);
+
+    // STRICT H1 contract, all 509 car pages: the prerendered H1 must be
+    // byte-identical (decoded text) to what the hydrated DOM renders —
+    // CarDetail.tsx renders `{car.brand} {car.model}` with NO year, and
+    // the <title> stamped by the same build is
+    // `{brand} {model} ({year}) — CarVibes`, so the expected H1 is the
+    // title minus that suffix. This can never drift from the data.
+    const h1Mismatch = [];
+    const h1WithYear = [];
+    for (const [f, html] of detailHtml) {
+      if (!f.startsWith("car/")) continue;
+      const h1 = decodeHtml(h1Of(html)).trim();
+      const expected = decodeHtml(titleOf(html).replace(/ \(\d{4}\) — CarVibes$/, "")).trim();
+      if (h1 !== expected) h1Mismatch.push(`${f}: "${h1}" ≠ title-derived "${expected}"`);
+      if (/\(\d{4}\)\s*$/.test(h1)) h1WithYear.push(f);
+    }
+    assert(
+      h1Mismatch.length === 0,
+      `all 509 prerendered car H1s are exactly "brand model" (no year)${h1Mismatch.length ? ` — ${h1Mismatch.slice(0, 3).join(" | ")}` : ""}`
+    );
+    assert(h1WithYear.length === 0, `no prerendered car H1 ends with (year)${h1WithYear.length ? ` — ${h1WithYear.slice(0, 3).join(", ")}` : ""}`);
+
+    // Same contract for stories: prerendered H1 == title minus suffix.
+    const storyH1Mismatch = [];
+    for (const [f, html] of detailHtml) {
+      if (!f.startsWith("story/")) continue;
+      const h1 = decodeHtml(h1Of(html)).trim();
+      const expected = decodeHtml(titleOf(html).replace(/ — CarVibes$/, "")).trim();
+      if (h1 !== expected) storyH1Mismatch.push(`${f}: "${h1}" ≠ "${expected}"`);
+    }
+    assert(
+      storyH1Mismatch.length === 0,
+      `all ${storyFiles.length} prerendered story H1s are exactly the story title${storyH1Mismatch.length ? ` — ${storyH1Mismatch.slice(0, 3).join(" | ")}` : ""}`
+    );
 
     const forty = readFileSync(path.join(DIST, "404.html"), "utf8");
     assert(!forty.includes('rel="canonical"'), "404.html carries NO canonical");
@@ -355,11 +409,35 @@ async function main() {
   const storyFile = `story/${storyId}.html`;
   const storyRoute = `/story/${storyId}`;
 
+  // Required samples: a BMW, a Ferrari (scenario A) and an electric car
+  // with a known year. Picked straight from the prerendered pages.
+  const pickCar = (test) => {
+    for (const f of carFiles) {
+      const html = readFileSync(path.join(DIST, "car", f), "utf8");
+      if (test(html)) return { id: f.replace(/\.html$/, ""), file: `car/${f}` };
+    }
+    return null;
+  };
+  const bmwCar = pickCar((h) => h.includes("<h1>BMW "));
+  const evCar = pickCar((h) => h.includes("<td>Electric</td>"));
+
   const scenarios = [
     {
       name: `A. direct ${carRoute}`,
       spec: { file: carFile, url: `https://carvibes.dev${carRoute}`, actions: [] },
     },
+    ...(bmwCar
+      ? [{
+          name: `A2. direct /car/${bmwCar.id} (BMW sample)`,
+          spec: { file: bmwCar.file, url: `https://carvibes.dev/car/${bmwCar.id}`, actions: [] },
+        }]
+      : []),
+    ...(evCar
+      ? [{
+          name: `A3. direct /car/${evCar.id} (EV sample, year available)`,
+          spec: { file: evCar.file, url: `https://carvibes.dev/car/${evCar.id}`, actions: [] },
+        }]
+      : []),
     {
       name: `B. direct ${storyRoute} + start reading`,
       spec: {
@@ -483,18 +561,40 @@ async function main() {
       );
     };
 
-    // A — dedicated car page
+    // Shared contract for every /car/:id scenario: exactly 1 H1, and
+    // that H1 is STRICTLY equal (same text) to the prerendered one.
+    // CarDetail renders `{brand} {model}` — no year in the H1; the year
+    // stays on the page in the meta line under the H1.
+    const assertCarContract = (label, s, htmlFile) => {
+      const html = readFileSync(path.join(DIST, htmlFile), "utf8");
+      const preH1 = decodeHtml(html.match(/<h1>([\s\S]*?)<\/h1>/)?.[1] ?? "").trim();
+      assert(s.h1.length === 1, `${label}: exactly 1 H1 after hydration (${JSON.stringify(s.h1)})`);
+      assert(
+        s.h1[0] === preH1,
+        `${label}: H1 STRICTLY equal prerendered vs hydrated ("${s.h1[0] ?? ""}" / "${preH1}")`
+      );
+      assert(!/\(\d{4}\)\s*$/.test(s.h1[0] ?? ""), `${label}: H1 carries no year`);
+      const year = html.match(/<title>([\s\S]*?)<\/title>/)?.[1]?.match(/ \((\d{4})\)/)?.[1];
+      if (year) {
+        assert(
+          new RegExp(`\\b${year}\\b`).test(s.bodyText ?? ""),
+          `${label}: year ${year} (available in data) still visible on the page, outside the H1`
+        );
+      }
+      noHome(s, label);
+      assert(s.dialogCount === 0, `${label}: no role=dialog (not an overlay)`);
+      assert(s.bodyOverflow === null || s.bodyOverflow === "", `${label}: body scroll NOT locked`);
+    };
+
+    // A — dedicated car page (the Ferrari sample)
     const a = results[`A. direct ${carRoute}`];
     if (a) {
       const s = a.initial;
-      assert(s.h1.length === 1, `A: exactly 1 H1 after hydration (${JSON.stringify(s.h1)})`);
+      assertCarContract("A", s, carFile);
       assert(
         s.h1[0]?.toLowerCase().startsWith(carRoute.split("/")[2].split("-")[0]),
         `A: H1 starts with the car's brand (${s.h1[0]})`
       );
-      noHome(s, "A");
-      assert(s.dialogCount === 0, "A: no role=dialog (not an overlay anymore)");
-      assert(s.bodyOverflow === null || s.bodyOverflow === "", "A: body scroll NOT locked");
       assert(
         s.canonicals.length === 1 &&
           s.canonicals[0] === `https://carvibes.dev${carRoute}`,
@@ -510,17 +610,31 @@ async function main() {
       );
     } else fail("A: missing scenario result");
 
+    // A2 — BMW sample, A3 — EV sample (both with a year in the data)
+    for (const [label, name, file] of [
+      ["A2", `A2. direct /car/${bmwCar?.id ?? "?"} (BMW sample)`, bmwCar?.file],
+      ["A3", `A3. direct /car/${evCar?.id ?? "?"} (EV sample, year available)`, evCar?.file],
+    ]) {
+      if (!file) {
+        fail(`${label}: sample car not found in the build`);
+        continue;
+      }
+      const v = results[name];
+      if (v) assertCarContract(label, v.initial, file);
+      else fail(`${label}: missing scenario result`);
+    }
+
     // B — dedicated story page
     const b = Object.values(results).find((v) => v.initial.pathname.startsWith("/story/"));
     if (b) {
       const s = b.initial;
       const storyId = s.pathname.split("/")[2];
       const storyHtml = readFileSync(path.join(DIST, "story", `${storyId}.html`), "utf8");
-      const prerenderH1 = storyHtml.match(/<h1>([\s\S]*?)<\/h1>/)?.[1] ?? "";
+      const prerenderH1 = decodeHtml(storyHtml.match(/<h1>([\s\S]*?)<\/h1>/)?.[1] ?? "").trim();
       assert(s.h1.length === 1, `B: exactly 1 H1 after hydration (${JSON.stringify(s.h1)})`);
       assert(
-        prerenderH1.toLowerCase().includes(s.h1[0]?.toLowerCase() ?? "\u0000"),
-        `B: hydrated H1 matches prerendered H1 (${JSON.stringify(s.h1)} / ${JSON.stringify(prerenderH1.slice(0, 60))})`
+        s.h1[0] === prerenderH1,
+        `B: story H1 STRICTLY equal prerendered vs hydrated — no divergence ("${s.h1[0] ?? ""}" / "${prerenderH1.slice(0, 60)}")`
       );
       noHome(s, "B");
       assert(s.dialogCount === 0, "B: no role=dialog (not an overlay anymore)");

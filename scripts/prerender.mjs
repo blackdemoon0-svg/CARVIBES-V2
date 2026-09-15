@@ -816,7 +816,11 @@ function carPage(car, siteUrl, data) {
     schema: seo.carJsonLd(car, siteUrl),
     body:
       `<article>` +
-      `<h1>${esc(name)} (${esc(car.year)})</h1>` +
+      // The H1 must be byte-identical to the hydrated one
+      // (CarDetail.tsx renders `{car.brand} {car.model}` with no year —
+      // the year stays in the meta line below the H1). Prerendered HTML
+      // and post-hydration DOM must never disagree.
+      `<h1>${esc(name)}</h1>` +
       (car.tagline ? `<p><em>“${esc(car.tagline)}”</em></p>` : "") +
       `<img src="${esc(car.image)}" alt="${esc(alt)}" />` +
       `<section><h2>Overview</h2><p>${esc(overview)}</p>` +
