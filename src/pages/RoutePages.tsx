@@ -1,5 +1,5 @@
 import { Suspense, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { t, type Lang } from "../lib/i18n";
 import { cars, allBrands } from "../lib/db";
 import type { Car } from "../lib/cars";
@@ -206,14 +206,17 @@ export function BrandsPage(props: ShellProps) {
               const entry = brandIndex.get(brand);
               if (!entry) return null;
               return (
-                <button
+                // Real crawlable <a> to the brand-filtered Explore page
+                // (was an onClick that jumped straight to the first car,
+                // which exposed no stable brand URL to crawlers).
+                <Link
                   key={brand}
-                  onClick={() => props.onOpenCar(entry.first)}
+                  to={`/explore?brand=${encodeURIComponent(brand)}`}
                   className="min-w-0 border border-line bg-charcoal px-4 py-5 text-left transition-colors hover:border-white/25"
                 >
                   <p className="break-words font-display text-lg font-semibold text-white">{brand}</p>
                   <p className="mt-1 text-xs text-fog">{entry.count}</p>
-                </button>
+                </Link>
               );
             })}
           </div>

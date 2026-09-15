@@ -10,9 +10,7 @@ import type { Lang } from "./lib/i18n";
 import { detectLang, isRtl, storeLang } from "./lib/i18n";
 import { useReveal } from "./lib/useReveal";
 import { addToCompare } from "./lib/prefs";
-import { cars } from "./lib/db";
-import { storyById } from "./lib/stories";
-import { usePageMeta } from "./lib/seo";
+import { isShellMetaRoute, usePageMeta } from "./lib/seo";
 import Navigation from "./components/Navigation";
 import Hero from "./components/Hero";
 import DiscoverSection from "./components/DiscoverSection";
@@ -31,15 +29,20 @@ import Footer from "./components/Footer";
 import NotFound from "./components/NotFound";
 import { BootSignal, PageLoader } from "./components/Loader";
 import {
-  LazyCarDetail,
   LazyCompareModal,
   LazyFindMyCar,
   LazyGlobalSearch,
-  LazyStoryDetail,
 } from "./components/lazy";
 import type { Story } from "./lib/stories";
 import type { Car } from "./lib/cars";
 import type { ShellProps } from "./pages/RoutePages";
+
+// Detail routes — each dedicated page (car sheet / story reader) ships
+// in its own chunk so the homepage entry stays lean; a direct landing
+// on /car/:id or /story/:id downloads exactly one extra chunk instead
+// of rendering the whole homepage behind an overlay.
+const CarRoutePage = lazy(() => import("./pages/CarDetailPage"));
+const StoryRoutePage = lazy(() => import("./pages/StoryDetailPage"));
 
 // Secondary routes — one shared async chunk (plus one chunk per heavy
 // leaf inside RoutePages), downloaded on demand. Everything above stays
@@ -95,25 +98,7 @@ export function Homepage({
   const [compareOpen, setCompareOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
 
-  // --- The URL is the single source of truth for detail overlays. ---
-  // This keeps the V2 modal design intact while making every car and
-  // story deep-linkable (and refresh-safe via the Vercel SPA rewrite).
-  const path = location.pathname;
-  const carMatch = path.match(/^\/car\/([^/]+)\/?$/);
-  const storyMatch = path.match(/^\/story\/([^/]+)\/?$/);
-  const carId = carMatch ? carMatch[1] : undefined;
-  const storyId = storyMatch ? storyMatch[1] : undefined;
-
-  const detailCar = carId ? cars.find((c) => c.id === carId) : undefined;
-  const activeStory = storyId ? storyById(storyId) : undefined;
-
-  const notFound =
-    (carId !== undefined && detailCar === undefined) ||
-    (storyId !== undefined && activeStory === undefined);
-
-  // Reveal-on-scroll must re-run when we swap the 404 screen back to the
-  // homepage (the `.reveal` elements are freshly mounted in that case).
-  useReveal(notFound);
+  useReveal();
 
   // --- Navigation helpers ---
   const openCar = useCallback(
@@ -124,12 +109,6 @@ export function Homepage({
     (story: Story) => navigate(`/story/${story.id}`),
     [navigate]
   );
-  const closeDetail = useCallback(() => {
-    // Go back when there is in-app history; otherwise return home.
-    const idx = (window.history.state as { idx?: number } | null)?.idx ?? 0;
-    if (idx > 0) navigate(-1);
-    else navigate("/", { replace: true });
-  }, [navigate]);
 
   // Add a car to compare and open the battle modal.
   const handleCompareCar = useCallback((car: Car) => {
@@ -137,12 +116,8 @@ export function Homepage({
     setCompareOpen(true);
   }, []);
 
-  // --- Per-route SEO metadata (title / canonical / Open Graph) ---
-  usePageMeta({ car: detailCar, story: activeStory, notFound, path });
-
-  if (notFound) {
-    return <NotFound lang={lang} onHome={() => navigate("/", { replace: true })} />;
-  }
+  // --- Homepage SEO metadata (title / canonical / Open Graph) ---
+  usePageMeta({ notFound: false, path: location.pathname });
 
   return (
     <div className="min-h-screen bg-ink text-white">
@@ -213,32 +188,6 @@ export function Homepage({
         </Suspense>
       )}
 
-      {activeStory && (
-        <Suspense fallback={<PageLoader />}>
-          <LazyStoryDetail
-            key={activeStory.id}
-            story={activeStory}
-            lang={lang}
-            onClose={closeDetail}
-            onOpenStory={openStory}
-            onOpenCar={openCar}
-            onCompareCar={handleCompareCar}
-          />
-        </Suspense>
-      )}
-
-      {detailCar && (
-        <Suspense fallback={<PageLoader />}>
-          <LazyCarDetail
-            key={detailCar.id}
-            car={detailCar}
-            lang={lang}
-            onClose={closeDetail}
-            onOpen={openCar}
-          />
-        </Suspense>
-      )}
-
       {/* First-time visitor guided tour (homepage only) */}
       <OnboardingTour lang={lang} />
     </div>
@@ -280,14 +229,15 @@ function RoutedApp({
     onCompareCar: handleCompareCar,
   };
 
-  const isHomeFamily =
-    location.pathname === "/" ||
-    location.pathname.startsWith("/car/") ||
-    location.pathname.startsWith("/story/");
+  // Head ownership: the shell writes ROUTE_META only for its own known
+  // routes. The homepage, the dedicated car/story pages and the
+  // catch-all 404 each call usePageMeta themselves — if the shell ran
+  // here too, its indexable meta would race (and win) against the 404's
+  // noindex + removed canonical on unknown URLs.
   usePageMeta({
     notFound: false,
     path: location.pathname,
-    skip: isHomeFamily,
+    skip: !isShellMetaRoute(location.pathname),
   });
 
   return (
@@ -301,11 +251,11 @@ function RoutedApp({
         />
         <Route
           path="/car/:id"
-          element={<Homepage lang={lang} onLangChange={onLangChange} />}
+          element={<CarRoutePage lang={lang} onLangChange={onLangChange} />}
         />
         <Route
           path="/story/:id"
-          element={<Homepage lang={lang} onLangChange={onLangChange} />}
+          element={<StoryRoutePage lang={lang} onLangChange={onLangChange} />}
         />
         <Route path="/explore" element={<ExplorePage {...shell} />} />
         <Route path="/used-cars" element={<UsedCarsRoutePage {...shell} />} />
