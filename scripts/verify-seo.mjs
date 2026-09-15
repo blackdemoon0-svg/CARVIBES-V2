@@ -62,13 +62,21 @@ for (const page of pages) {
   );
   const rel = path.relative(DIST, page.file);
 
+  // 404 shell: no canonical at all — a not-found page must not
+  // canonicalise anywhere (the old version pointed at the homepage).
+  if (page.route === "/404") {
+    if (canonicals.length !== 0) {
+      fail(`${rel}: 404 page must have NO canonical, found ${canonicals.length}`);
+    }
+    continue;
+  }
+
   if (canonicals.length !== 1) {
     fail(`${rel}: expected exactly 1 canonical, found ${canonicals.length}`);
     continue;
   }
   const expected = `${siteUrl}${page.route === "/" ? "/" : page.route}`;
-  // The 404 shell deliberately canonicalises to the homepage.
-  if (page.route !== "/404" && canonicals[0] !== expected) {
+  if (canonicals[0] !== expected) {
     fail(`${rel}: canonical is ${canonicals[0]}, expected ${expected}`);
   }
 

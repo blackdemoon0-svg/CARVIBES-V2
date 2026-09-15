@@ -43,6 +43,19 @@ function setCanonical(href: string) {
   el.setAttribute("href", href);
 }
 
+/**
+ * Removes the canonical element entirely. Used by 404 pages: a
+ * not-found page must not canonicalise anywhere — not to the homepage
+ * (which told Google "this is a duplicate of /"), not to a URL that
+ * does not exist. With noindex + no canonical the page simply drops
+ * out of the index without poisoning any other URL.
+ */
+function removeCanonical() {
+  document
+    .head.querySelector<HTMLLinkElement>('link[rel="canonical"]')
+    ?.remove();
+}
+
 function setRobots(content: string | null) {
   const el = document.head.querySelector<HTMLMetaElement>('meta[name="robots"]');
   if (content === null) {
@@ -147,6 +160,27 @@ export interface PageMeta {
   skip?: boolean;
 }
 
+/**
+ * Does this path have its head managed by the route SHELL (RoutedApp)?
+ *
+ *   - "/" and every ROUTE_META route: yes — the shell writes the meta.
+ *   - /car/:id and /story/:id: NO — the dedicated pages call
+ *     usePageMeta themselves (they know the car/story or that the id
+ *     is invalid, which the shell cannot).
+ *   - anything else (unknown routes): NO — the catch-all 404 page
+ *     calls usePageMeta with notFound.
+ *
+ * The shell MUST skip everywhere but the first case, otherwise two
+ * usePageMeta effects fight each other (the shell's indexable meta
+ * overwrites the 404's noindex + removed canonical).
+ */
+export function isShellMetaRoute(path: string): boolean {
+  const p = path.replace(/\/+$/, "") || "/";
+  if (p === "/") return true;
+  if (p.startsWith("/car/") || p.startsWith("/story/")) return false;
+  return Boolean(ROUTE_META[p]);
+}
+
 export function usePageMeta({ car, story, notFound, path, skip }: PageMeta) {
   useEffect(() => {
     if (skip) return;
@@ -155,40 +189,48 @@ export function usePageMeta({ car, story, notFound, path, skip }: PageMeta) {
     let image = DEFAULT_IMAGE;
     let type = "website";
     let url = `${SITE_URL}${path === "/" ? "/" : path}`;
+    // Canonical to emit; null = remove the element entirely (404 pages).
+    let canonical: string | null = url;
+    let robots: string | null = null;
 
     if (notFound) {
+      // Real 404: noindex, and NO canonical at all. Canonicalising to
+      // the homepage was the old bug — every invalid URL told Google it
+      // was a duplicate of "/", which is both wrong (the page is gone)
+      // and a canonical to a different URL than the one being crawled.
       title = "Page not found — CarVibes";
       description = "The page you are looking for does not exist.";
+      robots = "noindex, follow";
+      canonical = null;
+      // og:url keeps the site root as the only valid target.
       url = `${SITE_URL}/`;
-      setRobots("noindex, nofollow");
     } else {
-      setRobots(null);
-    }
+      const routeMeta = ROUTE_META[path.replace(/\/$/, "") || "/"];
+      if (routeMeta && !car && !story) {
+        title = routeMeta.title;
+        description = routeMeta.description;
+      }
 
-    const routeMeta = ROUTE_META[path.replace(/\/$/, "") || "/"];
-    if (routeMeta && !car && !story && !notFound) {
-      title = routeMeta.title;
-      description = routeMeta.description;
-    }
-
-    if (car) {
-      // Same builders as scripts/prerender.mjs (src/lib/carSeo.ts):
-      // unique title, real-specs description clamped for Google, and
-      // og:type "article" — so the raw HTML and this runtime pass agree.
-      title = carTitle(car);
-      description = carMetaDescription(car);
-      image = car.image;
-      type = "article";
-    } else if (story) {
-      title = `${story.title} — CarVibes`;
-      description = story.description;
-      image = story.image;
-      type = "article";
+      if (car) {
+        // Same builders as scripts/prerender.mjs (src/lib/carSeo.ts):
+        // unique title, real-specs description clamped for Google, and
+        // og:type "article" — so the raw HTML and this runtime pass agree.
+        title = carTitle(car);
+        description = carMetaDescription(car);
+        image = car.image;
+        type = "article";
+      } else if (story) {
+        title = `${story.title} — CarVibes`;
+        description = story.description;
+        image = story.image;
+        type = "article";
+      }
     }
 
     document.title = title;
     upsertMeta("name", "description", description);
-    setCanonical(url);
+    if (canonical) setCanonical(canonical);
+    else removeCanonical();
     upsertMeta("property", "og:site_name", SITE_NAME);
     upsertMeta("property", "og:title", title);
     upsertMeta("property", "og:description", description);
@@ -199,8 +241,11 @@ export function usePageMeta({ car, story, notFound, path, skip }: PageMeta) {
     upsertMeta("name", "twitter:title", title);
     upsertMeta("name", "twitter:description", description);
     upsertMeta("name", "twitter:image", image);
+    setRobots(robots);
     // Vehicle + FAQPage JSON-LD, generated by the exact same builder the
-    // prerendered HTML embeds (omitted on every other route).
+    // prerendered HTML embeds (omitted on every other route). Passing
+    // `car` (undefined on 404) also clears a payload left behind by a
+    // previous car page in client-side navigation.
     syncCarJsonLd(car);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [car?.id, story?.id, notFound, path]);
