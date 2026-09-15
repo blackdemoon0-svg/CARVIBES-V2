@@ -15,7 +15,8 @@
     "verify:seo": "node scripts/verify-seo.mjs",
     "validate:quiz": "node scripts/validate-quiz.mjs",
     "smoke:quiz": "node scripts/smoke-quiz.mjs",
-    "smoke:perf": "node scripts/smoke-perf.mjs"
+    "smoke:perf": "node scripts/smoke-perf.mjs",
+    "verify:hydrated": "node scripts/verify-hydrated.mjs"
   },
   "dependencies": {
     "@vercel/analytics": "^2.0.1",

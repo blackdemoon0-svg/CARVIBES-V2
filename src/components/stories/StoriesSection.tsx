@@ -80,8 +80,9 @@ export default function StoriesSection({
                 {t(lang, "st_featured")}
               </span>
             </div>
-            <button
-              onClick={() => onOpen(featured)}
+            {/* Real crawlable <a href="/story/:id"> (was onClick-only) */}
+            <Link
+              to={`/story/${featured.id}`}
               className="group relative block w-full overflow-hidden border border-line text-left"
             >
               <div className="relative aspect-[16/9] overflow-hidden sm:aspect-[21/9]">
@@ -114,7 +115,7 @@ export default function StoriesSection({
                   </div>
                 </div>
               </div>
-            </button>
+            </Link>
           </div>
         )}
 
@@ -197,9 +198,10 @@ export default function StoriesSection({
 
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {hidden.map((s, i) => (
-                <button
+                <Link
                   key={s.id}
-                  onClick={() => onOpen(s)}
+                  // Real crawlable <a> — the router handles navigation.
+                  to={`/story/${s.id}`}
                   className="reveal group relative block aspect-[4/3] overflow-hidden border border-line text-left"
                   data-delay={i * 100}
                 >
@@ -221,7 +223,7 @@ export default function StoriesSection({
                       {s.car}
                     </p>
                   </div>
-                </button>
+                </Link>
               ))}
             </div>
           </div>

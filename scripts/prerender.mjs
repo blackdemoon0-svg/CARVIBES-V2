@@ -181,10 +181,15 @@ function renderHead(html, page) {
   // The canonical every route was missing in the raw HTML. It is
   // self-referencing and matches what setCanonical() writes at runtime,
   // so Google's raw pass and its render pass can never disagree.
-  out = out.replace(
-    "</head>",
-    `    <link rel="canonical" href="${esc(page.url)}" />\n  </head>`
-  );
+  // 404 shells set noCanonical: a not-found page must not point at any
+  // other URL (not even the homepage) — runtime usePageMeta() removes
+  // the element for the same reason.
+  if (!page.noCanonical) {
+    out = out.replace(
+      "</head>",
+      `    <link rel="canonical" href="${esc(page.url)}" />\n  </head>`
+    );
+  }
 
   // Homepage only: start the hero image download together with the
   // HTML. The raw document carries no <img> (React mounts it after the
@@ -811,7 +816,11 @@ function carPage(car, siteUrl, data) {
     schema: seo.carJsonLd(car, siteUrl),
     body:
       `<article>` +
-      `<h1>${esc(name)} (${esc(car.year)})</h1>` +
+      // The H1 must be byte-identical to the hydrated one
+      // (CarDetail.tsx renders `{car.brand} {car.model}` with no year —
+      // the year stays in the meta line below the H1). Prerendered HTML
+      // and post-hydration DOM must never disagree.
+      `<h1>${esc(name)}</h1>` +
       (car.tagline ? `<p><em>“${esc(car.tagline)}”</em></p>` : "") +
       `<img src="${esc(car.image)}" alt="${esc(alt)}" />` +
       `<section><h2>Overview</h2><p>${esc(overview)}</p>` +
@@ -948,6 +957,12 @@ async function main() {
 
   // A 404 shell so unknown paths can answer with a real 404 status
   // instead of a soft 404 rendered by JavaScript.
+  //
+  // 404 rules (mirrored by usePageMeta() on the client side):
+  //   - noindex
+  //   - NO canonical (the old shell canonicalised to the homepage,
+  //     which told Google a missing URL was a duplicate of "/")
+  //   - one real H1, no homepage content
   pages.push({
     file: "404.html",
     title: "Page not found — CarVibes",
@@ -956,6 +971,7 @@ async function main() {
     image: DEFAULT_IMAGE,
     type: "website",
     noindex: true,
+    noCanonical: true,
     body: `<h1>Page not found</h1><p><a href="/">Back to CarVibes</a></p>`,
   });
 

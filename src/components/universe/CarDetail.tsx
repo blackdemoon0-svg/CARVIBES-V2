@@ -13,7 +13,7 @@ import {
   engineBreakdown,
 } from "../../lib/carSeo";
 import { addRecent, addToCompare } from "../../lib/prefs";
-import { useOverlay } from "../../lib/useOverlay";
+import { useBodyScrollLock, useEscapeToClose } from "../../lib/useOverlay";
 import { ArrowRight } from "../icons";
 import { SaveButton, CompareButton } from "../compare/ActionButtons";
 import CarCard from "./CarCard";
@@ -62,16 +62,27 @@ export default function CarDetail({
   lang,
   onClose,
   onOpen,
+  asPage = false,
 }: {
   car: Car;
   lang: Lang;
   onClose: () => void;
   onOpen: (car: Car) => void;
+  /**
+   * true when rendered as a full route page (/car/:id) instead of the
+   * full-screen overlay: the detail takes normal document flow (no
+   * `fixed` container, no dialog semantics, no body scroll lock — the
+   * document itself scrolls). The CLOSE button and every section are
+   * identical in both modes, so the design never forks.
+   */
+  asPage?: boolean;
 }) {
   const [activeImage, setActiveImage] = useState(0);
 
-  // Body scroll lock + Escape-to-close for the detail overlay.
-  useOverlay(onClose);
+  // Overlay: lock the page behind it. Page: the document scrolls.
+  // Escape keeps the same close behaviour (back / home) in both modes.
+  useBodyScrollLock(!asPage);
+  useEscapeToClose(onClose);
 
   // Track recently viewed vehicles.
   useEffect(() => {
@@ -219,9 +230,13 @@ export default function CarDetail({
 
   return (
     <div
-      className="fixed inset-0 z-[60] overflow-y-auto bg-ink/95 backdrop-blur-md"
-      role="dialog"
-      aria-modal="true"
+      className={
+        asPage
+          ? "min-h-screen bg-ink"
+          : "fixed inset-0 z-[60] overflow-y-auto bg-ink/95 backdrop-blur-md"
+      }
+      role={asPage ? undefined : "dialog"}
+      aria-modal={asPage ? undefined : true}
       aria-label={carName(car)}
     >
       <div className="min-h-full py-6 sm:py-10">
@@ -608,8 +623,9 @@ export default function CarDetail({
                 {sameBrand.map((c) => (
                   <Link
                     key={c.id}
+                    // The <a href> is the navigation (crawlable +
+                    // refresh-safe) — no second navigate() in onClick.
                     to={`/car/${c.id}`}
-                    onClick={() => onOpen(c)}
                     className="group flex items-center justify-between gap-3 border border-line bg-charcoal px-4 py-4 text-left transition-colors hover:border-white/25 hover:bg-graphite"
                   >
                     <div className="min-w-0">

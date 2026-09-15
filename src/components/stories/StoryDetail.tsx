@@ -1,17 +1,18 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import { t, type Lang } from "../../lib/i18n";
 import { stories, type Story } from "../../lib/stories";
 import { cars } from "../../lib/db";
-import type { Car } from "../../lib/cars";
 import { formatStat } from "../../lib/carUtils";
 import {
+  addToCompare,
   toggleSavedStory,
   isStorySaved,
   getStoryProgress,
   saveStoryProgress,
   subscribePrefs,
 } from "../../lib/prefs";
-import { useOverlay } from "../../lib/useOverlay";
+import { useBodyScrollLock, useEscapeToClose } from "../../lib/useOverlay";
 import { pexelsResize } from "../../lib/images";
 import { ArrowRight } from "../icons";
 import StoryImage from "./StoryImage";
@@ -34,16 +35,17 @@ export default function StoryDetail({
   story,
   lang,
   onClose,
-  onOpenStory,
-  onOpenCar,
-  onCompareCar,
+  asPage = false,
 }: {
   story: Story;
   lang: Lang;
   onClose: () => void;
-  onOpenStory: (s: Story) => void;
-  onOpenCar: (c: Car) => void;
-  onCompareCar?: (c: Car) => void;
+  /**
+   * true when rendered as a full route page (/story/:id) instead of the
+   * full-screen overlay: normal document flow, no dialog semantics, no
+   * body scroll lock. Content and layout are identical in both modes.
+   */
+  asPage?: boolean;
 }) {
   const [started, setStarted] = useState(false);
   const [chapter, setChapter] = useState(0);
@@ -61,8 +63,10 @@ export default function StoryDetail({
   const audioRef = useRef<{ ctx: AudioContext; gain: GainNode } | null>(null);
   const [soundOn, setSoundOn] = useState(false);
 
-  // Body scroll lock + Escape-to-close for the story reader.
-  useOverlay(onClose);
+  // Overlay: lock the page behind it. Page: the document scrolls.
+  // Escape keeps the same close behaviour (back / home) in both modes.
+  useBodyScrollLock(!asPage);
+  useEscapeToClose(onClose);
 
   // Always release the ambient audio when the reader closes.
   useEffect(
@@ -136,9 +140,11 @@ export default function StoryDetail({
 
   return (
     <div
-      className="fixed inset-0 z-[55] overflow-y-auto bg-ink"
-      role="dialog"
-      aria-modal="true"
+      className={
+        asPage ? "min-h-screen bg-ink" : "fixed inset-0 z-[55] overflow-y-auto bg-ink"
+      }
+      role={asPage ? undefined : "dialog"}
+      aria-modal={asPage ? undefined : true}
       aria-label={story.title}
     >
       <div ref={contentRef} className="relative">
@@ -332,21 +338,21 @@ export default function StoryDetail({
                     ))}
                   </div>
                   <div className="mt-8 flex flex-wrap gap-3">
-                    <button
-                      onClick={() => onOpenCar(linkedCar)}
+                    {/* Real, crawlable <a> links — no onClick-only navigation */}
+                    <Link
+                      to={`/car/${linkedCar.id}`}
                       className="cv-btn cv-btn-ghost group inline-flex h-13 items-center gap-3 px-7 text-[12px] font-semibold tracking-[0.18em] transition-colors hover:border-accent hover:bg-accent"
                     >
                       {t(lang, "st_explore_car")}
                       <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                    </button>
-                    {onCompareCar && (
-                      <button
-                        onClick={() => onCompareCar(linkedCar)}
-                        className="cv-btn cv-btn-subtle inline-flex h-13 items-center gap-2 px-7 text-[12px] font-semibold tracking-[0.18em] transition-colors hover:border-accent hover:text-white"
-                      >
-                        ⚔ {t(lang, "cp_compare")}
-                      </button>
-                    )}
+                    </Link>
+                    <Link
+                      to={`/compare?cars=${linkedCar.id}`}
+                      onClick={() => addToCompare(linkedCar.id)}
+                      className="cv-btn cv-btn-subtle inline-flex h-13 items-center gap-2 px-7 text-[12px] font-semibold tracking-[0.18em] transition-colors hover:border-accent hover:text-white"
+                    >
+                      ⚔ {t(lang, "cp_compare")}
+                    </Link>
                   </div>
                 </>
               ) : (
@@ -406,9 +412,11 @@ export default function StoryDetail({
               </h3>
               <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
                 {related.map((s, i) => (
-                  <button
+                  <Link
                     key={s.id}
-                    onClick={() => onOpenStory(s)}
+                    // Real crawlable <a> — the router handles navigation,
+                    // so no onClick is needed (and none is duplicated).
+                    to={`/story/${s.id}`}
                     className="reveal group relative block aspect-[16/11] overflow-hidden border border-line text-left"
                     data-delay={i * 100}
                   >
@@ -425,8 +433,47 @@ export default function StoryDetail({
                       <p className="text-[10px] tracking-[0.16em] text-fog">{s.car}</p>
                       <p className="mt-1 font-display text-base font-semibold text-white">{s.title}</p>
                     </div>
-                  </button>
+                  </Link>
                 ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ---- Continue browsing (dedicated page only) ----
+            Crawlable exit links, always present on /story/:id so the
+            page never depends on the top-bar button to leave. */}
+        {asPage && (
+          <div className="border-t border-line bg-ink-2 py-16">
+            <div className="mx-auto max-w-[1480px] px-5 sm:px-8 lg:px-16">
+              <h3 className="mb-8 flex items-center gap-3 text-[11px] font-semibold tracking-mega text-fog">
+                <span className="h-px w-6 bg-accent" />
+                {t(lang, "st_explore").toUpperCase()}
+              </h3>
+              <div className="flex flex-wrap gap-3">
+                <Link
+                  to="/news"
+                  className="group inline-flex h-12 items-center gap-3 border border-line bg-charcoal px-6 text-[11px] font-semibold tracking-[0.18em] text-mist transition-colors hover:border-white/25 hover:text-white"
+                >
+                  {t(lang, "st_eyebrow").toUpperCase()}
+                  <ArrowRight className="h-4 w-4 text-fog transition-transform duration-300 group-hover:translate-x-1 group-hover:text-white" />
+                </Link>
+                {linkedCar && (
+                  <Link
+                    to={`/car/${linkedCar.id}`}
+                    className="group inline-flex h-12 items-center gap-3 border border-line bg-charcoal px-6 text-[11px] font-semibold tracking-[0.18em] text-mist transition-colors hover:border-white/25 hover:text-white"
+                  >
+                    {`${linkedCar.brand} ${linkedCar.model}`}
+                    <ArrowRight className="h-4 w-4 text-fog transition-transform duration-300 group-hover:translate-x-1 group-hover:text-white" />
+                  </Link>
+                )}
+                <Link
+                  to="/explore"
+                  className="group inline-flex h-12 items-center gap-3 border border-line bg-charcoal px-6 text-[11px] font-semibold tracking-[0.18em] text-mist transition-colors hover:border-white/25 hover:text-white"
+                >
+                  {t(lang, "nav_explore").toUpperCase()}
+                  <ArrowRight className="h-4 w-4 text-fog transition-transform duration-300 group-hover:translate-x-1 group-hover:text-white" />
+                </Link>
               </div>
             </div>
           </div>

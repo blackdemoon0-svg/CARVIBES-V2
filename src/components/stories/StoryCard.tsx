@@ -1,33 +1,34 @@
+import { Link } from "react-router-dom";
 import { t, type Lang } from "../../lib/i18n";
 import type { Story } from "../../lib/stories";
 import { ArrowRight } from "../icons";
 import StoryImage from "./StoryImage";
 import { pexelsResize } from "../../lib/images";
 
+/**
+ * Story card — a real crawlable <a href="/story/:id"> (was an
+ * onClick-only article). The router handles the navigation from the
+ * href, so no onClick is attached.
+ *
+ * `onOpen` remains in the prop type for source compatibility with
+ * existing callers; it is intentionally NOT called here (a second
+ * navigate() in onClick would push duplicate history entries).
+ */
 export default function StoryCard({
   story,
   lang,
-  onOpen,
   index = 0,
 }: {
   story: Story;
   lang: Lang;
-  onOpen: (s: Story) => void;
+  onOpen?: (s: Story) => void;
   index?: number;
 }) {
   return (
-    <article
-      role="button"
-      tabIndex={0}
+    <Link
+      to={`/story/${story.id}`}
       aria-label={`${t(lang, "st_read_story")}: ${story.title}`}
-      onClick={() => onOpen(story)}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          onOpen(story);
-        }
-      }}
-      className="card-in edge-light group relative flex cursor-pointer flex-col overflow-hidden border border-line bg-charcoal transition-all duration-500 ease-out hover:-translate-y-1.5 hover:border-white/25 hover:shadow-[0_30px_70px_-24px_rgba(0,0,0,0.95),0_0_0_1px_rgba(227,38,46,0.12)]"
+      className="card-in edge-light group relative flex flex-col overflow-hidden border border-line bg-charcoal transition-all duration-500 ease-out hover:-translate-y-1.5 hover:border-white/25 hover:shadow-[0_30px_70px_-24px_rgba(0,0,0,0.95),0_0_0_1px_rgba(227,38,46,0.12)]"
       style={{ animationDelay: `${Math.min(index, 8) * 70}ms` }}
     >
       {/* Image */}
@@ -76,6 +77,6 @@ export default function StoryCard({
           </span>
         </div>
       </div>
-    </article>
+    </Link>
   );
 }

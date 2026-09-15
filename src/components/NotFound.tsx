@@ -24,12 +24,18 @@ export default function NotFound({
         <Logo />
       </div>
 
-      <p className="relative z-10 mt-12 font-display text-8xl font-bold leading-none text-white">
+      {/* The big "404" is decorative; the page's single H1 is the real
+          "Page not found" title below — one H1, same as the prerendered
+          404 shell, no hidden heading anywhere else. */}
+      <p
+        aria-hidden="true"
+        className="relative z-10 mt-12 font-display text-8xl font-bold leading-none text-white"
+      >
         404
       </p>
-      <p className="relative z-10 mt-5 text-[12px] font-medium tracking-mega text-mist">
+      <h1 className="relative z-10 mt-5 text-[12px] font-medium tracking-mega text-mist">
         {t(lang, "notfound_title")}
-      </p>
+      </h1>
       <p className="relative z-10 mt-5 max-w-sm text-sm leading-relaxed text-fog">
         {t(lang, "notfound_desc")}
       </p>

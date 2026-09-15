@@ -8,10 +8,15 @@ import ImageWithFallback from "../ImageWithFallback";
 import { pexelsResize } from "../../lib/images";
 import { SaveButton, CompareButton } from "../compare/ActionButtons";
 
+/**
+ * Car card — crawlable <a href="/car/:id"> since the V2 deep-link
+ * work. `onOpen` stays in the prop type for source compatibility but
+ * is intentionally NOT called: a second navigate() in onClick would
+ * push duplicate history entries on every card click.
+ */
 export default function CarCard({
   car,
   lang,
-  onOpen,
   index,
 }: {
   car: Car;
@@ -25,8 +30,9 @@ export default function CarCard({
       className="card-in edge-light group relative flex flex-col overflow-hidden border border-line bg-charcoal transition-all duration-500 ease-out hover:-translate-y-1.5 hover:border-white/25 hover:shadow-[0_30px_70px_-24px_rgba(0,0,0,0.95),0_0_0_1px_rgba(227,38,46,0.15)]"
       style={{ animationDelay: `${Math.min(index, 8) * 60}ms` }}
     >
-      {/* Image — crawlable link */}
-      <Link to={href} onClick={() => onOpen(car)} className="relative block aspect-[16/11] overflow-hidden bg-graphite">
+      {/* Image — crawlable link (the <a href> navigates; no second
+          navigate() in onClick, which pushed duplicate history entries) */}
+      <Link to={href} className="relative block aspect-[16/11] overflow-hidden bg-graphite">
         <ImageWithFallback
           src={pexelsResize(car.image, 800, 550)}
           alt={carAltText(car)}
@@ -81,7 +87,6 @@ export default function CarCard({
         {/* CTA — real <a> via Link for crawlability */}
         <Link
           to={href}
-          onClick={() => onOpen(car)}
           className="cv-btn cv-btn-outline group/btn mt-4 flex h-11 items-center justify-between px-4 text-[11px] font-semibold tracking-[0.2em]"
         >
           {t(lang, "card_explore")}
