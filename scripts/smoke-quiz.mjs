@@ -56,6 +56,9 @@ async function main() {
     entry,
     `
 import { QUIZZES, DAILY_COUNT, maxReward } from ${JSON.stringify(path.join(ROOT, "src/lib/quiz/quizzes.ts"))};
+import { computeMaxReward } from ${JSON.stringify(path.join(ROOT, "src/lib/quiz/bank.ts"))};
+import { TOTAL_QUESTIONS, MAX_REWARDS } from ${JSON.stringify(path.join(ROOT, "src/lib/quiz/counts.ts"))};
+import { QUESTIONS } from ${JSON.stringify(path.join(ROOT, "src/lib/quiz/data/index.ts"))};
 import { prepareRun } from ${JSON.stringify(path.join(ROOT, "src/lib/quiz/run.ts"))};
 import {
   emptyPlayer, recordRun, unlockPremiumQuiz, spendPoints, getPlayer,
@@ -75,6 +78,7 @@ import { CarQuizPage, ExplorePage, BrandsPage, ContactPage, PrivacyPage, TermsPa
 import { Homepage } from ${JSON.stringify(path.join(ROOT, "src/App.tsx"))};
 export {
   QUIZZES, prepareRun, DAILY_COUNT, maxReward, emptyPlayer, recordRun,
+  computeMaxReward, TOTAL_QUESTIONS, MAX_REWARDS, QUESTIONS,
   unlockPremiumQuiz, spendPoints, getPlayer, isDailyDone, dayKey,
   msUntilNextDay, POINTS_PER_CORRECT, XP_PER_CORRECT, HINT_COST,
   STREAK_BONUSES, PREMIUM_TIERS, PERFECT_BONUS, levelInfo,
@@ -106,6 +110,19 @@ export {
   const React = (await import("react")).default;
   const { renderToStaticMarkup } = await import("react-dom/server");
   const { MemoryRouter } = await import("react-router-dom");
+
+  // ----------------------------------------------------------
+  // 0. The build-time snapshot the hub renders (src/lib/quiz/counts.ts)
+  //    must be identical to the live bank — otherwise a data edit landed
+  //    without `npm run build` regenerating it.
+  // ----------------------------------------------------------
+  ok(lib.TOTAL_QUESTIONS === lib.QUESTIONS.length, `counts.ts TOTAL_QUESTIONS ${lib.TOTAL_QUESTIONS} vs bank ${lib.QUESTIONS.length}`);
+  for (const quiz of lib.QUIZZES) {
+    const snap = lib.MAX_REWARDS[quiz.id];
+    const real = lib.computeMaxReward(quiz);
+    ok(snap === real, `counts.ts MAX_REWARDS[${quiz.id}] ${snap} vs live ${real}`);
+    ok(lib.maxReward(quiz) === real, `quizzes.maxReward(${quiz.id}) drift`);
+  }
 
   // ----------------------------------------------------------
   // 1. Every quiz deals a complete, well-formed run

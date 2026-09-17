@@ -99,7 +99,7 @@ function syncCarJsonLd(car: Car | undefined) {
   }
 }
 
-const ROUTE_META: Record<string, { title: string; description: string }> = {
+const ROUTE_META: Record<string, { title: string; description: string; robots?: string }> = {
   "/car-quiz": {
     title: "Car Quiz – Automotive Trivia & Car Knowledge | CarVibes",
     description:
@@ -121,6 +121,7 @@ const ROUTE_META: Record<string, { title: string; description: string }> = {
   "/favorites": {
     title: "Favorites — CarVibes",
     description: "Your saved cars and stories on CarVibes.",
+    robots: "noindex, follow",
   },
   "/find-my-car": {
     title: "Find My Car — CarVibes",
@@ -129,6 +130,12 @@ const ROUTE_META: Record<string, { title: string; description: string }> = {
   "/compare": {
     title: "Compare cars — CarVibes",
     description: "Head-to-head car comparison and battle.",
+    // Must mirror the prerendered <meta name=robots> exactly: the
+    // hydrated DOM is what Google renders, and the app used to strip
+    // the noindex back off (raw HTML said noindex, post-render said
+    // index — the worst of both). scripts/prerender.mjs stamps the same
+    // value on the static page.
+    robots: "noindex, follow",
   },
   "/search": {
     title: "Search — CarVibes",
@@ -209,6 +216,7 @@ export function usePageMeta({ car, story, notFound, path, skip }: PageMeta) {
       if (routeMeta && !car && !story) {
         title = routeMeta.title;
         description = routeMeta.description;
+        robots = routeMeta.robots ?? null;
       }
 
       if (car) {

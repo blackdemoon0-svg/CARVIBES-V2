@@ -6,7 +6,7 @@ import { useEscapeToClose, useBodyScrollLock } from "../../lib/useOverlay";
 import { useReveal } from "../../lib/useReveal";
 import { QUIZZES, maxReward, quizById } from "../../lib/quiz/quizzes";
 import { QUIZ_CATEGORIES } from "../../lib/quiz/data/categories";
-import { QUESTIONS } from "../../lib/quiz/data";
+import { TOTAL_QUESTIONS } from "../../lib/quiz/counts";
 import {
   isDailyDone,
   isPremiumUnlocked,
@@ -16,7 +16,7 @@ import {
   type RunResult,
 } from "../../lib/quiz/progress";
 import { clearSession, createSession, loadSession, type QuizSession } from "../../lib/quiz/session";
-import { nextQuizKey, prepareRun, pick, type RunSpec } from "../../lib/quiz/run";
+import { nextQuizKey, pick, type RunSpec } from "../../lib/quiz/run-meta";
 import type { Difficulty, QuizDef } from "../../lib/quiz/types";
 import PlayerHud from "./PlayerHud";
 import QuizCard from "./QuizCard";
@@ -112,36 +112,47 @@ export default function QuizPage({ lang }: { lang: Lang }) {
     }
 
     // Resume the saved session when it belongs to this run, otherwise
-    // deal a fresh set of questions.
-    const saved = loadSession();
+    // deal a fresh set of questions. Run preparation pulls the full
+    // question bank, so the module is fetched on demand — the hub itself
+    // stays small (see src/lib/quiz/run-meta.ts for the budget note).
+    let cancelled = false;
+    void (async () => {
+      const { prepareRun } = await import("../../lib/quiz/run");
+      if (cancelled) return;
+      const saved = loadSession();
 
-    if (saved && saved.runKey === playKey) {
-      const restored = prepareRun(playKey, {
-        seedNonce: saved.seedNonce,
+      if (saved && saved.runKey === playKey) {
+        const restored = prepareRun(playKey, {
+          seedNonce: saved.seedNonce,
+          day: new Date().toISOString().slice(0, 10),
+        });
+        const sameQuestions =
+          restored &&
+          restored.questions.length === saved.questionIds.length &&
+          restored.questions.every((q, i) => q.id === saved.questionIds[i]);
+        if (restored && sameQuestions) {
+          setNotice(t(lang, "quiz_resumed"));
+          setState({ run: restored, session: saved, result: null, correctIds: [] });
+          return;
+        }
+      }
+
+      const nonce = Math.floor(Math.random() * 1_000_000);
+      const run = prepareRun(playKey, {
+        seedNonce: nonce,
         day: new Date().toISOString().slice(0, 10),
       });
-      const sameQuestions =
-        restored &&
-        restored.questions.length === saved.questionIds.length &&
-        restored.questions.every((q, i) => q.id === saved.questionIds[i]);
-      if (restored && sameQuestions) {
-        setNotice(t(lang, "quiz_resumed"));
-        setState({ run: restored, session: saved, result: null, correctIds: [] });
+      if (!run || !run.questions.length) {
+        setNotice(t(lang, "quiz_error_empty"));
+        setParams({}, { replace: true });
         return;
       }
-    }
-
-    const nonce = Math.floor(Math.random() * 1_000_000);
-    const run = prepareRun(playKey, {
-      seedNonce: nonce,
-      day: new Date().toISOString().slice(0, 10),
-    });
-    if (!run || !run.questions.length) {
-      setNotice(t(lang, "quiz_error_empty"));
-      setParams({}, { replace: true });
-      return;
-    }
-    setState({ run, session: createSession(run, nonce), result: null, correctIds: [] });
+      if (cancelled) return;
+      setState({ run, session: createSession(run, nonce), result: null, correctIds: [] });
+    })();
+    return () => {
+      cancelled = true;
+    };
     // `player` is intentionally excluded: unlocks/daily state are read
     // through getPlayer() and the guards above on entry only.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -386,7 +397,7 @@ export default function QuizPage({ lang }: { lang: Lang }) {
 
           <dl className="reveal mt-10 grid max-w-3xl grid-cols-2 gap-px border border-line bg-line sm:grid-cols-4" data-delay="200">
             {[
-              { label: t(lang, "quiz_stat_questions"), value: formatNumber(QUESTIONS.length, lang) },
+              { label: t(lang, "quiz_stat_questions"), value: formatNumber(TOTAL_QUESTIONS, lang) },
               { label: t(lang, "quiz_stat_quizzes"), value: String(QUIZZES.length) },
               { label: t(lang, "quiz_stat_categories"), value: String(QUIZ_CATEGORIES.length) },
               { label: t(lang, "quiz_stat_levels"), value: "100" },

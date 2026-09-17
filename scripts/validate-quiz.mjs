@@ -45,14 +45,15 @@ async function loadData() {
     entry,
     [
       `import { QUESTIONS } from ${JSON.stringify(path.join(ROOT, "src/lib/quiz/data/index.ts"))};`,
-      `import { QUIZZES, DAILY_COUNT, dailyQuestions } from ${JSON.stringify(path.join(ROOT, "src/lib/quiz/quizzes.ts"))};`,
+      `import { QUIZZES, DAILY_COUNT } from ${JSON.stringify(path.join(ROOT, "src/lib/quiz/quizzes.ts"))};`,
+      `import { dailyQuestions } from ${JSON.stringify(path.join(ROOT, "src/lib/quiz/bank.ts"))};`,
       `import { ACHIEVEMENTS } from ${JSON.stringify(path.join(ROOT, "src/lib/quiz/achievements.ts"))};`,
       `import { PREMIUM_TIERS } from ${JSON.stringify(path.join(ROOT, "src/lib/quiz/economy.ts"))};`,
       `import { cars } from ${JSON.stringify(path.join(ROOT, "src/lib/db.ts"))};`,
       `import { quizDicts } from ${JSON.stringify(path.join(ROOT, "src/lib/quiz/i18n.ts"))};`,
       `import { QUIZ_CATEGORIES } from ${JSON.stringify(path.join(ROOT, "src/lib/quiz/data/categories.ts"))};`,
       `import { LEVEL_TITLES } from ${JSON.stringify(path.join(ROOT, "src/lib/quiz/economy.ts"))};`,
-      `import { baseDicts } from ${JSON.stringify(path.join(ROOT, "src/lib/i18n.ts"))};`,
+      `import { baseDicts } from ${JSON.stringify(path.join(ROOT, "src/lib/i18n/all-dicts.ts"))};`,
       `export { QUESTIONS, QUIZZES, ACHIEVEMENTS, PREMIUM_TIERS, cars, DAILY_COUNT, dailyQuestions, quizDicts, QUIZ_CATEGORIES, LEVEL_TITLES, baseDicts };`,
     ].join("\n"),
     "utf8"

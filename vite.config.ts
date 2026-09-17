@@ -19,6 +19,10 @@ export default defineConfig({
     allowedHosts: [".e2b.app"],
   },
   build: {
+    // Route-aware <link rel="modulepreload"> injection in
+    // scripts/prerender.mjs reads this manifest to know which hashed
+    // chunk belongs to which page (deep links stop waterfailing).
+    manifest: true,
     // Multi-asset build (no inlining): each prerendered HTML page stays a
     // ~15 KB shell that shares the same hashed JS/CSS chunks, instead of
     // duplicating a 1.3 MB inlined bundle 548 times.

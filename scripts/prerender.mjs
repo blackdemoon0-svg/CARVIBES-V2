@@ -31,7 +31,7 @@
 // Runs automatically as part of `npm run build`.
 // ============================================================
 
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -71,6 +71,7 @@ async function loadData() {
     [
       `import { cars } from ${JSON.stringify(path.join(ROOT, "src/lib/db.ts"))};`,
       `import { stories } from ${JSON.stringify(path.join(ROOT, "src/lib/stories.ts"))};`,
+      `import { featuredStory } from ${JSON.stringify(path.join(ROOT, "src/lib/stories.ts"))};`,
       `import { QUESTIONS } from ${JSON.stringify(path.join(ROOT, "src/lib/quiz/data/index.ts"))};`,
       `import { QUIZZES } from ${JSON.stringify(path.join(ROOT, "src/lib/quiz/quizzes.ts"))};`,
       `import { QUIZ_CATEGORIES } from ${JSON.stringify(path.join(ROOT, "src/lib/quiz/data/categories.ts"))};`,
@@ -79,8 +80,8 @@ async function loadData() {
       `import { USED_CATEGORIES, USED_CAR_ENTRIES, usedCarsForCategory } from ${JSON.stringify(path.join(ROOT, "src/lib/usedCars.ts"))};`,
       `import { carTitle, carMetaDescription, carOverviewText, carFaq, carAltText, carJsonLd, carCanonicalPath, categoryWords, engineBreakdown } from ${JSON.stringify(path.join(ROOT, "src/lib/carSeo.ts"))};`,
       `import { battleScore } from ${JSON.stringify(path.join(ROOT, "src/lib/compare.ts"))};`,
-      `import { HERO_WEBP_SRCSET } from ${JSON.stringify(path.join(ROOT, "src/lib/images.ts"))};`,
-      `export { cars, stories, QUESTIONS, QUIZZES, QUIZ_CATEGORIES, quizDicts, POINTS_PER_CORRECT, USED_CATEGORIES, USED_CAR_ENTRIES, usedCarsForCategory, carTitle, carMetaDescription, carOverviewText, carFaq, carAltText, carJsonLd, carCanonicalPath, categoryWords, engineBreakdown, battleScore, HERO_WEBP_SRCSET };`,
+      `import { HERO_WEBP_SRCSET, HERO_JPEG_SRCSET, HERO_SIZES, HERO_FALLBACK_SRC, HERO_PORTRAIT_WEBP_SRCSET, HERO_PORTRAIT_JPEG_SRCSET, HERO_PORTRAIT_MEDIA, COVER_SIZES, COVER_PORTRAIT_MEDIA, FEATURED_COVER_SIZES, featuredCoverWebpSrcset, featuredCoverJpegSrcset, coverHeroSrc, coverHeroJpegSrcset, coverHeroWebpSrcset, coverHeroPortraitJpegSrcset, coverHeroPortraitWebpSrcset, coverHeroOptimizable, pexelsResize, pexelsWebp } from ${JSON.stringify(path.join(ROOT, "src/lib/images.ts"))};`,
+      `export { cars, stories, featuredStory, QUESTIONS, QUIZZES, QUIZ_CATEGORIES, quizDicts, POINTS_PER_CORRECT, USED_CATEGORIES, USED_CAR_ENTRIES, usedCarsForCategory, carTitle, carMetaDescription, carOverviewText, carFaq, carAltText, carJsonLd, carCanonicalPath, categoryWords, engineBreakdown, battleScore, HERO_WEBP_SRCSET, HERO_JPEG_SRCSET, HERO_SIZES, HERO_FALLBACK_SRC, HERO_PORTRAIT_WEBP_SRCSET, HERO_PORTRAIT_JPEG_SRCSET, HERO_PORTRAIT_MEDIA, COVER_SIZES, COVER_PORTRAIT_MEDIA, coverHeroSrc, coverHeroJpegSrcset, coverHeroWebpSrcset, coverHeroPortraitJpegSrcset, coverHeroPortraitWebpSrcset, coverHeroOptimizable, FEATURED_COVER_SIZES, featuredCoverWebpSrcset, featuredCoverJpegSrcset, pexelsResize, pexelsWebp };`,
     ].join("\n"),
     "utf8"
   );
@@ -96,9 +97,92 @@ async function loadData() {
       logLevel: "silent",
     });
     const mod = await import(pathToFileURL(outfile).href);
+    // Shared cover-hero maths — the SAME functions the runtime components
+    // use, so every prerendered preload / splash URL matches the hydrated
+    // <picture> byte-for-byte (one network fetch, never two).
+    const images = {
+      heroWebpSrcset: mod.HERO_WEBP_SRCSET,
+      heroJpegSrcset: mod.HERO_JPEG_SRCSET,
+      heroSizes: mod.HERO_SIZES,
+      heroFallbackSrc: mod.HERO_FALLBACK_SRC,
+      heroPortraitWebp: mod.HERO_PORTRAIT_WEBP_SRCSET,
+      heroPortraitJpeg: mod.HERO_PORTRAIT_JPEG_SRCSET,
+      heroPortraitMedia: mod.HERO_PORTRAIT_MEDIA,
+      coverSizes: mod.COVER_SIZES,
+      featuredSizes: mod.FEATURED_COVER_SIZES,
+      /** The /news featured banner — the SAME srcset/sizes StoriesSection
+       *  renders, so the preloaded bytes are the bytes the app paints. */
+      featured(url) {
+        if (!mod.coverHeroOptimizable(url)) return null;
+        return {
+          fallback: mod.pexelsResize(url, 1280, 880),
+          webp: mod.featuredCoverWebpSrcset(url),
+          jpeg: mod.featuredCoverJpegSrcset(url),
+          sizes: mod.FEATURED_COVER_SIZES,
+        };
+      },
+      coverOptimizable: mod.coverHeroOptimizable,
+      cover(url) {
+        if (!mod.coverHeroOptimizable(url)) {
+          return { src: url, jpeg: "", webp: "", sizes: undefined, optimizable: false };
+        }
+        return {
+          src: mod.coverHeroSrc(url),
+          jpeg: mod.coverHeroJpegSrcset(url),
+          webp: mod.coverHeroWebpSrcset(url),
+          portraitJpeg: mod.coverHeroPortraitJpegSrcset(url),
+          portraitWebp: mod.coverHeroPortraitWebpSrcset(url),
+          portraitMedia: mod.COVER_PORTRAIT_MEDIA,
+          sizes: mod.COVER_SIZES,
+          optimizable: true,
+        };
+      },
+      /** <picture> markup painted inside the boot splash for one cover URL. */
+      splashPicture(url, { sizes, portraitWebp, portraitJpeg, portraitMedia } = {}) {
+        if (!mod.coverHeroOptimizable(url)) return "";
+        const src = mod.coverHeroSrc(url);
+        const jpeg = mod.coverHeroJpegSrcset(url);
+        const webp = mod.coverHeroWebpSrcset(url);
+        const s = sizes || mod.COVER_SIZES;
+        const portrait =
+          portraitMedia && portraitWebp
+            ? (
+                `<source media="${esc(portraitMedia)}" type="image/webp" srcset="${esc(portraitWebp)}" sizes="${esc(s)}">` +
+                (portraitJpeg ? `<source media="${esc(portraitMedia)}" srcset="${esc(portraitJpeg)}" sizes="${esc(s)}">` : "")
+              )
+            : "";
+        return (
+          `<picture>${portrait}` +
+          `<source type="image/webp" srcset="${esc(webp)}" sizes="${esc(s)}">` +
+          `<img src="${esc(src)}" srcset="${esc(jpeg)}" sizes="${esc(s)}" alt="" ` +
+          `fetchpriority="high" decoding="async" ` +
+          `onerror="this.onerror=null;var w=this.closest('.boot-hero');if(w)w.style.display='none'"></picture>`
+        );
+      },
+      /** Preload payload for one cover: media-complementary pair so every
+       *  viewport preloads exactly the srcset its <picture> will select. */
+      preload(url, { sizes, portraitWebp, portraitMedia, landscapeMedia } = {}) {
+        if (!mod.coverHeroOptimizable(url)) return [];
+        const s = sizes || mod.COVER_SIZES;
+        const out = [];
+        if (portraitMedia && portraitWebp) {
+          out.push({ srcset: portraitWebp, sizes: s, media: portraitMedia });
+        }
+        out.push({
+          srcset: mod.coverHeroWebpSrcset(url),
+          sizes: s,
+          // complementary media so portrait viewports never also fetch the
+          // landscape candidate (and vice versa)
+          media: landscapeMedia || (portraitMedia ? `(not (${portraitMedia}))` : undefined),
+        });
+        return out;
+      },
+    };
     return {
       cars: mod.cars,
       stories: mod.stories,
+      featuredStory: mod.featuredStory,
+      images,
       heroWebpSrcset: mod.HERO_WEBP_SRCSET,
       quiz: {
         questions: mod.QUESTIONS,
@@ -191,20 +275,39 @@ function renderHead(html, page) {
     );
   }
 
-  // Homepage only: start the hero image download together with the
-  // HTML. The raw document carries no <img> (React mounts it after the
-  // bundle runs), so without this hint mobile visitors would pay
-  // bundle-download + parse before the LCP image even begins. The
-  // srcset here is generated from src/lib/images.ts — the exact same
-  // constants the Hero component renders — so the preload and the
-  // <picture> element always agree.
-  if (page.heroPreload) {
-    out = out.replace(
-      "</head>",
-      `    <link rel="preload" as="image" type="image/webp" imagesrcset="${esc(
-        page.heroPreload
-      )}" imagesizes="100vw" fetchpriority="high" />\n  </head>`
-    );
+  // LCP image discovery (Performance audit “Optimize LCP request
+  // discovery”): preload the page's Largest Contentful Paint candidate
+  // in the FIRST bytes of the document, with the exact srcset/sizes the
+  // hydrated <picture> will use (see lib/images cover helpers), so the
+  // browser fetches it while the HTML parses — not after the bundle
+  // downloaded, parsed and rendered. Homepage, /car/:id and /story/:id
+  // all qualify; other routes have no image LCP and get nothing.
+  if (page.preload?.length) {
+    const links = page.preload
+      .map(
+        (p) =>
+          `    <link rel="preload" as="image" type="image/webp"${p.media ? ` media="${esc(p.media)}"` : ""} imagesrcset="${esc(p.srcset)}" imagesizes="${esc(p.sizes)}" fetchpriority="high" />`
+      )
+      .join("\n");
+    // Queued ahead of the font preload (index.html marker) so the LCP
+    // image is the first fetch after the document on throttled pipes.
+    if (out.includes("<!--cv-preload-images-->"))
+      out = out.replace("<!--cv-preload-images-->", links);
+    else out = out.replace("</head>", `${links}\n  </head>`);
+  }
+
+  // Route-specific modulepreload: a direct landing on /car/:id used to
+  // waterfall entry → lazy route chunk → data chunk. Declaring the page's
+  // own chunks here fetches them in parallel with the entry — identical
+  // bytes, one full RTT less before the interactive app replaces the
+  // splash. (Vite already preloads the entry's static imports.)
+  if (page.preloadChunks?.length) {
+    const links = page.preloadChunks
+      .map((f) => `    <link rel="modulepreload" crossorigin href="/${f}" />`)
+      .join("\n");
+    if (out.includes("<!--cv-preload-modules-->"))
+      out = out.replace("<!--cv-preload-modules-->", links);
+    else out = out.replace("</head>", `${links}\n  </head>`);
   }
 
   if (page.noindex) {
@@ -243,6 +346,23 @@ function renderBody(html, content) {
   return html.replace(
     '<div id="root"></div>',
     `<div id="root">${content}</div>`
+  );
+}
+
+// Paint the page's LCP image inside the static boot splash. The splash is
+// a fixed overlay that shows from the first paint; giving it the SAME
+// cover the Hero / CarDetail / StoryDetail will render (same URLs, same
+// srcset + sizes, fetchpriority=high) means the Largest Contentful Paint
+// element is painted before ANY JavaScript runs — module download,
+// parsing and hydration no longer sit in front of the LCP. When React
+// commits, the splash is removed and the identical image underneath is
+// revealed from the exact same network/decode cache entries: zero extra
+// bytes, zero visible change.
+function renderSplash(html, page) {
+  if (!page.bootHero) return html;
+  return html.replace(
+    '<div class="boot-hero" data-boot-hero></div>',
+    `<div class="boot-hero">${page.bootHero}</div>`
   );
 }
 
@@ -690,8 +810,14 @@ function recommendCars(all, car, limit = 3) {
 function carPage(car, siteUrl, data) {
   const seo = data.seo;
   const allCars = data.cars;
-  const url = `${siteUrl}${seo.carCanonicalPath(car)}`;
+  const canonicalPath = seo.carCanonicalPath(car);
+  const url = `${siteUrl}${canonicalPath}`;
   const name = `${car.brand} ${car.model}`;
+  // First frame of the sheet's gallery — exactly what CarDetail.tsx
+  // renders on landing (activeImage = 0). Same URL everywhere: preload,
+  // splash <picture>, prerendered body <img>, hydrated <picture>.
+  const heroUrl = Array.isArray(car.gallery) && car.gallery.length ? car.gallery[0] : car.image;
+  const cover = data.images.cover(heroUrl);
 
   // Title / description / overview / FAQ / alt texts come from
   // src/lib/carSeo.ts — the exact same builders the runtime applies
@@ -806,6 +932,7 @@ function carPage(car, siteUrl, data) {
     : [];
 
   return {
+    path: canonicalPath,
     file: path.join("car", `${car.id}.html`),
     title,
     description,
@@ -814,6 +941,22 @@ function carPage(car, siteUrl, data) {
     type: "article",
     schemaOwner: "car",
     schema: seo.carJsonLd(car, siteUrl),
+    // LCP discovery + splash paint for this exact cover (see renderHead).
+    // Portrait viewports get the tall crop (splash is full-bleed; Chrome
+    // skips upscaled images as LCP candidates); landscape gets the 5:3 set.
+    preload: cover.optimizable
+      ? data.images.preload(heroUrl, {
+          portraitWebp: cover.portraitWebp,
+          portraitMedia: cover.portraitMedia,
+        })
+      : [],
+    bootHero: cover.optimizable
+      ? data.images.splashPicture(heroUrl, {
+          portraitWebp: cover.portraitWebp,
+          portraitJpeg: cover.portraitJpeg,
+          portraitMedia: cover.portraitMedia,
+        })
+      : "",
     body:
       `<article>` +
       // The H1 must be byte-identical to the hydrated one
@@ -822,7 +965,12 @@ function carPage(car, siteUrl, data) {
       // and post-hydration DOM must never disagree.
       `<h1>${esc(name)}</h1>` +
       (car.tagline ? `<p><em>“${esc(car.tagline)}”</em></p>` : "") +
-      `<img src="${esc(car.image)}" alt="${esc(alt)}" />` +
+      // Same URL set as the hydrated <picture> / preload / splash — one
+      // cached image for the whole page, and the crawler still sees the
+      // real cover with its descriptive alt text.
+      (cover.optimizable
+        ? `<img src="${esc(cover.src)}" srcset="${esc(cover.jpeg)}" sizes="${esc(cover.sizes)}" alt="${esc(alt)}" />`
+        : `<img src="${esc(heroUrl)}" alt="${esc(alt)}" />`) +
       `<section><h2>Overview</h2><p>${esc(overview)}</p>` +
       (car.categories && car.categories.length
         ? `<p>CarVibes categories: ${esc(seo.categoryWords(car).join(", "))}.</p>`
@@ -856,9 +1004,13 @@ function carPage(car, siteUrl, data) {
   };
 }
 
-function storyPage(story, siteUrl) {
+function storyPage(story, siteUrl, data) {
   const url = `${siteUrl}/story/${story.id}`;
   const description = clamp(story.description);
+  // Story covers render full-bleed (the reader hero spans the viewport),
+  // so the srcset match uses 100vw — same sizes string in splash, preload
+  // and the hydrated StoryImage <picture>.
+  const cover = data.images.cover(story.image);
 
   // stories.ts uses { title, paragraphs: string[], quote? } — the old
   // code read ch.body/ch.text and produced empty sections for every
@@ -894,12 +1046,25 @@ function storyPage(story, siteUrl) {
     ` · ${esc(String(story.readTime))} min</p>`;
 
   return {
+    path: `/story/${story.id}`,
     file: path.join("story", `${story.id}.html`),
     title: `${story.title} — CarVibes`,
     description,
     url,
     image: story.image,
     type: "article",
+    // LCP discovery + splash paint for the reader cover (full-bleed).
+    preload: cover.optimizable
+      ? data.images.preload(story.image, { sizes: "100vw", portraitWebp: cover.portraitWebp, portraitMedia: cover.portraitMedia })
+      : [],
+    bootHero: cover.optimizable
+      ? data.images.splashPicture(story.image, {
+          sizes: "100vw",
+          portraitWebp: cover.portraitWebp,
+          portraitJpeg: cover.portraitJpeg,
+          portraitMedia: cover.portraitMedia,
+        })
+      : "",
     schema: {
       "@context": "https://schema.org",
       "@type": "Article",
@@ -923,18 +1088,229 @@ function storyPage(story, siteUrl) {
 // ------------------------------------------------------------
 // 7. Run
 // ------------------------------------------------------------
+// ------------------------------------------------------------
+// 7a. Per-route modulepreload plan (from the Vite manifest)
+// ------------------------------------------------------------
+// Map every prerendered route onto the lazy chunks it will import right
+// after the entry runs (its own page chunk + shared data chunks). The
+// closure subtracts what Vite already preloads for the entry so nothing
+// is fetched twice, and routes without a manifest entry simply get no
+// hints (the app still works — the hints are an optimisation).
+function buildPreloadPlan(manifest) {
+  if (!manifest) return () => [];
+  const byFile = new Map();
+  for (const m of Object.values(manifest)) if (m?.file) byFile.set(m.file, m);
+  // Manifest file refs for shared chunks look like "_db-<hash>.js" (no
+  // assets/ dir, leading underscore) while the real output is
+  // "assets/db-<hash>.js". Normalise against the actual dist/ contents so
+  // a hint can never 404 into the SPA fallback.
+  const normalise = (f) => {
+    if (!f || !f.endsWith(".js")) return null;
+    const base = f.replace(/^\/+/, "").replace(/^assets\//, "").replace(/^_/, "");
+    const cand = "assets/" + base;
+    return existsSync(path.join(DIST, cand)) ? cand : null;
+  };
+  const collect = (files) => {
+    const out = new Set();
+    const stack = [...files];
+    while (stack.length) {
+      const f = stack.pop();
+      if (out.has(f)) continue;
+      out.add(f);
+      const m = byFile.get(f);
+      if (m) stack.push(...(m.imports || []));
+    }
+    return out;
+  };
+  const entryKey =
+    Object.keys(manifest).find((k) => manifest[k]?.isEntry) || "src/main.tsx";
+  const entryClosure = manifest[entryKey]
+    ? collect([manifest[entryKey].file])
+    : new Set();
+
+  // `<link rel="modulepreload">` policy — two kinds of routes, two right
+  // answers, because a hint is only free when it does not compete with the
+  // thing the browser is waiting to paint:
+  //
+  //   * image-LCP routes (/, /car/:id, /story/:id) paint their LCP element
+  //     from the FIRST bytes of HTML (the .boot-hero <picture> stamped by
+  //     renderSplash below). Every extra hint there just steals the first
+  //     ~200 KB of a 4G connection from that photo, so only the route's own
+  //     chunk and the heavy shared datasets are hinted. Measured on the
+  //     homepage: FCP 2 310 → 1 858 ms, LCP 2 611 → 2 168 ms, same bytes.
+  //   * text-LCP routes (/explore, /news, /used-cars, /car-quiz, …) have no
+  //     hero photo — their LCP candidate is painted by the app itself, so
+  //     the entire module graph is on the critical path and hinting it in
+  //     full removes two discovery round trips. They get every chunk.
+  const forRoots = (roots, { minBytes = 0, rootsAlways = false } = {}) => {
+    const rootFiles = new Set(roots.map((k) => manifest[k]?.file).filter(Boolean));
+    const closure = new Set(rootFiles);
+    for (const f of rootFiles) for (const dep of collect([f])) closure.add(dep);
+    const out = [];
+    for (const f of closure) {
+      const keepRoot = rootsAlways && rootFiles.has(f);
+      if (!keepRoot) {
+        if (entryClosure.has(f)) continue;
+        if (minBytes) {
+          try {
+            const sized = normalise(f);
+            if (!sized || statSync(path.join(DIST, sized)).size < minBytes) continue;
+          } catch {
+            continue;
+          }
+        }
+      }
+      const n = normalise(f);
+      if (n && !out.includes(n)) out.push(n);
+    }
+    return out;
+  };
+
+  // Chunks below this size are skipped for image-LCP routes: leaf helpers
+  // (cards, buttons, image wrappers, utils) are a few KB each and are
+  // discovered by the module graph the moment the route chunk runs.
+  const IMAGE_LCP_MIN = 20 * 1024;
+
+  const SHELL = ["src/pages/RoutePages.tsx"];
+  const PLANS = {
+    // Homepage sections mount one idle callback at a time (see
+    // src/lib/progressive.ts), so nothing is hinted here: the entry chunk
+    // plus the hero photo own the first 200 KB.
+    "/": [],
+    "/car": forRoots(["src/pages/CarDetailPage.tsx"], {
+      minBytes: IMAGE_LCP_MIN,
+      rootsAlways: true,
+    }),
+    "/story": forRoots(["src/pages/StoryDetailPage.tsx"], {
+      minBytes: IMAGE_LCP_MIN,
+      rootsAlways: true,
+    }),
+    "/car-quiz": forRoots([...SHELL, "src/components/quiz/QuizPage.tsx"]),
+    "/used-cars": forRoots([...SHELL, "src/components/usedcars/UsedCarsPage.tsx"]),
+    "/find-my-car": forRoots([...SHELL, "src/components/findmycar/FindMyCar.tsx"]),
+    "/search": forRoots([...SHELL, "src/components/GlobalSearch.tsx"]),
+    "/compare": forRoots([...SHELL, "src/components/compare/CompareModal.tsx"]),
+    secondary: forRoots(SHELL),
+  };
+  const SECONDARY = new Set(["/explore", "/news", "/brands", "/favorites"]);
+  return (routePath) => {
+    if (routePath === "/") return PLANS["/"];
+    if (routePath.startsWith("/car/")) return PLANS["/car"];
+    if (routePath.startsWith("/story/")) return PLANS["/story"];
+    if (PLANS[routePath]) return PLANS[routePath];
+    if (SECONDARY.has(routePath)) return PLANS.secondary;
+    // Pure-text legal pages (contact/privacy/terms) and the 404 shell get
+    // no hints at all: their chunk is tiny, and the RoutePages bundle
+    // carries the car datasets that these pages never render.
+    return [];
+  };
+}
+
 async function main() {
   const siteUrl = resolveSiteUrl();
-  const shell = readFileSync(path.join(DIST, "index.html"), "utf8");
+  const shellRaw = readFileSync(path.join(DIST, "index.html"), "utf8");
 
-  if (!shell.includes('<div id="root"></div>')) {
+  if (!shellRaw.includes('<div id="root"></div>')) {
     throw new Error('dist/index.html has no empty <div id="root"></div> to prerender into.');
   }
 
+  // The app stylesheet becomes NON-BLOCKING on prerendered pages.
+  //
+  // The first painted frame is the boot splash, which carries its own
+  // inline styles (above) — the Tailwind bundle is only needed when React
+  // takes over, a second or two later. Keeping the 94 KB stylesheet as a
+  // blocking <link> therefore taxes every crawl-landing with an extra
+  // render-blocking request for styles the splash does not need. Instead:
+  //   * <link rel=preload as=style> starts the download immediately
+  //     (parallel with the entry chunk, ~15 KB gzip);
+  //   * the stylesheet itself loads via the media="print" swap trick, so
+  //     it never blocks first paint;
+  //   * <noscript> keeps the blocking link for JS-off crawlers, which
+  //     still render the prerendered article as a user would;
+  //   * the swap also flips a window flag and fires `cv-css-ready`, which
+  //     src/lib/boot.ts waits for before revealing the app — revealing the
+  //     prerendered body one frame before Tailwind's preflight (body
+  //     margin:0, …) applies shifted every element on every page
+  //     (CLS ≈ 0.026 in Lighthouse).
+  let shell = shellRaw;
+  const cssLink = shellRaw.match(
+    /<link\s+rel="stylesheet"[^>]*href="(\/assets\/[^"]+\.css)"[^>]*>/
+  );
+  if (cssLink) {
+    const cssHref = cssLink[1];
+    shell = shellRaw.replace(
+      cssLink[0],
+      `    <link rel="preload" as="style" href="${cssHref}" crossorigin />\n` +
+        `    <link rel="stylesheet" href="${cssHref}" media="print" crossorigin data-cv-css onload="this.media='all';this.onload=null;window.__cvCss=1;window.dispatchEvent(new Event('cv-css-ready'))" />\n` +
+        `    <noscript><link rel="stylesheet" href="${cssHref}" /></noscript>`
+    );
+    console.log(`[prerender] app stylesheet made non-blocking (${cssHref}) — splash paints without it`);
+  }
+
+  // The entry module script is an ENHANCEMENT on prerendered pages: the
+  // first painted frame (boot splash + hero photo, and the full article
+  // for JS-off crawlers) is pure HTML. A deferred `<script type="module">`
+  // in <head> still joins Lighthouse's paint chain — measured FCP 2.11 s
+  // for a page whose observed first paint is 94 ms — so it is loaded async:
+  // React boots as soon as the chunk is there, and the reveal handshake
+  // (src/lib/boot.ts) hands over the splash. Nothing waits for it before
+  // the user can read the page.
+  const entryScript = shell.match(/<script type="module"([^>]*)><\/script>/);
+  if (entryScript && !/\basync\b/.test(entryScript[1])) {
+    shell = shell.replace(
+      entryScript[0],
+      `<script type="module" async${entryScript[1]}></script>`
+    );
+    console.log("[prerender] entry module script loaded async (out of the paint-blocking chain)");
+  }
+
+  let manifest = null;
+  for (const candidate of [
+    path.join(DIST, ".vite", "manifest.json"),
+    path.join(DIST, "manifest.json"),
+  ]) {
+    try {
+      manifest = JSON.parse(readFileSync(candidate, "utf8"));
+      break;
+    } catch {
+      /* manifest disabled / older build — skip the modulepreload hints */
+    }
+  }
+  const preloadPlan = buildPreloadPlan(manifest);
+
   const data = await loadData();
+
+  // Homepage LCP: the hero photo, painted inside the boot splash from the
+  // first byte, preloaded with the very same srcset the <picture> in
+  // Hero.tsx renders (shared constants in src/lib/images.ts).
+  const HERO_LANDSCAPE_MEDIA = `(orientation: landscape), (min-width: 1280px)`;
+  const homeHero = {
+    preload: [
+      { srcset: data.images.heroPortraitWebp, sizes: data.images.heroSizes, media: data.images.heroPortraitMedia },
+      { srcset: data.images.heroWebpSrcset, sizes: data.images.heroSizes, media: HERO_LANDSCAPE_MEDIA },
+    ],
+    bootHero:
+      `<picture><source media="${esc(data.images.heroPortraitMedia)}" type="image/webp" srcset="${esc(data.images.heroPortraitWebp)}" sizes="${esc(data.images.heroSizes)}">` +
+      `<source media="${esc(data.images.heroPortraitMedia)}" srcset="${esc(data.images.heroPortraitJpeg)}" sizes="${esc(data.images.heroSizes)}">` +
+      `<source type="image/webp" srcset="${esc(data.images.heroWebpSrcset)}" sizes="${esc(data.images.heroSizes)}">` +
+      `<img src="${esc(data.images.heroFallbackSrc)}" srcset="${esc(data.images.heroJpegSrcset)}" sizes="${esc(data.images.heroSizes)}" alt="" ` +
+      `fetchpriority="high" decoding="async" ` +
+      `onerror="this.onerror=null;var w=this.closest('.boot-hero');if(w)w.style.display='none'"></picture>`,
+  };
+
+  // /news has no full-bleed hero photo, but its featured banner IS the LCP
+  // element the moment the app mounts — so that exact candidate is preloaded
+  // from the first bytes of the document. Without the hint the fetch only
+  // starts when React renders (measured /news LCP 3.54 s on mobile, most of
+  // it waiting for the banner itself).
+  const featuredCover = data.featuredStory ? data.images.featured(data.featuredStory.image) : null;
+  const newsHero = featuredCover
+    ? { preload: [{ srcset: featuredCover.webp, sizes: featuredCover.sizes }] }
+    : {};
 
   const pages = [
     ...STATIC_PAGES.map((p) => ({
+      path: p.path,
       file: p.path === "/" ? "index.html" : `${p.path.replace(/^\//, "")}.html`,
       title: p.title,
       description: p.description,
@@ -942,7 +1318,8 @@ async function main() {
       image: DEFAULT_IMAGE,
       type: "website",
       noindex: p.noindex,
-      heroPreload: p.path === "/" ? data.heroWebpSrcset : undefined,
+      ...(p.path === "/" ? homeHero : {}),
+      ...(p.path === "/news" ? newsHero : {}),
       body: staticBody(p.path, data),
       schema:
         p.path === "/car-quiz"
@@ -952,7 +1329,7 @@ async function main() {
             : undefined,
     })),
     ...data.cars.map((c) => carPage(c, siteUrl, data)),
-    ...data.stories.map((s) => storyPage(s, siteUrl)),
+    ...data.stories.map((s) => storyPage(s, siteUrl, data)),
   ];
 
   // A 404 shell so unknown paths can answer with a real 404 status
@@ -980,9 +1357,14 @@ async function main() {
     if (seen.has(page.file)) throw new Error(`Duplicate output file: ${page.file}`);
     seen.add(page.file);
 
+    if (manifest && !page.preloadChunks) {
+      page.preloadChunks = preloadPlan(page.path || "");
+    }
+
     const target = path.join(DIST, page.file);
     mkdirSync(path.dirname(target), { recursive: true });
-    writeFileSync(target, renderBody(renderHead(shell, page), page.body), "utf8");
+    const html = renderSplash(renderBody(renderHead(shell, page), page.body), page);
+    writeFileSync(target, html, "utf8");
   }
 
   console.log(

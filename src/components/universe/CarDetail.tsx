@@ -17,7 +17,13 @@ import { useBodyScrollLock, useEscapeToClose } from "../../lib/useOverlay";
 import { ArrowRight } from "../icons";
 import { SaveButton, CompareButton } from "../compare/ActionButtons";
 import CarCard from "./CarCard";
-import { pexelsResize } from "../../lib/images";
+import {
+  COVER_SIZES,
+  coverHeroJpegSrcset,
+  coverHeroSrc,
+  coverHeroWebpSrcset,
+  pexelsResize,
+} from "../../lib/images";
 
 /** Compact specification-group card: real h3 heading + scannable rows. */
 function SpecGroup({
@@ -259,20 +265,46 @@ export default function CarDetail({
             </div>
           </div>
 
-          {/* Hero image — taller ratio on phones so the title/price overlay fits */}
+          {/* Hero image — taller ratio on phones so the title/price overlay fits.
+              This cover is the LCP element of /car/:id: the URL set comes from
+              the shared lib/images helpers, identical to what the prerenderer
+              preloads in <head> and paints in the boot splash — so the fetch
+              starts while the HTML parses, not after React boots, and the
+              hydrated <picture> reuses the exact cached bytes. */}
           <div className="relative aspect-[4/3] overflow-hidden border border-line bg-graphite sm:aspect-[16/9]">
-            <img
-              src={gallery[activeImage]}
-              alt={carAltText(car, activeImage, gallery.length)}
-              className="h-full w-full object-cover"
-              loading="eager"
-              decoding="async"
-              onError={(e) => {
-                (e.currentTarget as HTMLImageElement).onerror = null;
-                (e.currentTarget as HTMLImageElement).src =
-                  "https://images.pexels.com/photos/261985/pexels-photo-261985.jpeg?auto=compress&cs=tinysrgb&fit=crop&w=1400&h=900";
-              }}
-            />
+            {(() => {
+              const url = gallery[activeImage];
+              const jpeg = coverHeroJpegSrcset(url);
+              const webp = coverHeroWebpSrcset(url);
+              const img = (
+                <img
+                  src={coverHeroSrc(url)}
+                  {...(jpeg
+                    ? { srcSet: jpeg, sizes: COVER_SIZES }
+                    : {})}
+                  alt={carAltText(car, activeImage, gallery.length)}
+                  className="h-full w-full object-cover"
+                  loading="eager"
+                  decoding="async"
+                  fetchPriority={activeImage === 0 ? "high" : "auto"}
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).onerror = null;
+                    (e.currentTarget as HTMLImageElement).src =
+                      "https://images.pexels.com/photos/261985/pexels-photo-261985.jpeg?auto=compress&cs=tinysrgb&fit=crop&w=1400&h=900";
+                  }}
+                />
+              );
+              return jpeg || webp ? (
+                <picture>
+                  {webp ? (
+                    <source type="image/webp" srcSet={webp} sizes={COVER_SIZES} />
+                  ) : null}
+                  {img}
+                </picture>
+              ) : (
+                img
+              );
+            })()}
             <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-transparent to-ink/20" />
             {/* Title overlay */}
             <div className="absolute inset-x-0 bottom-0 p-5 sm:p-10">

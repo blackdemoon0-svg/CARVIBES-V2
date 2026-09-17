@@ -5,7 +5,7 @@
 // player's run away, so the live session is mirrored into localStorage
 // after every state change and rehydrated on load.
 // ============================================================
-import type { RunSpec } from "./run";
+import type { RunSpec } from "./run-meta";
 
 const KEY = "carvibes.quiz.session.v1";
 /** A half-finished run older than this is abandoned (24h). */

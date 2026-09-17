@@ -5,7 +5,7 @@ import { t, type Lang } from "../../lib/i18n";
 import { HINT_COST, STREAK_BONUSES } from "../../lib/quiz/economy";
 import { getPlayer, spendPoints } from "../../lib/quiz/progress";
 import { saveSession, type QuizSession } from "../../lib/quiz/session";
-import { pick, type RunSpec } from "../../lib/quiz/run";
+import { pick, type RunSpec } from "../../lib/quiz/run-meta";
 import { categoryById } from "../../lib/quiz/data/categories";
 import {
   CategoryBadge,

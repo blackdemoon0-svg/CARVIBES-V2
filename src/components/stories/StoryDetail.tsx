@@ -13,7 +13,14 @@ import {
   subscribePrefs,
 } from "../../lib/prefs";
 import { useBodyScrollLock, useEscapeToClose } from "../../lib/useOverlay";
-import { pexelsResize } from "../../lib/images";
+import {
+  coverHeroJpegSrcset,
+  coverHeroPortraitJpegSrcset,
+  coverHeroPortraitWebpSrcset,
+  coverHeroSrc,
+  coverHeroWebpSrcset,
+  pexelsResize,
+} from "../../lib/images";
 import { ArrowRight } from "../icons";
 import StoryImage from "./StoryImage";
 
@@ -191,15 +198,26 @@ export default function StoryDetail({
           </div>
         </div>
 
-        {/* ---- HERO ---- */}
+        {/* ---- HERO ----
+            The cover is this page's LCP element. URLs come from the shared
+            helpers in lib/images so the <picture>, the prerendered
+            <link rel=preload> and the boot-splash copy are byte-identical:
+            one download, discovered while the HTML parses — never after
+            React boots. */}
         <div className="relative flex min-h-[90svh] flex-col justify-end overflow-hidden">
           <StoryImage
-            src={story.image}
+            src={coverHeroSrc(story.image)}
             alt={story.title}
             title={story.title}
             accent={story.accent}
             className="absolute inset-0 h-full w-full"
             eager
+            srcSet={coverHeroJpegSrcset(story.image) || undefined}
+            webpSrcSet={coverHeroWebpSrcset(story.image) || undefined}
+            portraitSrcSet={coverHeroPortraitJpegSrcset(story.image) || undefined}
+            portraitWebpSrcSet={coverHeroPortraitWebpSrcset(story.image) || undefined}
+            sizes="100vw"
+            fetchPriority="high"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/50 to-ink/20" />
           <div className="absolute inset-0 bg-gradient-to-r from-ink/60 via-transparent to-transparent" />

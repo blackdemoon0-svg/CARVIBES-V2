@@ -4,8 +4,8 @@ import { t, type Lang } from "../../lib/i18n";
 import { levelInfo } from "../../lib/quiz/economy";
 import type { PlayerState } from "../../lib/quiz/types";
 import type { RunResult } from "../../lib/quiz/progress";
-import type { RunSpec } from "../../lib/quiz/run";
-import { pick } from "../../lib/quiz/run";
+import type { RunSpec } from "../../lib/quiz/run-meta";
+import { pick } from "../../lib/quiz/run-meta";
 import {
   formatNumber,
   GhostButton,

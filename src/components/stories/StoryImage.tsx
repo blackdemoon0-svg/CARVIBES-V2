@@ -5,6 +5,11 @@ import { cn } from "../../utils/cn";
  * Image with a branded CarVibes fallback. If the real image fails to load
  * (network error / missing URL), we render a premium gradient panel with
  * the story title instead of a broken-image icon.
+ *
+ * Optional `srcSet`/`webpSrcSet`/`sizes`/`fetchPriority` turn the image
+ * into a proper responsive <picture> — used by the story cover hero so the
+ * LCP element matches, byte-for-byte, the URL the prerenderer preloads and
+ * paints inside the boot splash (see scripts/prerender.mjs + lib/images).
  */
 export default function StoryImage({
   src,
@@ -14,6 +19,13 @@ export default function StoryImage({
   className,
   imgClassName,
   eager = false,
+  srcSet,
+  webpSrcSet,
+  sizes,
+  fetchPriority,
+  portraitWebpSrcSet,
+  portraitSrcSet,
+  portraitMedia = "(orientation: portrait)",
 }: {
   src: string;
   alt: string;
@@ -23,6 +35,14 @@ export default function StoryImage({
   imgClassName?: string;
   /** Set for full-screen hero images that must load immediately. */
   eager?: boolean;
+  srcSet?: string;
+  webpSrcSet?: string;
+  sizes?: string;
+  fetchPriority?: "high" | "auto";
+  /** Tall crop for portrait viewports (see lib/images HERO_PORTRAIT_*). */
+  portraitWebpSrcSet?: string;
+  portraitSrcSet?: string;
+  portraitMedia?: string;
 }) {
   const [failed, setFailed] = useState(false);
 
@@ -46,16 +66,35 @@ export default function StoryImage({
     );
   }
 
+  const img = (
+    <img
+      src={src}
+      alt={alt}
+      loading={eager ? "eager" : "lazy"}
+      decoding="async"
+      {...(srcSet ? { srcSet, sizes } : {})}
+      {...(fetchPriority ? { fetchPriority } : {})}
+      onError={() => setFailed(true)}
+      className={cn("h-full w-full object-cover", imgClassName)}
+    />
+  );
+
   return (
     <div className={cn("relative overflow-hidden bg-graphite", className)}>
-      <img
-        src={src}
-        alt={alt}
-        loading={eager ? "eager" : "lazy"}
-        decoding="async"
-        onError={() => setFailed(true)}
-        className={cn("h-full w-full object-cover", imgClassName)}
-      />
+      {srcSet || webpSrcSet ? (
+        <picture>
+          {portraitWebpSrcSet ? (
+            <source media={portraitMedia} type="image/webp" srcSet={portraitWebpSrcSet} sizes={sizes} />
+          ) : null}
+          {portraitSrcSet ? (
+            <source media={portraitMedia} srcSet={portraitSrcSet} sizes={sizes} />
+          ) : null}
+          {webpSrcSet ? <source type="image/webp" srcSet={webpSrcSet} sizes={sizes} /> : null}
+          {img}
+        </picture>
+      ) : (
+        img
+      )}
     </div>
   );
 }

@@ -41,6 +41,20 @@
     scroll-margin-top: 5.5rem;
   }
 
+  /* PERFORMANCE — rendering only what the viewport can see.
+     `content-visibility: auto` lets Chrome skip style/layout/paint for
+     below-the-fold <section>s (the big car / story grids, the quiz hub,
+     …) until they approach the viewport: first render drops to the hero
+     + first section. Content stays in the DOM (crawlable, searchable,
+     fully accessible); `contain-intrinsic-size` keeps the scrollbar
+     honest. The homepage hero (#top) and interactive overlays are
+     excluded so the LCP-critical first screen never defers. */
+  main > section:not(#top):not(:first-child),
+  main > div > section:not(#top):not(:first-child) {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 600px;
+  }
+
   ::selection {
     background: rgba(227, 38, 46, 0.35);
     color: #fff;

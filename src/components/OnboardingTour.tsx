@@ -66,52 +66,66 @@ interface Rect {
   height: number;
 }
 
+// Pure positioning maths — shared by the first (pre-paint) measure and the
+// later refinements. `tipH` is either the estimated card height (before the
+// tooltip exists) or its measured one. Returns viewport-absolute CSS pixels
+// for a fixed, top-left-anchored element that is then MOVED WITH
+// transform:translate() only — top/left never change after the first paint,
+// which is exactly what keeps the tour out of CLS (transform-only updates
+// are never layout shifts, and there is no "paint at (12,0) then jump"
+// frame any more).
+function positionFor(r: Rect, tipW: number, tipH: number) {
+  const vw = typeof window === "undefined" ? 390 : window.innerWidth;
+  const vh = typeof window === "undefined" ? 700 : window.innerHeight;
+  const width = Math.min(tipW, vw - VIEW_PAD * 2);
+  const bottom = r.top + r.height;
+  const above = bottom + GAP + tipH > vh - VIEW_PAD;
+  let left = r.left + r.width / 2 - width / 2;
+  left = Math.max(VIEW_PAD, Math.min(left, vw - width - VIEW_PAD));
+  let top = above ? r.top - GAP - tipH : bottom + GAP;
+  // Keep the tooltip clear of the fixed navbar and on-screen.
+  top = Math.max(72, Math.min(top, vh - tipH - VIEW_PAD));
+  return { x: Math.round(left), y: Math.round(top), width, above };
+}
+
+const TIP_ESTIMATE_H = 190;
+
 export default function OnboardingTour({ lang }: { lang: Lang }) {
   const [active, setActive] = useState(false);
   const [step, setStep] = useState(0);
   const [rect, setRect] = useState<Rect | null>(null);
-  const [tip, setTip] = useState<{ top: number; left: number; above: boolean }>({
-    top: 0,
-    left: VIEW_PAD,
-    above: false,
-  });
+  const [tip, setTip] = useState<{
+    x: number;
+    y: number;
+    width: number;
+    above: boolean;
+  } | null>(null);
   const tipRef = useRef<HTMLDivElement>(null);
 
-  const measure = useCallback((target: string) => {
+  // Synchronously read the target box (single forced layout, only while the
+  // tour is running — never during boot/LCP).
+  const targetRect = (target: string): Rect | null => {
     const el = document.querySelector<HTMLElement>(target);
-    if (!el) {
-      setRect(null);
-      return;
-    }
+    if (!el) return null;
     const r = el.getBoundingClientRect();
-    setRect({
-      top: r.top,
-      left: r.left,
-      width: r.width,
-      height: r.height,
-    });
+    return { top: r.top, left: r.left, width: r.width, height: r.height };
+  };
 
-    // Position the tooltip: below the target when there's room, above on
-    // shorter viewports; always clamped inside the screen (mobile safe).
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
-    const width = Math.min(TOOLTIP_WIDTH, vw - VIEW_PAD * 2);
-    const tipHeight = tipRef.current?.offsetHeight ?? 190;
-
-    let left = r.left + r.width / 2 - width / 2;
-    left = Math.max(VIEW_PAD, Math.min(left, vw - width - VIEW_PAD));
-
-    let top = r.bottom + GAP;
-    let above = false;
-    if (top + tipHeight > vh - VIEW_PAD) {
-      above = true;
-      top = r.top - GAP - tipHeight;
-    }
-    // Keep the tooltip clear of the fixed navbar and on-screen.
-    top = Math.max(72, Math.min(top, vh - tipHeight - VIEW_PAD));
-
-    setTip({ top, left, above });
-  }, []);
+  const place = useCallback(
+    (target: string, refineHeight = false) => {
+      const r = targetRect(target);
+      if (!r) {
+        setRect(null);
+        return;
+      }
+      setRect(r);
+      const tipH = refineHeight
+        ? tipRef.current?.offsetHeight ?? TIP_ESTIMATE_H
+        : TIP_ESTIMATE_H;
+      setTip(positionFor(r, TOOLTIP_WIDTH, tipH));
+    },
+    []
+  );
 
   const goToStep = useCallback(
     (next: number) => {
@@ -121,13 +135,17 @@ export default function OnboardingTour({ lang }: { lang: Lang }) {
       }
       setStep(next);
       const target = STEPS[next].target;
+      // Position from the CURRENT scroll offset, in the same state batch as
+      // setStep — the tooltip never paints at a stale spot.
+      place(target, true);
       const el = document.querySelector<HTMLElement>(target);
-      // Bring the target into a comfortable position before measuring.
+      // Bring the target into a comfortable position, then refine once the
+      // smooth scroll has settled (transform-only movement; and a user
+      // gesture happened <500 ms ago, so it is CLS-exempt anyway).
       el?.scrollIntoView({ behavior: "smooth", block: "center" });
-      window.setTimeout(() => measure(target), 480);
-      measure(target); // instant pass in case the element is already visible
+      window.setTimeout(() => place(target, true), 480);
     },
-    [measure]
+    [place]
   );
 
   const finish = useCallback(() => {
@@ -142,34 +160,49 @@ export default function OnboardingTour({ lang }: { lang: Lang }) {
 
   const start = useCallback(() => {
     setStep(0);
+    // Measure BEFORE making the tour visible: the first painted frame of the
+    // tooltip is already at its final position (a paint-then-jump here was
+    // the source of the homepage's 0.22 CLS — a fixed overlay moving in
+    // top/left counts as a layout shift).
+    place(STEPS[0].target);
     setActive(true);
-    const target = STEPS[0].target;
     window.scrollTo({ top: 0, behavior: "smooth" });
-    window.setTimeout(() => measure(target), 500);
-  }, [measure]);
+    window.setTimeout(() => place(STEPS[0].target, true), 500);
+  }, [place]);
 
   // Auto-start for first-time visitors (only on the homepage where this is
   // mounted); also listen for the manual "start tour" event from nav/guide.
+  // The auto-open is armed on `load` + 1.4 s — never during boot: measuring
+  // and animating the tour while the entry chunks parse/execute used to add
+  // forced reflows to the busiest window of the page.
   useEffect(() => {
     const onManual = () => start();
     window.addEventListener(ONBOARDING_EVENT, onManual);
-    const delay = window.setTimeout(() => {
-      if (takePendingOnboarding() || !hasSeenOnboarding()) start();
-    }, 1400);
+    let delay = 0;
+    const arm = () => {
+      delay = window.setTimeout(() => {
+        if (takePendingOnboarding() || !hasSeenOnboarding()) start();
+      }, 1400);
+    };
+    if (document.readyState === "complete") arm();
+    else window.addEventListener("load", arm, { once: true });
     return () => {
       window.removeEventListener(ONBOARDING_EVENT, onManual);
-      window.clearTimeout(delay);
+      window.removeEventListener("load", arm);
+      if (delay) window.clearTimeout(delay);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Keep the spotlight/tooltip glued to the target on scroll & resize.
+  // Reads happen in one rAF; only transforms are written, so re-gluing is
+  // compositor-cheap and invisible to CLS.
   useEffect(() => {
     if (!active) return;
     let raf = 0;
     const onReflow = () => {
       cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(() => measure(STEPS[step].target));
+      raf = requestAnimationFrame(() => place(STEPS[step].target));
     };
     window.addEventListener("scroll", onReflow, true);
     window.addEventListener("resize", onReflow);
@@ -178,7 +211,7 @@ export default function OnboardingTour({ lang }: { lang: Lang }) {
       window.removeEventListener("scroll", onReflow, true);
       window.removeEventListener("resize", onReflow);
     };
-  }, [active, step, measure]);
+  }, [active, step, place]);
 
   // Close on Escape.
   useEffect(() => {
@@ -197,12 +230,15 @@ export default function OnboardingTour({ lang }: { lang: Lang }) {
   const pad = 6;
   const spot = rect
     ? {
-        top: Math.max(0, rect.top - pad),
-        left: Math.max(0, rect.left - pad),
+        x: Math.max(0, rect.left - pad),
+        y: Math.max(0, rect.top - pad),
         width: rect.width + pad * 2,
         height: rect.height + pad * 2,
       }
     : null;
+  // Fallback anchor when the tour is started before its target exists:
+  // keep the card on-screen instead of painting at (0,0) and jumping.
+  const tipPos = tip ?? { x: VIEW_PAD, y: 120, width: TOOLTIP_WIDTH, above: false };
 
   return (
     <div
@@ -215,13 +251,15 @@ export default function OnboardingTour({ lang }: { lang: Lang }) {
       onClick={() => goToStep(step + 1)}
     >
       {/* Dimming layer with a spotlight cutout around the target.
-          Clicks anywhere on the dim advance the tour — no dead zones. */}
+          Clicks anywhere on the dim advance the tour — no dead zones.
+          MOVES VIA transform ONLY (top/left stay at 0): repositioning the
+          spotlight during the tour can therefore never register as a
+          layout shift. */}
       {spot && (
         <div
-          className="absolute cursor-pointer transition-all duration-300 ease-out"
+          className="absolute left-0 top-0 cursor-pointer duration-300 ease-out [transition-property:transform,width,height] will-change-transform"
           style={{
-            top: spot.top,
-            left: spot.left,
+            transform: `translate3d(${spot.x}px, ${spot.y}px, 0)`,
             width: spot.width,
             height: spot.height,
             borderRadius: 14,
@@ -241,11 +279,14 @@ export default function OnboardingTour({ lang }: { lang: Lang }) {
         </div>
       )}
 
-      {/* Tooltip card */}
+      {/* Tooltip card — fixed at the origin and moved with transform only.
+          It is painted at its final coordinates from frame 1 (the tour is
+          measured before activation), so it contributes exactly zero to
+          CLS. */}
       <div
         ref={tipRef}
-        className="edge-light fixed w-[min(20.6rem,calc(100vw-1.5rem))] border border-line bg-charcoal/95 p-5 shadow-2xl shadow-black/60 backdrop-blur-xl"
-        style={{ top: tip.top, left: tip.left }}
+        className="edge-light fixed left-0 top-0 w-[min(20.6rem,calc(100vw-1.5rem))] border border-line bg-charcoal/95 p-5 shadow-2xl shadow-black/60 backdrop-blur-xl duration-300 ease-out [transition-property:transform] will-change-transform"
+        style={{ transform: `translate3d(${tipPos.x}px, ${tipPos.y}px, 0)` }}
         // Clicks inside the card must not bubble to the dim layer.
         onClick={(e) => e.stopPropagation()}
       >
@@ -253,7 +294,7 @@ export default function OnboardingTour({ lang }: { lang: Lang }) {
         <span
           className={cn(
             "absolute left-1/2 h-2.5 w-2.5 -translate-x-1/2 rotate-45 border-line bg-charcoal",
-            tip.above ? "-bottom-[5px] border-b border-r" : "-top-[5px] border-l border-t"
+            tipPos.above ? "-bottom-[5px] border-b border-r" : "-top-[5px] border-l border-t"
           )}
         />
 

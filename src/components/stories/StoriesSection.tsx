@@ -4,7 +4,7 @@ import { t, type Lang } from "../../lib/i18n";
 import { stories, featuredStory, storyCategories, type Story, type StoryCategory } from "../../lib/stories";
 import StoryCard from "./StoryCard";
 import StoryImage from "./StoryImage";
-import { pexelsResize } from "../../lib/images";
+import { pexelsResize, featuredCoverWebpSrcset, featuredCoverJpegSrcset, FEATURED_COVER_SIZES } from "../../lib/images";
 import { ArrowRight, SearchIcon } from "../icons";
 
 const COMPACT_COUNT = 6;
@@ -88,9 +88,18 @@ export default function StoriesSection({
               <div className="relative aspect-[16/9] overflow-hidden sm:aspect-[21/9]">
                 <StoryImage
                   src={pexelsResize(featured.image, 1280, 880)}
+                  webpSrcSet={featuredCoverWebpSrcset(featured.image)}
+                  srcSet={featuredCoverJpegSrcset(featured.image)}
+                  sizes={FEATURED_COVER_SIZES}
                   alt={featured.title}
                   title={featured.title}
                   accent={featured.accent}
+                  /* On /news this banner is the LCP element: it must be
+                     eager + high priority (and a 640 px crop on phones,
+                     not the old fixed 1280 px one). On the homepage the
+                     strip is below the fold, so it stays lazy. */
+                  eager={!compact}
+                  fetchPriority={compact ? undefined : "high"}
                   className="absolute inset-0 h-full w-full"
                   imgClassName="transition-transform duration-[1400ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.05]"
                 />

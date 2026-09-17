@@ -3,7 +3,7 @@ import { t, type Lang } from "../../lib/i18n";
 import type { Story } from "../../lib/stories";
 import { ArrowRight } from "../icons";
 import StoryImage from "./StoryImage";
-import { pexelsResize } from "../../lib/images";
+import { pexelsResize, cardCoverWebpSrcset, cardCoverJpegSrcset, CARD_COVER_SIZES } from "../../lib/images";
 
 /**
  * Story card — a real crawlable <a href="/story/:id"> (was an
@@ -35,6 +35,9 @@ export default function StoryCard({
       <div className="relative aspect-[16/11] overflow-hidden bg-graphite">
         <StoryImage
           src={pexelsResize(story.image, 800, 550)}
+          webpSrcSet={cardCoverWebpSrcset(story.image)}
+          srcSet={cardCoverJpegSrcset(story.image)}
+          sizes={CARD_COVER_SIZES}
           alt={story.title}
           title={story.title}
           accent={story.accent}

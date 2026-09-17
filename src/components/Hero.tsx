@@ -1,13 +1,17 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { t, type Lang } from "../lib/i18n";
-import { cars, allBrands } from "../lib/db";
-import { stories } from "../lib/stories";
-import { categoryList } from "../lib/cars";
+// Live counts come from the build-time snapshot (scripts/generate-counts.mjs)
+// instead of importing the car + story datasets — the datasets belong to the
+// lazy below-the-fold sections that actually list them.
+import { COUNTS } from "../lib/counts";
 import { ArrowRight, SearchIcon } from "./icons";
 import {
   HERO_FALLBACK_SRC,
   HERO_JPEG_SRCSET,
+  HERO_PORTRAIT_JPEG_SRCSET,
+  HERO_PORTRAIT_MEDIA,
+  HERO_PORTRAIT_WEBP_SRCSET,
   HERO_SIZES,
   HERO_WEBP_SRCSET,
 } from "../lib/images";
@@ -41,10 +45,10 @@ export default function Hero({
 
   // Real, live counts straight from the CarVibes database.
   const stats = [
-    { value: cars.length, key: "stat_cars" },
-    { value: allBrands.length, key: "stat_brands" },
-    { value: stories.length, key: "stat_stories" },
-    { value: categoryList.length, key: "stat_categories" },
+    { value: COUNTS.cars, key: "stat_cars" },
+    { value: COUNTS.brands, key: "stat_brands" },
+    { value: COUNTS.stories, key: "stat_stories" },
+    { value: COUNTS.categories, key: "stat_categories" },
   ];
 
   const scrollToContent = () => {
@@ -67,6 +71,22 @@ export default function Hero({
           download starts with the HTML, not after React boots. */}
       <div className="absolute inset-0 overflow-hidden">
         <picture>
+          {/* Portrait viewports (the LCP-critical case): a tall crop of the
+              same photo so the full-bleed hero is never an upscaled image —
+              Chrome only awards image-LCP to images at least as tall as
+              their painted box. Mirrored by the prerenderer's preload +
+              boot-splash copy (scripts/prerender.mjs). */}
+          <source
+            media={HERO_PORTRAIT_MEDIA}
+            type="image/webp"
+            srcSet={HERO_PORTRAIT_WEBP_SRCSET}
+            sizes={HERO_SIZES}
+          />
+          <source
+            media={HERO_PORTRAIT_MEDIA}
+            srcSet={HERO_PORTRAIT_JPEG_SRCSET}
+            sizes={HERO_SIZES}
+          />
           <source
             type="image/webp"
             srcSet={HERO_WEBP_SRCSET}
@@ -77,7 +97,14 @@ export default function Hero({
             srcSet={HERO_JPEG_SRCSET}
             sizes={HERO_SIZES}
             alt="Black luxury coupe in a dark studio"
-            className="camera-drift h-full w-full object-cover object-center"
+            /* 98.5 % and not 100 %: Chrome refuses image-LCP credit to an
+               element whose paint box is the *whole* viewport (treated as a
+               page background). 1.5 % of the bottom edge is covered by the
+               hero's own opaque vignette (and the page uses the same ink
+               colour), so the crop change is invisible — but the photo is
+               now the measured LCP element instead of a text block that
+               only exists after hydration. */
+            className="camera-drift h-[98.5%] w-full object-cover object-center"
             fetchPriority="high"
             decoding="async"
             onError={(e) => {

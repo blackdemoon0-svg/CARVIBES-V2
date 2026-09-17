@@ -7,31 +7,32 @@ import {
   useNavigate,
 } from "react-router-dom";
 import type { Lang } from "./lib/i18n";
-import { detectLang, isRtl, storeLang } from "./lib/i18n";
+import { detectLang, ensureLocale, isLocaleLoaded, isRtl, storeLang } from "./lib/i18n";
 import { useReveal } from "./lib/useReveal";
 import { addToCompare } from "./lib/prefs";
 import { isShellMetaRoute, usePageMeta } from "./lib/seo";
 import Navigation from "./components/Navigation";
 import Hero from "./components/Hero";
-import DiscoverSection from "./components/DiscoverSection";
-import BudgetSection from "./components/BudgetSection";
 import FeaturesSection from "./components/FeaturesSection";
 import HowToSection from "./components/HowToSection";
 import OnboardingTour from "./components/OnboardingTour";
-import PopularCarsSection from "./components/PopularCarsSection";
-import RankingsSection from "./components/RankingsSection";
-import StoriesSection from "./components/stories/StoriesSection";
 import FindMyCarSection from "./components/FindMyCarSection";
-import CarUniverse from "./components/universe/CarUniverse";
-import FavoritesSection from "./components/favorites/FavoritesSection";
-import CompareBar from "./components/compare/CompareBar";
 import Footer from "./components/Footer";
 import NotFound from "./components/NotFound";
 import { BootSignal, PageLoader } from "./components/Loader";
+import CompareBar from "./components/compare/CompareBar";
+import { Stage } from "./components/Stage";
 import {
+  LazyBudgetSection,
+  LazyCarUniverse,
   LazyCompareModal,
+  LazyDiscoverSection,
+  LazyFavoritesSection,
   LazyFindMyCar,
   LazyGlobalSearch,
+  LazyPopularCarsSection,
+  LazyRankingsSection,
+  LazyStoriesSection,
 } from "./components/lazy";
 import type { Story } from "./lib/stories";
 import type { Car } from "./lib/cars";
@@ -135,21 +136,46 @@ export function Homepage({
           onBrands={() => navigate("/brands")}
         />
         {/* Quick categories + popular brands live right after the hero, so
-            the first screen flows straight into useful browse content. */}
-        <DiscoverSection lang={lang} />
-        <PopularCarsSection lang={lang} onOpen={openCar} />
-        <BudgetSection lang={lang} />
-        <RankingsSection lang={lang} onOpen={openCar} />
+            the first screen flows straight into useful browse content.
+            Every section below the full-viewport hero is code-split (see
+            components/lazy.ts): the car/story datasets stream in AFTER the
+            first paint instead of blocking it, one shared lazy chunk.
+            Each keeps its own Suspense boundary so sections appear as
+            their data arrives, progressively. */}
+        {/* Staged mounting (see src/lib/progressive.ts): every section
+            below the hero gets its own idle-callback "turn", so the first
+            commit stays a small task — the hero photo keeps its CPU while
+            it decodes — and the page assembles in seven short paints
+            instead of one long one. Stage 0 (Discover) shares the hero
+            viewport, so it mounts with the shell. */}
+        <Stage order={0}>
+          <LazyDiscoverSection lang={lang} />
+        </Stage>
+        <Stage order={1}>
+          <LazyPopularCarsSection lang={lang} onOpen={openCar} />
+        </Stage>
+        <Stage order={2}>
+          <LazyBudgetSection lang={lang} />
+        </Stage>
+        <Stage order={3}>
+          <LazyRankingsSection lang={lang} onOpen={openCar} />
+        </Stage>
         <FeaturesSection lang={lang} />
-        <StoriesSection lang={lang} onOpen={openStory} compact />
+        <Stage order={4}>
+          <LazyStoriesSection lang={lang} onOpen={openStory} compact />
+        </Stage>
         <FindMyCarSection lang={lang} onStart={() => setFinderOpen(true)} />
-        <CarUniverse lang={lang} onOpen={openCar} />
-        <FavoritesSection
-          lang={lang}
-          onOpenCar={openCar}
-          onOpenStory={openStory}
-          onCompareCar={handleCompareCar}
-        />
+        <Stage order={5}>
+          <LazyCarUniverse lang={lang} onOpen={openCar} />
+        </Stage>
+        <Stage order={6}>
+          <LazyFavoritesSection
+            lang={lang}
+            onOpenCar={openCar}
+            onOpenStory={openStory}
+            onCompareCar={handleCompareCar}
+          />
+        </Stage>
         <HowToSection lang={lang} />
       </main>
       <Footer
@@ -321,9 +347,37 @@ export default function App() {
   // browser language, or English as the fallback.
   const [lang, setLang] = useState<Lang>(() => detectLang());
 
+  // Only the English dictionary ships inside the entry bundle; the
+  // detected language is one tiny chunk away (src/lib/i18n → ensureLocale).
+  // Until it is registered we keep showing the branded full-screen loader
+  // instead of painting English text that would immediately swap — the boot
+  // splash already covers this instant, so the visitor never sees a flash.
+  const [localeReady, setLocaleReady] = useState<boolean>(() =>
+    isLocaleLoaded(lang)
+  );
+  useEffect(() => {
+    if (isLocaleLoaded(lang)) {
+      setLocaleReady(true);
+      return;
+    }
+    let live = true;
+    void ensureLocale(lang).then(() => {
+      if (live) setLocaleReady(true);
+    });
+    return () => {
+      live = false;
+    };
+  }, [lang]);
+
   const handleLangChange = useCallback((l: Lang) => {
     storeLang(l);
-    setLang(l);
+    if (isLocaleLoaded(l)) {
+      setLang(l);
+      return;
+    }
+    // Swap the visible language only once its dictionary has arrived —
+    // selecting a new language never renders half-translated UI.
+    void ensureLocale(l).then(() => setLang(l));
   }, []);
 
   // Keep the document's text direction in sync (Arabic = RTL) and expose the
@@ -340,7 +394,11 @@ export default function App() {
       {/* Outside every Suspense boundary: retires the static boot splash
           on the very first commit, even while a lazy chunk downloads. */}
       <BootSignal />
-      <RoutedApp lang={lang} onLangChange={handleLangChange} />
+      {localeReady ? (
+        <RoutedApp lang={lang} onLangChange={handleLangChange} />
+      ) : (
+        <PageLoader />
+      )}
     </BrowserRouter>
   );
 }

@@ -79,6 +79,21 @@ async function runWorker(spec) {
     runScripts: "outside-only",
   });
   const { window } = dom;
+  // jsdom never fetches the app stylesheet, so the non-blocking CSS link
+  // (see scripts/prerender.mjs) would never report ready and src/lib/boot.ts
+  // would reveal only after its 2.5 s guard. Pretend it applied.
+  window.__cvCss = 1;
+  // jsdom has no real font loader; src/lib/boot.ts waits (bounded) for the
+  // font set to settle before revealing the app, so stub it as settled.
+  try {
+    if (window.document && !window.document.fonts) {
+      Object.defineProperty(window.document, "fonts", {
+        value: { ready: Promise.resolve(), status: "loaded", load: () => Promise.resolve([]) },
+      });
+    }
+  } catch {}
+
+
 
   // --- browser API stubs (same set as scripts/smoke-perf.mjs) ---
   window.matchMedia =

@@ -1,15 +1,41 @@
+// ============================================================
+// CARVIBES — scroll-reveal activation (`.reveal` → `.is-visible`)
+//
+// An IntersectionObserver toggles the entrance animation on every element
+// that enters the viewport. The observer is LIVE: a MutationObserver keeps
+// watching <body>, so content that mounts LATER (lazy homepage sections,
+// the compare modal, paginated grids — anything behind a code-split
+// boundary) is still animated. Without this, a `.reveal` element rendered
+// after the initial effect run would stay invisible forever, because the
+// entrance CSS starts at opacity 0.
+//
+// Mutation batches are coalesced into a single rAF pass and element lookups
+// skip anything already observed/visible, so the cost per DOM change is a
+// cheap querySelectorAll — never a forced sync layout at boot.
+// ============================================================
+
 import { useEffect } from "react";
 
-/**
- * Attaches an IntersectionObserver to all `.reveal` elements and adds
- * `is-visible` when they enter the viewport (with a slight delay).
- */
 export function useReveal(watch?: unknown) {
   useEffect(() => {
-    const els = Array.from(document.querySelectorAll<HTMLElement>(".reveal"));
+    const observed = new WeakSet<Element>();
+    const attachAll = (io?: IntersectionObserver) => {
+      const els = Array.from(
+        document.querySelectorAll<HTMLElement>(".reveal")
+      ).filter((el) => !el.classList.contains("is-visible") && !observed.has(el));
+      if (!els.length) return;
+      if (!io) {
+        els.forEach((el) => el.classList.add("is-visible"));
+        return;
+      }
+      els.forEach((el) => {
+        observed.add(el);
+        io.observe(el);
+      });
+    };
 
     if (!("IntersectionObserver" in window)) {
-      els.forEach((el) => el.classList.add("is-visible"));
+      attachAll(undefined);
       return;
     }
 
@@ -28,7 +54,26 @@ export function useReveal(watch?: unknown) {
       { threshold: 0.12, rootMargin: "0px 0px -8% 0px" }
     );
 
-    els.forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
+    let scheduled = 0;
+    const schedule = () => {
+      if (scheduled) return;
+      scheduled = requestAnimationFrame(() => {
+        scheduled = 0;
+        attachAll(observer);
+      });
+    };
+    attachAll(observer);
+
+    const mo =
+      "MutationObserver" in window
+        ? new MutationObserver(schedule)
+        : null;
+    mo?.observe(document.body, { childList: true, subtree: true });
+
+    return () => {
+      if (scheduled) cancelAnimationFrame(scheduled);
+      mo?.disconnect();
+      observer.disconnect();
+    };
   }, [watch]);
 }

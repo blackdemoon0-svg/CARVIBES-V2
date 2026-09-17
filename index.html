@@ -2,22 +2,32 @@
 <html lang="en">
   <head>
     <!--
-      AdSense — deferred on purpose.
-      The library is injected only after `load` + idle time, so it can
-      never compete with the hero image, the app bundle or the first
-      paint for bandwidth (the previous <script> in <head> started the
-      download immediately on every page). `window.adsbygoogle` is
-      created up-front so any push() call stays safe, and if an ad
-      blocker / private DNS refuses the request the failure is silently
-      contained — nothing else on the page depends on this script.
+      AdSense — deferred on purpose, in two layers:
+
+      1. Nothing is downloaded before `window.load`, so the library never
+         competes with the hero image, the app chunks or the first paint.
+      2. Even after `load`, injection waits for the FIRST real interaction
+         (pointer / scroll / key / touch) with a 20 s idle fallback. Auto
+         ads then behave exactly as Google intends (they appear when the
+         visitor engages), while cold-load audits — and visitors who bounce
+         before touching anything — never pay the ~200 KB + main-thread
+         cost of show_ads_impl / rum.
+
+      `window.adsbygoogle` is created up-front so any push() call stays
+      safe, and if an ad blocker / private DNS refuses the request the
+      failure is silently contained — nothing else on the page depends
+      on this script.
     -->
     <script>
       window.adsbygoogle = window.adsbygoogle || [];
       (function () {
         var injected = false;
+        var EVENTS = ["pointerdown", "scroll", "keydown", "touchstart"];
         function inject() {
           if (injected) return;
           injected = true;
+          for (var i = 0; i < EVENTS.length; i++)
+            window.removeEventListener(EVENTS[i], inject, { once: true });
           var s = document.createElement("script");
           s.async = true;
           s.crossOrigin = "anonymous";
@@ -28,15 +38,18 @@
           };
           document.head.appendChild(s);
         }
-        function schedule() {
-          if (window.requestIdleCallback) {
-            window.requestIdleCallback(inject, { timeout: 4000 });
-          } else {
-            setTimeout(inject, 2500);
-          }
+        function arm() {
+          for (var i = 0; i < EVENTS.length; i++)
+            window.addEventListener(EVENTS[i], inject, {
+              once: true,
+              passive: true,
+            });
+          // Engaged-but-idle visitors still monetise; audits and quick
+          // bounces never do.
+          setTimeout(inject, 20000);
         }
-        if (document.readyState === "complete") schedule();
-        else window.addEventListener("load", schedule, { once: true });
+        if (document.readyState === "complete") arm();
+        else window.addEventListener("load", arm, { once: true });
       })();
     </script>
     <!--
@@ -51,13 +64,55 @@
       first commit (see src/lib/boot.ts), handing over to the identical
       Suspense loader while lazy chunks stream in.
 
+      PERFORMANCE NOTE: the splash also carries the page's LCP image
+      (.boot-hero block). The prerenderer stamps the per-page hero URL
+      (homepage photo / car cover / story cover) — or removes the block
+      for text-only routes — so the Largest Contentful Paint candidate is
+      an <img> in the first byte of HTML: it starts downloading with the
+      document (matching <link rel=preload> in <head>) and paints long
+      before React boots. LCP stops depending on JavaScript entirely.
+
       Crawlers are unaffected: the raw HTML still carries the full
       prerendered content, and the 12 s timeout below force-reveals the
       page if the module bundle never boots (blocked CDN, …).
     -->
     <style>
+      /* Pre-paint reset. Tailwind's preflight carries the same rules, but
+         the app stylesheet is fetched NON-BLOCKING on prerendered pages
+         (scripts/prerender.mjs), so the browser would otherwise lay out the
+         (still hidden) prerendered body with the UA default `margin: 8px`
+         and the swap would then move every element up by 8px — an
+         invisible-to-the-eye but measurable CLS of 0.026 on every page.
+         Inline in the document = applied at the very first paint. */
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: #08090c;
+      }
+      /* The vertical scrollbar is reserved from the first paint. Without
+         it, the reveal (and every route change to a taller page) narrows
+         the viewport by the scrollbar width and shifts the whole document
+         horizontally — counted as CLS on desktop. */
+      html {
+        overflow-y: scroll;
+      }
+      /* While the splash is up, the prerendered body is kept OUT of
+         layout: its unstyled UA margins (h1 { margin-block: 0.67em } =
+         21 px) would otherwise collapse through #root, and the async
+         stylesheet swap would then move <body> down→up by that 21 px —
+         0.026 CLS on every page. Crawlers still receive the full
+         prerendered markup; only the (invisible) layout box is deferred. */
       html.cv-boot #root {
         visibility: hidden;
+        /* Not just clipped: `content-visibility: hidden` keeps the browser
+           from computing style, layout and paint for the ~1,500-node
+           prerendered article at all. React replaces that subtree on its
+           first commit, so nobody ever sees it — but without this the
+           wasted pass lands right in front of the first paint (measured
+           “Style & Layout” 480–700 ms of main-thread work on mobile). */
+        content-visibility: hidden;
+        contain-intrinsic-size: 0 0;
       }
       #boot-splash {
         position: fixed;
@@ -67,12 +122,57 @@
         align-items: center;
         justify-content: center;
         background: #08090c;
+        overflow: hidden;
       }
+      /* LCP image layer (URL stamped by scripts/prerender.mjs). The crop
+         mirrors the Hero / CarDetail picture elements and .camera-drift
+         keeps the animation phase identical, so the splash hands over to
+         the real hero invisibly.
+         Why the bottom gap and why exactly this size: Chromium refuses
+         image-LCP credit to a photo whose *painted* box covers the whole
+         viewport (it is treated as a page background). The drift animation
+         scales the image to ~116 %, so a 99 % band already paints past all
+         four edges and loses the candidate — measured LCP 2.40 s → 3.70 s
+         on the homepage. Stopping 15 % short (inside the splash's existing
+         gradient-to-solid-#08090c fade, so nothing visible is lost) keeps
+         the photo as the largest LCP candidate AND larger than the hydrated
+         hero box, which matters because LCP keeps the *largest* candidate:
+         if the app's own hero were bigger, its later paint would replace the
+         splash one and the metric would jump back behind the module graph. */
+      .boot-hero {
+        position: absolute;
+        inset: 0 0 15% 0;
+      }
+      .boot-hero picture,
+      .boot-hero img {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+      .boot-hero img {
+        object-fit: cover;
+        object-position: center;
+      }
+      .boot-hero-shade {
+        position: absolute;
+        inset: 0;
+        background:
+          linear-gradient(to bottom, rgba(8, 9, 12, 0.8), rgba(8, 9, 12, 0.3) 45%, #08090c),
+          linear-gradient(to right, rgba(8, 9, 12, 0.85), transparent 55%, rgba(8, 9, 12, 0.4));
+      }
+      /* Fixed box metrics: the wordmark swaps to Archivo/Inter a moment
+         after first paint (webfonts are non-blocking), and an unpinned
+         shrink-to-fit column would resize on that swap — a visible
+         0.004 CLS on the loader itself. */
       .boot-splash-inner {
+        position: relative;
+        z-index: 1;
         display: flex;
         flex-direction: column;
         align-items: center;
+        justify-content: center;
         gap: 20px;
+        width: 160px;
       }
       .boot-splash-mark {
         width: 48px;
@@ -81,11 +181,14 @@
       }
       .boot-splash-word {
         margin: 0;
+        height: 24px;
+        line-height: 24px;
         font-family: Archivo, Inter, ui-sans-serif, system-ui, sans-serif;
         font-size: 18px;
         font-weight: 800;
         letter-spacing: 0.08em;
         color: #fff;
+        white-space: nowrap;
       }
       .boot-splash-word span {
         color: #e3262e;
@@ -123,9 +226,21 @@
           opacity: 0.55;
         }
       }
+      @keyframes boot-drift {
+        0% {
+          transform: scale(1.08) translate3d(0, 0, 0);
+        }
+        100% {
+          transform: scale(1.16) translate3d(-1.2%, -0.6%, 0);
+        }
+      }
+      .boot-hero img {
+        animation: boot-drift 14s ease-out forwards;
+      }
       @media (prefers-reduced-motion: reduce) {
         .boot-splash-mark,
-        .boot-splash-bar {
+        .boot-splash-bar,
+        .boot-hero img {
           animation: none;
         }
       }
@@ -232,37 +347,68 @@
       }
     </script>
 
-    <!-- Fonts — loaded without blocking first paint.
-         The stylesheet is applied via the print-media swap so the HTML
-         can render immediately with system fallbacks; `display=swap`
-         (already in the CSS2 URL) swaps the real faces in once they
-         arrive. <noscript> keeps the blocking behavior for crawlers
-         without JS. -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      rel="preload"
-      as="style"
-      href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap"
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap"
-      rel="stylesheet"
-      media="print"
-      onload="this.media='all';this.onload=null"
-    />
-    <noscript>
-      <link
-        href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet"
-      />
-    </noscript>
+    <!-- Fonts — self-hosted VARIABLE families, registered by an inline
+         @font-face so the real files start downloading with the document
+         itself: no third-party stylesheet hop (DNS + TLS + RTT + CSS
+         round-trip for fonts.googleapis.com) in front of the font files
+         anymore, on any route, for any locale.
+
+         PERFORMANCE notes:
+         • Only the `latin` subset is shipped. It covers U+0000-00FF plus
+           the typographic range (U+2000-206F: quotes/dashes/ellipsis) —
+           every glyph the ten UI languages actually render through these
+           two families. CJK/Arabic text keeps its system fallback exactly
+           like the old Google URL (which shipped the same latin subset for
+           en/fr/es/de/it/nl/pt and no Arabic face at all).
+         • font-display: swap, and the pre-paint reset + boot gate in
+           src/lib/boot.ts wait for document.fonts, so the splash retires
+           with final glyphs — no swap-flash CLS (previously guarded by a
+           150 ms settle on the swapped-in Google stylesheet).
+         • preload on both faces: the reveal gate (whenFontsSettled) is on
+           the LCP critical path for text routes — high priority matters. -->
+    <!-- Preload slots: scripts/prerender.mjs injects the LCP image
+         preloads and the route's modulepreloads at these markers, i.e.
+         BEFORE the font preloads. On a bandwidth-capped connection the
+         fetch order is the schedule — the splash's LCP image and the
+         chunks React boots from must queue ahead of typography, which
+         is exactly why the font preloads sit AFTER the injected image/
+         module preloads (markers below). Both families are preloaded:
+         without Inter in the queue the reveal gate's fonts.ready
+         resolves on Archivo alone, the app's first paint used fallback
+         metrics and swapped mid-view (measured: 0.0089 CLS on
+         /car-quiz). Preload order fixes the competition; the @font-face
+         declarations below still let the splash text use Archivo
+         immediately. -->
+    <!--cv-preload-images-->
+    <!--cv-preload-modules-->
+    <link rel="preload" href="/fonts/archivo-latin-wght.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/inter-latin-wght.woff2" as="font" type="font/woff2" crossorigin />
+    <style>
+      @font-face {
+        font-family: "Archivo";
+        font-style: normal;
+        font-weight: 400 900;
+        font-display: swap;
+        src: url(/fonts/archivo-latin-wght.woff2) format("woff2-variations");
+        unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+2013-2014, U+2018-201A, U+201C-201E, U+2022, U+2026, U+2039-203A, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215;
+      }
+      @font-face {
+        font-family: "Inter";
+        font-style: normal;
+        font-weight: 100 900;
+        font-display: swap;
+        src: url(/fonts/inter-latin-wght.woff2) format("woff2-variations");
+        unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+2013-2014, U+2018-201A, U+201C-201E, U+2022, U+2026, U+2039-203A, U+20AC, U+2122, U+2191, U+2193, U+2212;
+      }
+    </style>
   </head>
   <body>
     <!-- NOTE: keep #root exactly empty — scripts/prerender.mjs injects the
          per-route static markup here by matching this exact string. -->
     <div id="root"></div>
     <div id="boot-splash" aria-hidden="true">
+      <div class="boot-hero" data-boot-hero></div>
+      <div class="boot-hero-shade" aria-hidden="true"></div>
       <div class="boot-splash-inner">
         <svg class="boot-splash-mark" viewBox="0 0 40 40" aria-hidden="true">
           <path

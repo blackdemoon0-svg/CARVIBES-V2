@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { t, type Lang } from "../../lib/i18n";
-import { FAQ_COUNT } from "../../lib/quiz/i18n";
+import { FAQ_COUNT } from "../../lib/quiz/i18n/en-meta";
 import { DIFFICULTIES } from "../../lib/quiz/types";
 import { QUIZ_CATEGORIES } from "../../lib/quiz/data/categories";
 import { QUIZZES } from "../../lib/quiz/quizzes";
