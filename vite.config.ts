@@ -3,6 +3,10 @@ import { fileURLToPath } from "url";
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
+// Marketplace API (listings, uploads, admin moderation). Mounted into the
+// dev + preview server so the marketplace is fully functional in the
+// preview; production runs the same handler via `npm run marketplace:serve`.
+import { marketplaceApiPlugin } from "./server/marketplace/vite-plugin.mjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -13,8 +17,11 @@ export default defineConfig({
   // files resolve correctly on deep SPA routes (/car/:id) served by the
   // Vercel rewrite — and so every prerendered HTML copy can share them.
   base: "/",
-  plugins: [react(), tailwindcss()],
+  plugins: [marketplaceApiPlugin(), react(), tailwindcss()],
+  // Uploaded listing photos live in public/marketplace-media (git-ignored,
+  // written by the API). Watching it would restart the server on every upload.
   server: {
+    watch: { ignored: ["**/public/marketplace-media/**", "**/data/**"] },
     // Live-preview hosts (e.g. *.e2b.app) must be allowed to view the app.
     allowedHosts: [".e2b.app"],
   },

@@ -30,7 +30,16 @@ if (!existsSync(DIST)) {
 
 // Routes that render from localStorage / a user query: intentionally
 // noindex and intentionally absent from the sitemap.
-const NOINDEX = new Set(["/favorites", "/compare", "/search", "/404"]);
+const NOINDEX = new Set([
+  "/favorites",
+  "/compare",
+  "/search",
+  "/404",
+  // Marketplace: the seller funnel and the moderation console are
+  // never indexable, never in the sitemap (see scripts/generate-sitemap.mjs).
+  "/marketplace/sell",
+  "/admin/marketplace",
+]);
 
 const siteUrl = new URL(
   process.env.SITE_URL?.trim() ||

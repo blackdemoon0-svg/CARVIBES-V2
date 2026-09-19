@@ -244,3 +244,74 @@ export function InstagramIcon({ className }: IconProps) {
     </svg>
   );
 }
+
+/** Filter sliders — marketplace filter drawer trigger. */
+export function SlidersIcon({ className }: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <path d="M4 6h16M4 12h16M4 18h16" />
+      <circle cx="9" cy="6" r="2" fill="var(--color-ink)" />
+      <circle cx="15" cy="12" r="2" fill="var(--color-ink)" />
+      <circle cx="8" cy="18" r="2" fill="var(--color-ink)" />
+    </svg>
+  );
+}
+
+/** Shield — trust / moderation surfaces. */
+export function ShieldIcon({ className }: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <path d="M12 3l7 3v6c0 4.2-2.9 7.6-7 9-4.1-1.4-7-4.8-7-9V6l7-3z" />
+      <path d="M9.2 12.2l2 2 3.6-4" />
+    </svg>
+  );
+}
+
+/** Camera — photo upload surfaces. */
+export function CameraIcon({ className }: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <path d="M3 8.5A2.5 2.5 0 015.5 6h1.2l1-2h6.6l1 2h1.2A2.5 2.5 0 0119 8.5v8A2.5 2.5 0 0116.5 19h-11A2.5 2.5 0 013 16.5v-8z" />
+      <circle cx="11" cy="12" r="3.2" />
+    </svg>
+  );
+}
+
+/** Launch announcement — a rocket reads as "new" without saying "empty". */
+export function RocketIcon({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
+      <path d="M13.5 3.5c3.4-.9 6.1-.6 7 .3.9.9 1.2 3.6.3 7-1.1 4.2-4.6 7.7-8.8 8.8l-3.4-3.4-3.4-3.4C6.3 8.6 9.3 4.6 13.5 3.5Z" />
+      <path d="M8.5 15.5 4 20" />
+      <circle cx="15" cy="9" r="1.6" />
+      <path d="M6 12.5 4 12l1.8-2.2M11.5 18l.5 2 2.2-1.8" />
+    </svg>
+  );
+}

@@ -107,6 +107,7 @@ const STATIC_ROUTES = [
   { path: "/brands", changefreq: "weekly", priority: "0.8", group: "cars" },
   { path: "/find-my-car", changefreq: "monthly", priority: "0.7", group: "site" },
   { path: "/car-quiz", changefreq: "daily", priority: "0.9", group: "site" },
+  { path: "/marketplace", changefreq: "daily", priority: "0.9", group: "marketplace" },
   { path: "/contact", changefreq: "yearly", priority: "0.4", group: "site" },
   { path: "/privacy-policy", changefreq: "yearly", priority: "0.2", group: "site" },
   { path: "/terms", changefreq: "yearly", priority: "0.2", group: "site" },
@@ -149,6 +150,34 @@ async function loadData() {
 }
 
 // ------------------------------------------------------------
+// 3b. Marketplace inventory (approved listings + qualifying facets)
+// ------------------------------------------------------------
+// Read straight from the marketplace store — the same module the API
+// serves from — so the sitemap can only ever contain APPROVED listings.
+// Pending and rejected submissions are invisible here by construction
+// (store.publicListings() filters on status === "approved").
+//
+// A store that is absent or unreadable is not an error: a deployment that
+// has not migrated seller data yet simply has no marketplace URLs beyond
+// /marketplace itself. Re-run the build after approving listings (or
+// after pointing MARKETPLACE_DATA_DIR at the deployed store) to publish
+// the new URLs.
+async function loadMarketplace() {
+  const mod = (rel) => pathToFileURL(path.join(ROOT, "server", "marketplace", rel)).href;
+  try {
+    const [store, view] = await Promise.all([import(mod("store.mjs")), import(mod("public-view.mjs"))]);
+    const listings = await store.publicListings();
+    return {
+      listings: listings.map((l) => ({ loc: view.listingPath(l), lastmod: (l.publishedAt ?? l.updatedAt ?? "").slice(0, 10) })),
+      facets: view.facetPages(listings).map((f) => ({ loc: f.path, lastmod: "" })),
+    };
+  } catch (error) {
+    console.warn(`[sitemap] marketplace store unavailable (${error.message}) — skipping listing URLs`);
+    return { listings: [], facets: [] };
+  }
+}
+
+// ------------------------------------------------------------
 // 4. lastmod, sourced from real git history (never faked)
 // ------------------------------------------------------------
 // A <lastmod> that is not accurate is worse than no <lastmod> at all —
@@ -158,6 +187,7 @@ async function loadData() {
 // (shallow clones, tarball builds, …).
 const GIT_SOURCES = {
   site: ["src", "index.html"],
+  marketplace: ["server/marketplace", "src/lib/marketplace", "src/pages/marketplace", "src/components/marketplace"],
   cars: ["src/lib/cars.ts", "src/lib/carBuilder.ts", "src/lib/db.ts", "src/lib/data"],
   stories: ["src/lib/stories.ts"],
 };
@@ -192,7 +222,7 @@ function encodePath(routePath) {
     .join("/");
 }
 
-function buildEntries(siteUrl, { carIds, storyIds }, lastmod) {
+function buildEntries(siteUrl, { carIds, storyIds, marketplace }, lastmod) {
   const entries = [];
 
   for (const route of STATIC_ROUTES) {
@@ -210,6 +240,29 @@ function buildEntries(siteUrl, { carIds, storyIds }, lastmod) {
       lastmod: lastmod.cars,
       changefreq: "monthly",
       priority: "0.8",
+    });
+  }
+
+  // Approved marketplace listings: stable, self-canonical, reviewed pages.
+  for (const item of marketplace.listings) {
+    entries.push({
+      loc: siteUrl + encodePath(item.loc),
+      // The listing's own publish date beats a repository commit date.
+      lastmod: item.lastmod || lastmod.marketplace,
+      changefreq: "weekly",
+      priority: "0.7",
+    });
+  }
+
+  // Facet pages only exist when supply justifies them (>= 3 listings for
+  // that single filter), which is exactly what facetPages() enforces — no
+  // combinatorial filter URLs ever reach the sitemap.
+  for (const item of marketplace.facets) {
+    entries.push({
+      loc: siteUrl + encodePath(item.loc),
+      lastmod: lastmod.marketplace,
+      changefreq: "weekly",
+      priority: "0.6",
     });
   }
 
@@ -283,14 +336,16 @@ function renderRobots(siteUrl) {
 async function main() {
   const siteUrl = resolveSiteUrl();
   const data = await loadData();
+  const marketplace = await loadMarketplace();
 
   const lastmod = {
     site: gitLastModified(GIT_SOURCES.site),
     cars: gitLastModified(GIT_SOURCES.cars),
     stories: gitLastModified(GIT_SOURCES.stories),
+    marketplace: gitLastModified(GIT_SOURCES.marketplace),
   };
 
-  const entries = buildEntries(siteUrl, data, lastmod);
+  const entries = buildEntries(siteUrl, { ...data, marketplace }, lastmod);
   validate(entries, siteUrl);
 
   writeFileSync(path.join(PUBLIC_DIR, "sitemap.xml"), renderSitemap(entries), "utf8");
@@ -299,7 +354,8 @@ async function main() {
   const staticCount = STATIC_ROUTES.length;
   console.log(
     `[sitemap] ${entries.length} URLs → public/sitemap.xml ` +
-      `(${staticCount} static, ${data.carIds.length} cars, ${data.storyIds.length} stories)`
+      `(${staticCount} static, ${data.carIds.length} cars, ${data.storyIds.length} stories, ` +
+      `${marketplace.listings.length} approved listings, ${marketplace.facets.length} facets)`
   );
   console.log(`[sitemap] canonical domain: ${siteUrl}`);
   console.log(`[sitemap] robots.txt → Sitemap: ${siteUrl}/sitemap.xml`);

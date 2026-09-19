@@ -3,10 +3,11 @@ import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "../utils/cn";
 import { LANGS as LANG_LIST, t, type Lang } from "../lib/i18n";
 import { useBodyScrollLock } from "../lib/useOverlay";
+import { useAdminIdentity } from "../lib/marketplace/useAdminIdentity";
 import { startOnboarding, requestOnboardingAfterNav } from "../lib/onboarding";
 import { Logo } from "./Logo";
 import LanguageSelector from "./LanguageSelector";
-import { SearchIcon, ChevronDown, ArrowRight, HelpIcon } from "./icons";
+import { SearchIcon, ChevronDown, ArrowRight, HelpIcon, ShieldIcon } from "./icons";
 
 interface NavProps {
   lang: Lang;
@@ -43,6 +44,24 @@ const PRIMARY_LINKS: Destination[] = [
  */
 const QUIZ_LINK: Destination = { key: "nav_quiz", to: "/car-quiz" };
 
+/**
+ * MarketVibes — the car marketplace. It joins the bar inline from `xl` up
+ * (below that it lives in "More" / the mobile drawer) so the existing four
+ * primary destinations never wrap or overflow at 1024px.
+ */
+const MARKETPLACE_LINK: Destination = { key: "nav_marketplace", to: "/marketplace" };
+
+/**
+ * Creator Dashboard — the private moderation console.
+ *
+ * It is NOT part of any link list: it is rendered only when
+ * `useAdminIdentity()` has confirmed with the server that the visitor is an
+ * allow-listed administrator. A visitor or a normal signed-in user never
+ * receives the markup at all (and would still be refused by the API if they
+ * guessed the URL).
+ */
+const CREATOR_DASHBOARD = { key: "nav_creator_dashboard", to: "/admin/marketplace" };
+
 const SECONDARY_LINKS: Destination[] = [
   { key: "nav_used_cars", to: "/used-cars" },
   { key: "nav_find", to: "/find-my-car" },
@@ -57,6 +76,7 @@ const MOBILE_GROUPS: { titleKey: string; links: Destination[] }[] = [
       { key: "nav_home", to: "/#top", section: "top" },
       ...PRIMARY_LINKS,
       QUIZ_LINK,
+      MARKETPLACE_LINK,
     ],
   },
   {
@@ -85,6 +105,8 @@ export default function Navigation({
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  // Server-verified admin identity — never a client-side guess.
+  const { isAdmin } = useAdminIdentity();
 
   // "How to use CarVibes" — scroll to the guide section (on any page) and
   // (re)start the interactive tour.
@@ -254,6 +276,24 @@ export default function Navigation({
               </Fragment>
             ))}
 
+            {/* MarketVibes — inline from xl, tucked into "More" below it. */}
+            <NavLink
+              to={MARKETPLACE_LINK.to}
+              onClick={() => handleSectionClick()}
+              className={({ isActive }) =>
+                cn(
+                  linkClasses,
+                  "hidden items-center gap-1.5 xl:flex",
+                  isActive ? "text-white" : "text-mist"
+                )
+              }
+            >
+              <span aria-hidden="true" className="text-[8px] leading-none text-accent">
+                ◆
+              </span>
+              {t(lang, MARKETPLACE_LINK.key)}
+            </NavLink>
+
             {/* Secondary destinations */}
             <div className="relative" onClick={(e) => e.stopPropagation()}>
               <button
@@ -284,6 +324,16 @@ export default function Navigation({
                     : "pointer-events-none -translate-y-1 opacity-0"
                 )}
               >
+                <Link
+                  to={MARKETPLACE_LINK.to}
+                  onClick={() => setMoreOpen(false)}
+                  className="flex w-full items-center justify-between px-4 py-3 text-left text-[11px] font-semibold tracking-[0.18em] text-mist transition-colors hover:bg-graphite/60 hover:text-white"
+                >
+                  {t(lang, MARKETPLACE_LINK.key)}
+                  <span aria-hidden="true" className="text-[8px] text-accent">
+                    ◆
+                  </span>
+                </Link>
                 {SECONDARY_LINKS.map((link) => (
                   <Link
                     key={link.key}
@@ -317,6 +367,24 @@ export default function Navigation({
 
           {/* Right — actions */}
           <div className="flex items-center gap-2 sm:gap-3">
+            {/* Creator Dashboard — only rendered for a verified admin. */}
+            {isAdmin && (
+              <Link
+                to={CREATOR_DASHBOARD.to}
+                aria-label={t(lang, CREATOR_DASHBOARD.key)}
+                title={t(lang, CREATOR_DASHBOARD.key)}
+                className={cn(
+                  "cv-btn cv-btn-sm group hidden h-10 items-center gap-2 border px-3 lg:inline-flex",
+                  "border-amber-400/40 bg-amber-400/10 text-amber-100 hover:border-amber-300/70 hover:text-white"
+                )}
+              >
+                <ShieldIcon className="h-4 w-4" />
+                <span className="hidden text-[11px] font-semibold tracking-[0.18em] xl:inline">
+                  {t(lang, "nav_creator_dashboard_short")}
+                </span>
+              </Link>
+            )}
+
             {/* Search — primary CTA */}
             <button
               onClick={onSearch}
@@ -388,7 +456,7 @@ export default function Navigation({
                     }}
                   >
                     <span className="flex items-center gap-3">
-                      {link.key === "nav_quiz" && (
+                      {(link.key === "nav_quiz" || link.key === "nav_marketplace") && (
                         <span aria-hidden="true" className="text-sm text-accent">
                           ◆
                         </span>
@@ -398,6 +466,26 @@ export default function Navigation({
                     <ArrowRight className="h-5 w-5 text-fog" />
                   </Link>
                 ))}
+                {group.titleKey === "nav_group_tools" && isAdmin && (
+                  <Link
+                    to={CREATOR_DASHBOARD.to}
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center justify-between border-b border-line py-4 font-display text-xl font-semibold tracking-tight text-amber-100 transition-colors hover:text-white"
+                    style={{
+                      transitionDelay: `${(gi * 5 + group.links.length) * 40}ms`,
+                      ...(mobileOpen
+                        ? { opacity: 1, transform: "translateY(0)" }
+                        : { opacity: 0, transform: "translateY(12px)" }),
+                      transition: "opacity 0.4s ease, transform 0.4s ease, color 0.3s ease",
+                    }}
+                  >
+                    <span className="flex items-center gap-3">
+                      <ShieldIcon className="h-5 w-5" />
+                      {t(lang, CREATOR_DASHBOARD.key)}
+                    </span>
+                    <ArrowRight className="h-5 w-5 text-fog" />
+                  </Link>
+                )}
                 {group.titleKey === "nav_group_tools" && (
                   <button
                     onClick={handleHelp}

@@ -358,11 +358,31 @@ try {
   fail(`app bundle threw: ${err?.message}`);
 }
 
-// Give React a moment to mount.
-await new Promise((r) => setTimeout(r, 800));
+// Wait for the boot handover — bounded, and measured.
+//
+// A fixed sleep was the wrong instrument here: jsdom's module evaluation
+// takes ~800-1000 ms depending on machine load, so a hard 800 ms budget
+// reported false failures while telling us nothing about the app. Polling
+// measures the real time-to-ready and still fails on a genuine regression.
+const readyStart = Date.now();
+let readyMs = null;
+for (let i = 0; i < 160; i++) {
+  if (window.__carvibesReady === true) {
+    readyMs = Date.now() - readyStart;
+    break;
+  }
+  await new Promise((r) => setTimeout(r, 25));
+}
 
 // Boot handover: splash retired, prerendered markup replaced by React.
-assert(window.__carvibesReady === true, "app signalled ready on first commit");
+assert(
+  window.__carvibesReady === true,
+  `app signalled ready on first commit (${readyMs ?? "timeout"} ms)`
+);
+assert(
+  readyMs !== null && readyMs < 2000,
+  `boot handover inside the 2 s budget (${readyMs ?? ">3000"} ms)`
+);
 assert(!window.document.getElementById("boot-splash"), "boot splash removed after React commits");
 assert(!window.document.documentElement.classList.contains("cv-boot"), "cv-boot guard lifted after React commits");
 

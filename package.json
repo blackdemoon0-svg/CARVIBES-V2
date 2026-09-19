@@ -10,13 +10,16 @@
     "generate:sitemap": "node scripts/generate-sitemap.mjs",
     "typecheck": "tsc --noEmit",
     "preview": "vite preview",
+    "marketplace:serve": "node server/marketplace/serve.mjs",
+    "marketplace:taxonomy": "node scripts/generate-marketplace-taxonomy.mjs",
     "prerender": "node scripts/prerender.mjs",
     "submit:indexnow": "node scripts/submit-indexnow.mjs",
     "verify:seo": "node scripts/verify-seo.mjs",
     "validate:quiz": "node scripts/validate-quiz.mjs",
     "smoke:quiz": "node scripts/smoke-quiz.mjs",
     "smoke:perf": "node scripts/smoke-perf.mjs",
-    "verify:hydrated": "node scripts/verify-hydrated.mjs"
+    "verify:hydrated": "node scripts/verify-hydrated.mjs",
+    "marketplace:reset": "node scripts/reset-marketplace.mjs"
   },
   "dependencies": {
     "@fontsource-variable/archivo": "5.3.0",

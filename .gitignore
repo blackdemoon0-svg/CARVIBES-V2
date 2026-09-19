@@ -32,3 +32,11 @@ pnpm-debug.log*
 .idea/
 .DS_Store
 Thumbs.db
+
+# Marketplace runtime data (listings + staged uploads + uploaded photos).
+# Never committed: it is user content, not source. See docs/MARKETPLACE.md.
+# NOTE: root-anchored on purpose — an unanchored `data/` also swallows
+# src/lib/marketplace/data/ (the taxonomy + country lists, which ARE
+# source and must be committed).
+/data/
+/public/marketplace-media/

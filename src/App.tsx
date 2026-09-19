@@ -85,6 +85,17 @@ const TermsPage = lazy(() =>
   import("./pages/RoutePages").then((m) => ({ default: m.TermsPage })),
 );
 
+// Marketplace (MarketVibes) — every route is its own chunk: a visitor who
+// never opens the marketplace downloads none of it, and the seller funnel
+// + admin dashboard (the heaviest parts) live in separate chunks again.
+const MarketplacePage = lazy(() => import("./pages/marketplace/MarketplacePage"));
+const MarketplaceListingPage = lazy(() => import("./pages/marketplace/MarketplaceListingPage"));
+const SellPage = lazy(() => import("./pages/marketplace/SellPage"));
+const AdminMarketplacePage = lazy(() => import("./pages/marketplace/AdminMarketplacePage"));
+
+/** Facet routes share one chunk with the marketplace index. */
+const MarketplaceFacetPage = lazy(() => import("./pages/marketplace/MarketplaceFacetPage"));
+
 export function Homepage({
   lang,
   onLangChange,
@@ -307,6 +318,24 @@ function RoutedApp({
         <Route path="/contact" element={<ContactPage {...shell} />} />
         <Route path="/privacy-policy" element={<PrivacyPage {...shell} />} />
         <Route path="/terms" element={<TermsPage {...shell} />} />
+        {/* MarketVibes — public marketplace */}
+        <Route path="/marketplace" element={<MarketplacePage lang={lang} />} />
+        <Route
+          path="/marketplace/brand/:brand"
+          element={<MarketplaceFacetPage lang={lang} kind="brand" />}
+        />
+        <Route
+          path="/marketplace/country/:country"
+          element={<MarketplaceFacetPage lang={lang} kind="country" />}
+        />
+        <Route
+          path="/marketplace/condition/:condition"
+          element={<MarketplaceFacetPage lang={lang} kind="condition" />}
+        />
+        <Route path="/marketplace/sell" element={<SellPage lang={lang} />} />
+        <Route path="/marketplace/car/:slug" element={<MarketplaceListingPage lang={lang} />} />
+        {/* Private moderation dashboard (server-authorized) */}
+        <Route path="/admin/marketplace" element={<AdminMarketplacePage lang={lang} />} />
         <Route
           path="*"
           element={

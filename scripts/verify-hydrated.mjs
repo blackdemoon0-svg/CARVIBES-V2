@@ -405,11 +405,47 @@ async function main() {
     assert((forty.match(/<h1>/g) ?? []).length === 1, "404.html has exactly 1 H1");
     assert(!forty.includes("FIND YOUR PERFECT"), "404.html has no homepage content");
 
+    const facetFiles = ["brand", "country", "condition"].flatMap((kind) => {
+      const dir = path.join(DIST, "marketplace", kind);
+      return existsSync(dir) ? readdirSync(dir).map((f) => `${kind}/${f}`) : [];
+    });
+
     const sitemap = readFileSync(path.join(DIST, "sitemap.xml"), "utf8");
     const locs = sitemap.match(/<loc>/g)?.length ?? 0;
+    // MarketVibes URLs are supply-driven (approved listings + the single
+    // facets that clear the 3-listing threshold), so the exact number is
+    // not a constant — but every one of them must live under /marketplace
+    // and nothing else may sneak in.
+    const marketplaceLocs = sitemap.match(/<loc>https:\/\/carvibes\.dev\/marketplace/g)?.length ?? 0;
     assert(
-      locs === 509 + storyFiles.length + 10,
-      `sitemap lists 509 cars + ${storyFiles.length} stories + 10 static pages (${locs})`
+      locs === 509 + storyFiles.length + 10 + marketplaceLocs,
+      `sitemap lists 509 cars + ${storyFiles.length} stories + 10 static pages + ${marketplaceLocs} marketplace URLs (${locs})`
+    );
+    assert(
+      /<loc>https:\/\/carvibes\.dev\/marketplace<\/loc>/.test(sitemap),
+      "sitemap lists the marketplace landing page"
+    );
+    assert(
+      !/<loc>[^<]*\/marketplace\/sell/.test(sitemap) && !/<loc>[^<]*\/admin\//.test(sitemap),
+      "sitemap must never list the seller funnel or the admin console"
+    );
+    // Supply-driven: with no approved listings the directory does not exist
+    // at all (the marketplace ships empty), which is a valid state.
+    const listingDir = path.join(DIST, "marketplace", "car");
+    const listingFiles = existsSync(listingDir) ? readdirSync(listingDir) : [];
+    for (const file of listingFiles) {
+      assert(
+        sitemap.includes(`/marketplace/car/${file.replace(/\.html$/, "")}<`),
+        `sitemap lists the approved listing /marketplace/car/${file.replace(/\.html$/, "")}`
+      );
+    }
+    assert(
+      marketplaceLocs === 1 + listingFiles.length + facetFiles.length,
+      `marketplace sitemap URLs = landing + ${listingFiles.length} listings + ${facetFiles.length} facets (${marketplaceLocs})`
+    );
+    assert(
+      listingFiles.length === 0 ? !/<loc>[^<]*\/marketplace\/car\//.test(sitemap) : true,
+      "an empty marketplace lists no listing URLs"
     );
   }
 

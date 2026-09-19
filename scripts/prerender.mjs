@@ -324,7 +324,9 @@ function renderHead(html, page) {
     const attrs =
       page.schemaOwner === "car"
         ? ' id="carvibes-jsonld" data-owner="car"'
-        : ' data-owner="static"';
+        : page.schemaOwner === "marketplace"
+          ? ' id="marketplace-jsonld" data-owner="marketplace"'
+          : ' data-owner="static"';
     out = out.replace(
       "</head>",
       `    <script type="application/ld+json"${attrs}>\n${jsonLd(page.schema)}\n    </script>\n  </head>`
@@ -440,6 +442,15 @@ const STATIC_PAGES = [
     description: "Terms of use for CarVibes.",
   },
   {
+    // MarketVibes — the public marketplace. Indexable, supply-driven: the
+    // same strings the React page writes through useMarketplaceMeta()
+    // (mk_meta_title / mk_meta_desc in src/lib/i18n/base/en.ts).
+    path: "/marketplace",
+    title: "Cars for sale — CarVibes MarketVibes",
+    description:
+      "Browse cars for sale from private sellers and dealers: prices, photos, mileage and direct contact. New and used cars by make, country and budget.",
+  },
+  {
     path: "/favorites",
     title: "Favorites — CarVibes",
     description: "Your saved cars and stories on CarVibes.",
@@ -457,9 +468,27 @@ const STATIC_PAGES = [
     description: "Search cars and stories on CarVibes.",
     noindex: true,
   },
+  {
+    // Seller funnel — a form has no search value and must never compete
+    // with the listings. Mirrors mk_sell_meta_* and useMarketplaceMeta().
+    path: "/marketplace/sell",
+    title: "Sell your car — CarVibes MarketVibes",
+    description:
+      "List your car for sale on CarVibes MarketVibes: photos, price, location and the contact method you prefer. Free submission, reviewed before publishing.",
+    noindex: true,
+  },
+  {
+    // Private moderation console. Nobody but an allow-listed administrator
+    // can use it (enforced by the API, not by hiding it), and it is never
+    // indexed, never in the sitemap, never linked from public pages.
+    path: "/admin/marketplace",
+    title: "Admin — CarVibes MarketVibes",
+    description: "Private marketplace moderation dashboard.",
+    noindex: true,
+  },
 ];
 
-function staticBody(routePath, { cars, stories, quiz, used }) {
+function staticBody(routePath, { cars, stories, quiz, used }, market) {
   const topCars = cars.slice(0, 60).map((c) => ({
     href: `/car/${c.id}`,
     label: `${c.brand} ${c.model} (${c.year})`,
@@ -514,6 +543,17 @@ function staticBody(routePath, { cars, stories, quiz, used }) {
       return quizBody(routePath, { cars, stories: allStories, quiz });
     case "/used-cars":
       return usedCarsBody(used);
+    case "/marketplace":
+      return marketplaceIndexBody(market);
+    case "/marketplace/sell":
+      return marketplaceSellBody();
+    case "/admin/marketplace":
+      return (
+        "<article><h1>Marketplace moderation</h1>" +
+        "<p>Administrator sign-in required. Only allow-listed accounts can open this dashboard, and every " +
+        "moderation action is verified by the server.</p>" +
+        `<nav aria-label="Marketplace"><ul><li><a href="/marketplace">Back to the marketplace</a></li></ul></nav></article>`
+      );
     default: {
       const page = STATIC_PAGES.find((p) => p.path === routePath);
       return `<h1>${esc(page.title.replace(/ — CarVibes$/, ""))}</h1><p>${esc(page.description)}</p>`;
@@ -1190,12 +1230,20 @@ function buildPreloadPlan(manifest) {
     "/find-my-car": forRoots([...SHELL, "src/components/findmycar/FindMyCar.tsx"]),
     "/search": forRoots([...SHELL, "src/components/GlobalSearch.tsx"]),
     "/compare": forRoots([...SHELL, "src/components/compare/CompareModal.tsx"]),
+    "/marketplace": forRoots([...SHELL, "src/pages/marketplace/MarketplacePage.tsx"]),
+    "/marketplace/car": forRoots([...SHELL, "src/pages/marketplace/MarketplaceListingPage.tsx"]),
+    "/marketplace/sell": forRoots([...SHELL, "src/components/marketplace/sell/SellWizard.tsx"]),
+    "/admin/marketplace": forRoots([...SHELL, "src/pages/marketplace/AdminMarketplacePage.tsx"]),
     secondary: forRoots(SHELL),
   };
   const SECONDARY = new Set(["/explore", "/news", "/brands", "/favorites"]);
   return (routePath) => {
     if (routePath === "/") return PLANS["/"];
     if (routePath.startsWith("/car/")) return PLANS["/car"];
+    if (routePath.startsWith("/marketplace/car/")) return PLANS["/marketplace/car"];
+    if (routePath.startsWith("/marketplace/sell")) return PLANS["/marketplace/sell"];
+    if (routePath.startsWith("/admin/")) return PLANS["/admin/marketplace"];
+    if (routePath.startsWith("/marketplace")) return PLANS["/marketplace"];
     if (routePath.startsWith("/story/")) return PLANS["/story"];
     if (PLANS[routePath]) return PLANS[routePath];
     if (SECONDARY.has(routePath)) return PLANS.secondary;
@@ -1204,6 +1252,318 @@ function buildPreloadPlan(manifest) {
     // carries the car datasets that these pages never render.
     return [];
   };
+}
+
+
+// ------------------------------------------------------------
+// 5c. MarketVibes — build-time marketplace data
+// ------------------------------------------------------------
+// Approved listings live in the marketplace store (data/marketplace/
+// listings.json — the very file the API serves from), never in the app
+// bundle. The build reads it through the SAME modules the API uses, so a
+// prerendered listing page can never disagree with
+// GET /api/marketplace/listings/<slug>: same title, same specs, same
+// JSON-LD, same related cars.
+//
+// No store on disk (fresh clone, CI without data, seller data not
+// deployed yet) simply means "no marketplace pages yet" — never a failed
+// build. Pending and rejected listings are unreachable from here:
+// publicListings() filters on APPROVED only.
+async function loadMarketplace() {
+  const importUrl = (rel) => pathToFileURL(path.join(ROOT, "server", "marketplace", rel)).href;
+  try {
+    const [store, view] = await Promise.all([import(importUrl("store.mjs")), import(importUrl("public-view.mjs"))]);
+    const listings = await store.publicListings();
+    const facets = view.facetPages(listings);
+    return { store, view, listings, facets };
+  } catch (error) {
+    console.warn(
+      `[prerender] marketplace store unavailable (${error.message}) — no listing pages prerendered`
+    );
+    return { store: null, view: null, listings: [], facets: [] };
+  }
+}
+
+/** Related cars — mirrors the selection GET /listings/:slug performs. */
+function marketplaceRelated(record, listings) {
+  const others = listings.filter((l) => l.id !== record.id);
+  return {
+    similar: others
+      .filter((l) => l.vehicle?.bodyType && l.vehicle?.bodyType === record.vehicle?.bodyType)
+      .slice(0, 6),
+    moreFromBrand: others.filter((l) => l.vehicle?.brand === record.vehicle?.brand).slice(0, 6),
+    moreFromRegion: others.filter((l) => l.location?.country === record.location?.country).slice(0, 6),
+  };
+}
+
+/** Real <a href> links for every listing — the crawl path into the detail pages. */
+function marketplaceCards(items, view) {
+  return (
+    "<ul>" +
+    items
+      .map((l) => {
+        const bits = [
+          l.pricing?.price ? view.formatPrice(l.pricing.price, l.pricing.currency) : "",
+          l.vehicle?.year ? String(l.vehicle.year) : "",
+          l.vehicle?.condition === "new" ? "New" : "Used",
+          [l.location?.city, l.location?.country].filter(Boolean).join(", "),
+        ]
+          .filter(Boolean)
+          .join(" · ");
+        return `<li><a href="${esc(view.listingPath(l))}">${esc(view.listingTitle(l))}</a> — ${esc(bits)}</li>`;
+      })
+      .join("") +
+    "</ul>"
+  );
+}
+
+/** The listing page's crawlable content: specs, gallery, description, links. */
+function marketplaceListingBody(record, detail, market) {
+  const view = market.view;
+  const v = record.vehicle ?? {};
+  const media = record.media ?? [];
+  const location = [record.location?.city, record.location?.region, record.location?.country]
+    .filter(Boolean)
+    .join(", ");
+  const specs = detail.specs
+    .map((s) => `<tr><th scope="row">${esc(s.label)}</th><td>${esc(s.value)}</td></tr>`)
+    .join("");
+  const photos = media
+    .map((m, index) => {
+      const size = m.width && m.height ? ` width="${m.width}" height="${m.height}"` : "";
+      return (
+        `<img src="${esc(m.url)}" alt="${esc(
+          index === 0 ? detail.title : `${detail.title} — photo ${index + 1}`
+        )}"${index === 0 ? ' fetchpriority="high" decoding="async"' : ' loading="lazy" decoding="async"'}${size} />`
+      );
+    })
+    .join("");
+  const related = marketplaceRelated(record, market.listings);
+  const heading = (text, items) => (items.length ? `<h2>${esc(text)}</h2>${marketplaceCards(items, view)}` : "");
+  const brandPath = v.brand ? view.facetPath("brand", v.brand) : null;
+  const countryPath = record.location?.country ? view.facetPath("country", record.location.country) : null;
+
+  return (
+    "<article>" +
+    `<nav aria-label="Breadcrumb"><ol>` +
+    `<li><a href="/marketplace">MarketVibes</a></li>` +
+    (brandPath ? `<li><a href="${esc(brandPath)}">${esc(v.brand)}</a></li>` : "") +
+    (countryPath ? `<li><a href="${esc(countryPath)}">${esc(record.location.country)}</a></li>` : "") +
+    `<li aria-current="page">${esc(detail.title)}</li></ol></nav>` +
+    `<h1>${v.year ? `${v.year} ` : ""}${esc(v.brand ?? "")} <span>${esc(v.model ?? "")}</span></h1>` +
+    `<p><strong>${esc(detail.priceLabel)}</strong>${detail.negotiable ? " · Negotiable" : ""} · ${esc(
+      detail.conditionLabel
+    )}${v.year ? ` · ${v.year}` : ""}${detail.mileageLabel ? ` · ${esc(detail.mileageLabel)}` : ""}</p>` +
+    `<p>For sale in ${esc(location || "—")} by a ${esc(detail.sellerTypeLabel.toLowerCase())}${
+      detail.seller?.companyName ? ` — ${esc(detail.seller.companyName)}` : ""
+    }.</p>` +
+    (photos ? `<div>${photos}</div>` : "") +
+    (specs ? `<h2>Specifications</h2><table><tbody>${specs}</tbody></table>` : "") +
+    `<h2>Seller's description</h2><p>${esc(
+      v.description || "The seller did not add a description."
+    )}</p>` +
+    `<h2>Contact the seller</h2><p><a href="${esc(detail.contact.href)}" rel="nofollow">${esc(
+      detail.contact.cta
+    )}</a> — the seller's contact details stay on the server and are only reached through that link.</p>` +
+    `<p><em>CarVibes is not part of the transaction. Never pay a deposit before seeing the car.</em></p>` +
+    heading("Similar cars", related.similar) +
+    heading(v.brand ? `More cars from ${v.brand}` : "More cars from this brand", related.moreFromBrand) +
+    heading(
+      record.location?.country ? `More cars in ${record.location.country}` : "More cars in this region",
+      related.moreFromRegion
+    ) +
+    `<nav aria-label="Marketplace"><ul>` +
+    `<li><a href="/marketplace">Back to the marketplace</a></li>` +
+    `<li><a href="/marketplace/sell">Sell your car</a></li>` +
+    `<li><a href="/used-cars">Best used cars to buy</a></li>` +
+    `</ul></nav>` +
+    "</article>"
+  );
+}
+
+/** Facet page (single filter, only when supply justifies it). */
+function marketplaceFacetBody(facet, market) {
+  const view = market.view;
+  const items = market.listings.filter((l) => {
+    if (facet.kind === "brand") return l.vehicle?.brand === facet.value;
+    if (facet.kind === "country") return l.location?.country === facet.value;
+    return l.vehicle?.condition === facet.value;
+  });
+  const h1 =
+    facet.kind === "country"
+      ? `Cars for sale in ${facet.value}`
+      : facet.kind === "condition"
+        ? `${facet.value === "new" ? "New" : "Used"} cars for sale`
+        : `${facet.value} cars for sale`;
+  const siblings = market.facets
+    .filter((f) => f.kind === facet.kind && f.path !== facet.path)
+    .slice(0, 12)
+    .map((f) => ({ href: f.path, label: `${f.value} (${f.count})` }));
+
+  return (
+    "<article>" +
+    `<nav aria-label="Breadcrumb"><ol><li><a href="/marketplace">MarketVibes</a></li>` +
+    `<li aria-current="page">${esc(facet.value)}</li></ol></nav>` +
+    `<h1>${esc(h1)}</h1>` +
+    `<p>${esc(facet.description)}</p>` +
+    marketplaceCards(items.slice(0, 48), view) +
+    (siblings.length ? linkList(siblings, `More choices`) : "") +
+    `<nav aria-label="Marketplace"><ul><li><a href="/marketplace">Back to the marketplace</a></li>` +
+    `<li><a href="/marketplace/sell">Sell your car</a></li></ul></nav>` +
+    "</article>"
+  );
+}
+
+/** The marketplace landing page's crawlable content. */
+function marketplaceIndexBody(market) {
+  const view = market.view;
+  // No listings at all — the marketplace is live and empty, exactly as it
+  // ships. Same words as the React zero state (components/marketplace/
+  // states.tsx), so the prerendered page and the hydrated one agree.
+  if (!view || market.listings.length === 0) {
+    return (
+      "<article><h1>Find your next car.<span>Sell yours.</span></h1>" +
+      "<h2>New feature — the CarVibes Marketplace has just launched!</h2>" +
+      "<p>Discover the first listings and be among the first to publish your car.</p>" +
+      "<h2>No cars listed yet</h2>" +
+      "<p>Be the first to sell your car on MarketVibes. Every listing is reviewed by hand before it appears here.</p>" +
+      `<nav aria-label="Marketplace"><ul><li><a href="/marketplace/sell">Sell your car</a></li>` +
+      `<li><a href="/used-cars">Best used cars to buy in 2026–2027</a></li></ul></nav></article>`
+    );
+  }
+  const groups = ["brand", "country", "condition"].map((kind) => {
+    const pages = market.facets.filter((f) => f.kind === kind).slice(0, 16);
+    const heading =
+      kind === "brand" ? "Browse by make" : kind === "country" ? "Browse by country" : "Browse by condition";
+    return pages.length ? linkList(pages.map((f) => ({ href: f.path, label: `${f.value} (${f.count})` })), heading) : "";
+  });
+
+  return (
+    "<article>" +
+    "<h1>Find your next car.<span>Sell yours.</span></h1>" +
+    "<p>The CarVibes marketplace: cars listed for sale by private sellers and dealers. Filter by make, " +
+    "country, condition and price, open a car for its full specification, photos and price, then contact " +
+    `the seller directly. Every listing is reviewed before it goes live — ${market.listings.length} car${
+      market.listings.length === 1 ? "" : "s"
+    } listed right now.</p>` +
+    groups.join("") +
+    linkList(
+      market.listings
+        .slice(0, 24)
+        .map((l) => ({
+          href: view.listingPath(l),
+          label: `${view.listingTitle(l)} — ${view.formatPrice(l.pricing?.price, l.pricing?.currency)}`,
+        })),
+      "Latest listings"
+    ) +
+    `<nav aria-label="Marketplace"><ul><li><a href="/marketplace/sell">Sell your car</a></li>` +
+    `<li><a href="/used-cars">Best used cars to buy in 2026–2027</a></li></ul></nav>` +
+    "</article>"
+  );
+}
+
+/** The seller funnel: noindex, but still a real page with real links. */
+function marketplaceSellBody() {
+  return (
+    "<article>" +
+    "<h1>Sell your car on CarVibes MarketVibes</h1>" +
+    "<p>List your car in a few minutes: vehicle, condition and price, location, photos and the contact method you " +
+    "prefer. Submitting is free and every listing is reviewed by hand before it appears publicly — nothing is " +
+    "published automatically.</p>" +
+    "<h2>How it works</h2><ol>" +
+    "<li>Fill in the vehicle, price and location.</li>" +
+    "<li>Add a few photos — the first one becomes the main image.</li>" +
+    "<li>Choose how buyers should reach you (WhatsApp, phone, Instagram or other).</li>" +
+    "<li>Review everything and submit. The listing stays pending until an administrator approves it.</li>" +
+    "</ol>" +
+    "<p>Buyers contact you through a CarVibes link, so your phone number is never displayed as plain text.</p>" +
+    `<nav aria-label="Marketplace"><ul><li><a href="/marketplace">Back to the marketplace</a></li></ul></nav>` +
+    "</article>"
+  );
+}
+
+/**
+ * Approved listings + qualifying facet pages, as real prerendered routes.
+ *
+ * A listing page also embeds the exact payload the API serves at
+ * GET /api/marketplace/listings/<slug> (id="mk-listing-bootstrap"). The
+ * React page reads it during its first render, so the price, specs and the
+ * gallery image are committed as soon as the bundle executes — the image
+ * request no longer waits for a client-side fetch round trip. Background
+ * revalidation still runs, so view counting and seller edits behave exactly
+ * as on a client-side navigation.
+ */
+function marketplacePages(siteUrl, market) {
+  if (!market.view) return [];
+  const view = market.view;
+  const pages = [];
+
+  for (const record of market.listings) {
+    const routePath = view.listingPath(record);
+    const seo = view.buildListingSeo(record, siteUrl);
+    const detail = view.toPublicDetail(record, [], [], [], { siteUrl });
+    const payload = JSON.stringify({ ok: true, data: detail }).replace(/</g, "\\u003c");
+    pages.push({
+      path: routePath,
+      file: `${routePath.replace(/^\//, "")}.html`,
+      title: seo.title,
+      description: seo.description,
+      url: `${siteUrl}${routePath}`,
+      image: seo.absoluteImage || DEFAULT_IMAGE,
+      type: "website",
+      schema: seo.jsonLd,
+      schemaOwner: "marketplace",
+      body:
+        marketplaceListingBody(record, detail, market) +
+        `<script type="application/json" id="mk-listing-bootstrap" data-slug="${esc(record.slug)}" ` +
+        `data-public-id="${esc(record.publicId)}">${payload}</script>`,
+    });
+  }
+
+  for (const facet of market.facets) {
+    const listed = market.listings
+      .filter((l) => {
+        if (facet.kind === "brand") return l.vehicle?.brand === facet.value;
+        if (facet.kind === "country") return l.location?.country === facet.value;
+        return l.vehicle?.condition === facet.value;
+      })
+      .slice(0, 12);
+    pages.push({
+      path: facet.path,
+      file: `${facet.path.replace(/^\//, "")}.html`,
+      title: facet.title,
+      description: facet.description,
+      url: `${siteUrl}${facet.path}`,
+      image: DEFAULT_IMAGE,
+      type: "website",
+      body: marketplaceFacetBody(facet, market),
+      // Same shape the React page writes through useMarketplaceMeta():
+      // an ItemList of the visible cars plus a BreadcrumbList.
+      schema: [
+        {
+          "@context": "https://schema.org",
+          "@type": "ItemList",
+          numberOfItems: listed.length,
+          itemListElement: listed.map((l, index) => ({
+            "@type": "ListItem",
+            position: index + 1,
+            url: `${siteUrl}${view.listingPath(l)}`,
+            name: view.listingTitle(l),
+          })),
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            { "@type": "ListItem", position: 1, name: "MarketVibes", item: `${siteUrl}/marketplace` },
+            { "@type": "ListItem", position: 2, name: facet.value, item: `${siteUrl}${facet.path}` },
+          ],
+        },
+      ],
+    });
+  }
+
+  return pages;
 }
 
 async function main() {
@@ -1279,6 +1639,7 @@ async function main() {
   const preloadPlan = buildPreloadPlan(manifest);
 
   const data = await loadData();
+  const market = await loadMarketplace();
 
   // Homepage LCP: the hero photo, painted inside the boot splash from the
   // first byte, preloaded with the very same srcset the <picture> in
@@ -1320,7 +1681,7 @@ async function main() {
       noindex: p.noindex,
       ...(p.path === "/" ? homeHero : {}),
       ...(p.path === "/news" ? newsHero : {}),
-      body: staticBody(p.path, data),
+      body: staticBody(p.path, data, market),
       schema:
         p.path === "/car-quiz"
           ? quizSchema(data, siteUrl)
@@ -1330,6 +1691,7 @@ async function main() {
     })),
     ...data.cars.map((c) => carPage(c, siteUrl, data)),
     ...data.stories.map((s) => storyPage(s, siteUrl, data)),
+    ...marketplacePages(siteUrl, market),
   ];
 
   // A 404 shell so unknown paths can answer with a real 404 status
@@ -1369,7 +1731,8 @@ async function main() {
 
   console.log(
     `[prerender] ${pages.length} HTML files → dist/ ` +
-      `(${STATIC_PAGES.length} static, ${data.cars.length} cars, ${data.stories.length} stories, 1 x 404)`
+      `(${STATIC_PAGES.length} static, ${data.cars.length} cars, ${data.stories.length} stories, ` +
+      `${market.listings.length} marketplace listings, ${market.facets.length} facets, 1 x 404)`
   );
   console.log(`[prerender] canonical domain: ${siteUrl}`);
 }
