@@ -16,13 +16,11 @@
     },
     {
       "src": "^/api/marketplace/(.*)$",
-      "dest": "${MARKETPLACE_API_ORIGIN}/api/marketplace/$1",
-      "env": ["MARKETPLACE_API_ORIGIN"]
+      "dest": "https://carvibes-v2-production.up.railway.app/api/marketplace/$1"
     },
     {
       "src": "^/marketplace-media/(.*)$",
-      "dest": "${MARKETPLACE_API_ORIGIN}/marketplace-media/$1",
-      "env": ["MARKETPLACE_API_ORIGIN"]
+      "dest": "https://carvibes-v2-production.up.railway.app/marketplace-media/$1"
     },
     {
       "src": "/(favicon\\.svg)",
