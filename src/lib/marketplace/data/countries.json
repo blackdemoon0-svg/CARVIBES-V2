@@ -1,0 +1,302 @@
+[
+  {
+    "code": "DZ",
+    "name": "Algeria",
+    "currency": "DZD",
+    "dial": "+213"
+  },
+  {
+    "code": "AR",
+    "name": "Argentina",
+    "currency": "ARS",
+    "dial": "+54"
+  },
+  {
+    "code": "AU",
+    "name": "Australia",
+    "currency": "AUD",
+    "dial": "+61"
+  },
+  {
+    "code": "AT",
+    "name": "Austria",
+    "currency": "EUR",
+    "dial": "+43"
+  },
+  {
+    "code": "BH",
+    "name": "Bahrain",
+    "currency": "BHD",
+    "dial": "+973"
+  },
+  {
+    "code": "BE",
+    "name": "Belgium",
+    "currency": "EUR",
+    "dial": "+32"
+  },
+  {
+    "code": "BR",
+    "name": "Brazil",
+    "currency": "BRL",
+    "dial": "+55"
+  },
+  {
+    "code": "CA",
+    "name": "Canada",
+    "currency": "CAD",
+    "dial": "+1"
+  },
+  {
+    "code": "CL",
+    "name": "Chile",
+    "currency": "CLP",
+    "dial": "+56"
+  },
+  {
+    "code": "CN",
+    "name": "China",
+    "currency": "CNY",
+    "dial": "+86"
+  },
+  {
+    "code": "CZ",
+    "name": "Czechia",
+    "currency": "CZK",
+    "dial": "+420"
+  },
+  {
+    "code": "DK",
+    "name": "Denmark",
+    "currency": "DKK",
+    "dial": "+45"
+  },
+  {
+    "code": "EG",
+    "name": "Egypt",
+    "currency": "EGP",
+    "dial": "+20"
+  },
+  {
+    "code": "FI",
+    "name": "Finland",
+    "currency": "EUR",
+    "dial": "+358"
+  },
+  {
+    "code": "FR",
+    "name": "France",
+    "currency": "EUR",
+    "dial": "+33"
+  },
+  {
+    "code": "DE",
+    "name": "Germany",
+    "currency": "EUR",
+    "dial": "+49"
+  },
+  {
+    "code": "GR",
+    "name": "Greece",
+    "currency": "EUR",
+    "dial": "+30"
+  },
+  {
+    "code": "IN",
+    "name": "India",
+    "currency": "INR",
+    "dial": "+91"
+  },
+  {
+    "code": "IE",
+    "name": "Ireland",
+    "currency": "EUR",
+    "dial": "+353"
+  },
+  {
+    "code": "IT",
+    "name": "Italy",
+    "currency": "EUR",
+    "dial": "+39"
+  },
+  {
+    "code": "JP",
+    "name": "Japan",
+    "currency": "JPY",
+    "dial": "+81"
+  },
+  {
+    "code": "JO",
+    "name": "Jordan",
+    "currency": "JOD",
+    "dial": "+962"
+  },
+  {
+    "code": "KE",
+    "name": "Kenya",
+    "currency": "KES",
+    "dial": "+254"
+  },
+  {
+    "code": "KW",
+    "name": "Kuwait",
+    "currency": "KWD",
+    "dial": "+965"
+  },
+  {
+    "code": "LB",
+    "name": "Lebanon",
+    "currency": "LBP",
+    "dial": "+961"
+  },
+  {
+    "code": "LY",
+    "name": "Libya",
+    "currency": "LYD",
+    "dial": "+218"
+  },
+  {
+    "code": "MR",
+    "name": "Mauritania",
+    "currency": "MRU",
+    "dial": "+222"
+  },
+  {
+    "code": "MX",
+    "name": "Mexico",
+    "currency": "MXN",
+    "dial": "+52"
+  },
+  {
+    "code": "MA",
+    "name": "Morocco",
+    "currency": "MAD",
+    "dial": "+212"
+  },
+  {
+    "code": "NL",
+    "name": "Netherlands",
+    "currency": "EUR",
+    "dial": "+31"
+  },
+  {
+    "code": "NZ",
+    "name": "New Zealand",
+    "currency": "NZD",
+    "dial": "+64"
+  },
+  {
+    "code": "NG",
+    "name": "Nigeria",
+    "currency": "NGN",
+    "dial": "+234"
+  },
+  {
+    "code": "NO",
+    "name": "Norway",
+    "currency": "NOK",
+    "dial": "+47"
+  },
+  {
+    "code": "OM",
+    "name": "Oman",
+    "currency": "OMR",
+    "dial": "+968"
+  },
+  {
+    "code": "PL",
+    "name": "Poland",
+    "currency": "PLN",
+    "dial": "+48"
+  },
+  {
+    "code": "PT",
+    "name": "Portugal",
+    "currency": "EUR",
+    "dial": "+351"
+  },
+  {
+    "code": "QA",
+    "name": "Qatar",
+    "currency": "QAR",
+    "dial": "+974"
+  },
+  {
+    "code": "RO",
+    "name": "Romania",
+    "currency": "RON",
+    "dial": "+40"
+  },
+  {
+    "code": "SA",
+    "name": "Saudi Arabia",
+    "currency": "SAR",
+    "dial": "+966"
+  },
+  {
+    "code": "SG",
+    "name": "Singapore",
+    "currency": "SGD",
+    "dial": "+65"
+  },
+  {
+    "code": "ZA",
+    "name": "South Africa",
+    "currency": "ZAR",
+    "dial": "+27"
+  },
+  {
+    "code": "KR",
+    "name": "South Korea",
+    "currency": "KRW",
+    "dial": "+82"
+  },
+  {
+    "code": "ES",
+    "name": "Spain",
+    "currency": "EUR",
+    "dial": "+34"
+  },
+  {
+    "code": "SE",
+    "name": "Sweden",
+    "currency": "SEK",
+    "dial": "+46"
+  },
+  {
+    "code": "CH",
+    "name": "Switzerland",
+    "currency": "CHF",
+    "dial": "+41"
+  },
+  {
+    "code": "TN",
+    "name": "Tunisia",
+    "currency": "TND",
+    "dial": "+216"
+  },
+  {
+    "code": "TR",
+    "name": "Türkiye",
+    "currency": "TRY",
+    "dial": "+90"
+  },
+  {
+    "code": "AE",
+    "name": "United Arab Emirates",
+    "currency": "AED",
+    "dial": "+971"
+  },
+  {
+    "code": "GB",
+    "name": "United Kingdom",
+    "currency": "GBP",
+    "dial": "+44"
+  },
+  {
+    "code": "US",
+    "name": "United States",
+    "currency": "USD",
+    "dial": "+1"
+  }
+]

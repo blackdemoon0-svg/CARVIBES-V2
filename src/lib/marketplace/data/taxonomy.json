@@ -1,0 +1,274 @@
+{
+  "makes": [
+    "Abarth",
+    "AC",
+    "Acura",
+    "Alfa Romeo",
+    "Alpine",
+    "Aston Martin",
+    "Audi",
+    "Bentley",
+    "BMW",
+    "Bugatti",
+    "Buick",
+    "BYD",
+    "Cadillac",
+    "Chery",
+    "Chevrolet",
+    "Chrysler",
+    "Citroën",
+    "Cupra",
+    "Dacia",
+    "Daewoo",
+    "Daihatsu",
+    "Datsun",
+    "Dodge",
+    "DS",
+    "Ferrari",
+    "Fiat",
+    "Ford",
+    "Genesis",
+    "GMC",
+    "Great Wall",
+    "Haval",
+    "Honda",
+    "Hummer",
+    "Hyundai",
+    "Infiniti",
+    "Isuzu",
+    "Jaguar",
+    "Jeep",
+    "Kia",
+    "Koenigsegg",
+    "Lada",
+    "Lamborghini",
+    "Lancia",
+    "Land Rover",
+    "Lexus",
+    "Lincoln",
+    "Lotus",
+    "Lucid",
+    "Maserati",
+    "Maybach",
+    "Mazda",
+    "McLaren",
+    "Mercedes-AMG",
+    "Mercedes-Benz",
+    "MG",
+    "Mini",
+    "Mitsubishi",
+    "NIO",
+    "Nissan",
+    "Opel",
+    "Pagani",
+    "Peugeot",
+    "Plymouth",
+    "Polestar",
+    "Pontiac",
+    "Porsche",
+    "RAM",
+    "Renault",
+    "Rimac",
+    "Rivian",
+    "Rolls-Royce",
+    "Rover",
+    "Saab",
+    "SEAT",
+    "Shelby",
+    "Skoda",
+    "Škoda",
+    "Smart",
+    "SsangYong",
+    "Subaru",
+    "Suzuki",
+    "Tata",
+    "Tesla",
+    "Toyota",
+    "Volkswagen",
+    "Volvo",
+    "Xpeng",
+    "Zeekr"
+  ],
+  "bodyTypes": [
+    "Sedan",
+    "SUV",
+    "Hatchback",
+    "Coupé",
+    "Convertible",
+    "Roadster",
+    "Wagon",
+    "Crossover",
+    "Pickup",
+    "Van",
+    "Minivan",
+    "Other"
+  ],
+  "colors": [
+    "Black",
+    "White",
+    "Pearl White",
+    "Silver",
+    "Grey",
+    "Blue",
+    "Red",
+    "Green",
+    "Yellow",
+    "Orange",
+    "Brown",
+    "Beige",
+    "Gold",
+    "Burgundy",
+    "Matte Black",
+    "Other"
+  ],
+  "currencies": [
+    "AED",
+    "ARS",
+    "AUD",
+    "BHD",
+    "BRL",
+    "CAD",
+    "CHF",
+    "CLP",
+    "CNY",
+    "CZK",
+    "DKK",
+    "DZD",
+    "EGP",
+    "EUR",
+    "GBP",
+    "INR",
+    "JOD",
+    "JPY",
+    "KES",
+    "KRW",
+    "KWD",
+    "LBP",
+    "LYD",
+    "MAD",
+    "MRU",
+    "MXN",
+    "NGN",
+    "NOK",
+    "NZD",
+    "OMR",
+    "PLN",
+    "QAR",
+    "RON",
+    "SAR",
+    "SEK",
+    "SGD",
+    "TND",
+    "TRY",
+    "USD",
+    "ZAR"
+  ],
+  "fuels": [
+    {
+      "id": "petrol",
+      "label": "Petrol"
+    },
+    {
+      "id": "diesel",
+      "label": "Diesel"
+    },
+    {
+      "id": "hybrid",
+      "label": "Hybrid"
+    },
+    {
+      "id": "phev",
+      "label": "Plug-in hybrid"
+    },
+    {
+      "id": "electric",
+      "label": "Electric"
+    },
+    {
+      "id": "lpg",
+      "label": "LPG / CNG"
+    },
+    {
+      "id": "other",
+      "label": "Other"
+    }
+  ],
+  "transmissions": [
+    {
+      "id": "automatic",
+      "label": "Automatic"
+    },
+    {
+      "id": "manual",
+      "label": "Manual"
+    },
+    {
+      "id": "dct",
+      "label": "Dual-clutch (DCT)"
+    },
+    {
+      "id": "cvt",
+      "label": "CVT"
+    },
+    {
+      "id": "other",
+      "label": "Other"
+    }
+  ],
+  "conditions": [
+    {
+      "id": "new",
+      "label": "New"
+    },
+    {
+      "id": "used",
+      "label": "Used"
+    }
+  ],
+  "sellerTypes": [
+    {
+      "id": "individual",
+      "label": "Individual"
+    },
+    {
+      "id": "professional",
+      "label": "Professional"
+    },
+    {
+      "id": "dealer",
+      "label": "Dealer"
+    }
+  ],
+  "contactMethods": [
+    {
+      "id": "whatsapp",
+      "label": "WhatsApp"
+    },
+    {
+      "id": "phone",
+      "label": "Call"
+    },
+    {
+      "id": "instagram",
+      "label": "Instagram"
+    },
+    {
+      "id": "other",
+      "label": "Contact"
+    }
+  ],
+  "sorts": [
+    {
+      "id": "newest",
+      "label": "Newest"
+    },
+    {
+      "id": "price_asc",
+      "label": "Price: low to high"
+    },
+    {
+      "id": "price_desc",
+      "label": "Price: high to low"
+    }
+  ]
+}
