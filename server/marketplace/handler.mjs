@@ -572,7 +572,7 @@ export function createMarketplaceHandler() {
         });
       }
 
-      if (route === "/listings" && method === "GET") return handlePublicListings(req, res, url);
+      if (route === "/listings" && method === "GET") return await handlePublicListings(req, res, url);
 
       // Indexable facet pages (path-based, supply-driven). The UI uses the
       // very same objects for its internal-linking blocks and for the
@@ -589,13 +589,13 @@ export function createMarketplaceHandler() {
       }
 
       const contactMatch = /^\/listings\/([^/]+)\/contact$/.exec(route);
-      if (contactMatch && method === "GET") return handleContactRedirect(req, res, decodeURIComponent(contactMatch[1]));
+      if (contactMatch && method === "GET") return await handleContactRedirect(req, res, decodeURIComponent(contactMatch[1]));
 
       const detailMatch = /^\/listings\/([^/]+)$/.exec(route);
-      if (detailMatch && method === "GET") return handlePublicDetail(req, res, decodeURIComponent(detailMatch[1]), url);
+      if (detailMatch && method === "GET") return await handlePublicDetail(req, res, decodeURIComponent(detailMatch[1]), url);
 
-      if (route === "/listings" && method === "POST") return handleSubmit(req, res);
-      if (route === "/uploads" && method === "POST") return handleUpload(req, res);
+      if (route === "/listings" && method === "POST") return await handleSubmit(req, res);
+      if (route === "/uploads" && method === "POST") return await handleUpload(req, res);
 
       // ---- admin auth ----
       if (route === "/admin/session" && method === "GET") {
@@ -611,8 +611,8 @@ export function createMarketplaceHandler() {
           },
         });
       }
-      if (route === "/admin/login/google" && method === "POST") return handleAdminLoginGoogle(req, res);
-      if (route === "/admin/login/passcode" && method === "POST") return handleAdminLoginPasscode(req, res);
+      if (route === "/admin/login/google" && method === "POST") return await handleAdminLoginGoogle(req, res);
+      if (route === "/admin/login/passcode" && method === "POST") return await handleAdminLoginPasscode(req, res);
       if (route === "/admin/logout" && method === "POST") {
         return json(res, 200, { ok: true }, { "set-cookie": clearCookie() });
       }
@@ -621,7 +621,7 @@ export function createMarketplaceHandler() {
       if (route.startsWith("/admin/")) {
         const session = requireAdmin(req, res);
         if (!session) return;
-        if (route === "/admin/listings" && method === "GET") return handleAdminList(req, res, url);
+        if (route === "/admin/listings" && method === "GET") return await handleAdminList(req, res, url);
         const adminDetailMatch = /^\/admin\/listings\/([^/]+)$/.exec(route);
         if (adminDetailMatch && method === "GET") {
           const record = await findById(decodeURIComponent(adminDetailMatch[1]));
@@ -629,8 +629,8 @@ export function createMarketplaceHandler() {
           return json(res, 200, adminDetail(record));
         }
         const reviewMatch = /^\/admin\/listings\/([^/]+)\/review$/.exec(route);
-        if (reviewMatch && method === "POST") return handleAdminReview(req, res, decodeURIComponent(reviewMatch[1]), session);
-        if (route === "/admin/listings/bulk" && method === "POST") return handleAdminBulk(req, res, session);
+        if (reviewMatch && method === "POST") return await handleAdminReview(req, res, decodeURIComponent(reviewMatch[1]), session);
+        if (route === "/admin/listings/bulk" && method === "POST") return await handleAdminBulk(req, res, session);
         if (route === "/admin/stats" && method === "GET") {
           const records = await allListings();
           return json(res, 200, {
@@ -652,11 +652,12 @@ export function createMarketplaceHandler() {
       return fail(res, 404, "unknown_route");
     } catch (error) {
       const status = Number(error?.status) || 500;
-      if (status >= 500) {
-        console.error("[marketplace] api error:", error);
-        return fail(res, 500, "server_error");
-      }
-      return fail(res, status, String(error.message ?? "request_failed"));
+      if (status >= 500) console.error("[marketplace] api error:", error);
+      fail(res, status >= 500 ? 500 : status, status >= 500 ? "server_error" : String(error.message ?? "request_failed"));
+      // An over-sized body was paused, never drained: close the connection
+      // once the answer is on the wire.
+      if (error?.tooLarge) res.once("finish", () => req.destroy());
+      return;
     }
   };
 }

@@ -62,7 +62,15 @@ const server = createServer(async (req, res) => {
     res.end(JSON.stringify({ error: "not_found" }));
     return;
   }
-  await handler(req, res);
+  // Last-resort guard: an unhandled rejection in a request listener takes the
+  // whole API process down, so the handler is never allowed to escape.
+  try {
+    await handler(req, res);
+  } catch (error) {
+    console.error("[marketplace] unhandled handler error:", error);
+    if (!res.headersSent) sendJson(res, Number(error?.status) || 500, { error: "server_error" });
+    else res.destroy();
+  }
 });
 
 // ------------------------------------------------------------

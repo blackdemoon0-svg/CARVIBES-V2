@@ -93,17 +93,31 @@ export function readBody(req, maxBytes = LIMITS.maxBodyBytes) {
   return new Promise((resolve, reject) => {
     const chunks = [];
     let size = 0;
+    let settled = false;
     req.on("data", (chunk) => {
+      if (settled) return;
       size += chunk.length;
       if (size > maxBytes) {
-        reject(Object.assign(new Error("Payload too large"), { status: 413 }));
-        req.destroy();
+        settled = true;
+        // Stop buffering the body, but keep the socket alive just long enough
+        // for the caller to answer with a real 413: destroying the request
+        // here would kill the response too.
+        req.pause();
+        reject(Object.assign(new Error("Payload too large"), { status: 413, tooLarge: true }));
         return;
       }
       chunks.push(chunk);
     });
-    req.on("end", () => resolve(Buffer.concat(chunks)));
-    req.on("error", reject);
+    req.on("end", () => {
+      if (settled) return;
+      settled = true;
+      resolve(Buffer.concat(chunks));
+    });
+    req.on("error", (error) => {
+      if (settled) return;
+      settled = true;
+      reject(error);
+    });
   });
 }
 
