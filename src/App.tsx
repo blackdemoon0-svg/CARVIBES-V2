@@ -96,6 +96,11 @@ const AdminMarketplacePage = lazy(() => import("./pages/marketplace/AdminMarketp
 /** Facet routes share one chunk with the marketplace index. */
 const MarketplaceFacetPage = lazy(() => import("./pages/marketplace/MarketplaceFacetPage"));
 
+// MarketCar (/marketcar) — the indexable landing page that explains the
+// marketplace. Standalone chunk: it needs neither the car database that
+// RoutePages pulls in nor the marketplace API client.
+const MarketCarPage = lazy(() => import("./pages/MarketCarPage"));
+
 export function Homepage({
   lang,
   onLangChange,
@@ -318,6 +323,8 @@ function RoutedApp({
         <Route path="/contact" element={<ContactPage {...shell} />} />
         <Route path="/privacy-policy" element={<PrivacyPage {...shell} />} />
         <Route path="/terms" element={<TermsPage {...shell} />} />
+        {/* MarketCar — SEO landing page about the marketplace (index, follow) */}
+        <Route path="/marketcar" element={<MarketCarPage {...shell} />} />
         {/* MarketVibes — public marketplace */}
         <Route path="/marketplace" element={<MarketplacePage lang={lang} />} />
         <Route

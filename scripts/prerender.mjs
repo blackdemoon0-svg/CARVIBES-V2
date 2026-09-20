@@ -81,7 +81,12 @@ async function loadData() {
       `import { carTitle, carMetaDescription, carOverviewText, carFaq, carAltText, carJsonLd, carCanonicalPath, categoryWords, engineBreakdown } from ${JSON.stringify(path.join(ROOT, "src/lib/carSeo.ts"))};`,
       `import { battleScore } from ${JSON.stringify(path.join(ROOT, "src/lib/compare.ts"))};`,
       `import { HERO_WEBP_SRCSET, HERO_JPEG_SRCSET, HERO_SIZES, HERO_FALLBACK_SRC, HERO_PORTRAIT_WEBP_SRCSET, HERO_PORTRAIT_JPEG_SRCSET, HERO_PORTRAIT_MEDIA, COVER_SIZES, COVER_PORTRAIT_MEDIA, FEATURED_COVER_SIZES, featuredCoverWebpSrcset, featuredCoverJpegSrcset, coverHeroSrc, coverHeroJpegSrcset, coverHeroWebpSrcset, coverHeroPortraitJpegSrcset, coverHeroPortraitWebpSrcset, coverHeroOptimizable, pexelsResize, pexelsWebp } from ${JSON.stringify(path.join(ROOT, "src/lib/images.ts"))};`,
-      `export { cars, stories, featuredStory, QUESTIONS, QUIZZES, QUIZ_CATEGORIES, quizDicts, POINTS_PER_CORRECT, USED_CATEGORIES, USED_CAR_ENTRIES, usedCarsForCategory, carTitle, carMetaDescription, carOverviewText, carFaq, carAltText, carJsonLd, carCanonicalPath, categoryWords, engineBreakdown, battleScore, HERO_WEBP_SRCSET, HERO_JPEG_SRCSET, HERO_SIZES, HERO_FALLBACK_SRC, HERO_PORTRAIT_WEBP_SRCSET, HERO_PORTRAIT_JPEG_SRCSET, HERO_PORTRAIT_MEDIA, COVER_SIZES, COVER_PORTRAIT_MEDIA, coverHeroSrc, coverHeroJpegSrcset, coverHeroWebpSrcset, coverHeroPortraitJpegSrcset, coverHeroPortraitWebpSrcset, coverHeroOptimizable, FEATURED_COVER_SIZES, featuredCoverWebpSrcset, featuredCoverJpegSrcset, pexelsResize, pexelsWebp };`,
+      // MarketCar (/marketcar): the base English dictionary (the SAME mc_*
+      // strings the page renders) + the marketplace taxonomy facts it quotes.
+      `import { dict as baseEn } from ${JSON.stringify(path.join(ROOT, "src/lib/i18n/base/en.ts"))};`,
+      `import { MAKES, COUNTRIES, CURRENCIES } from ${JSON.stringify(path.join(ROOT, "src/lib/marketplace/taxonomy.ts"))};`,
+      `import { MAX_PHOTOS } from ${JSON.stringify(path.join(ROOT, "src/lib/marketplace/sellForm.ts"))};`,
+      `export { cars, stories, featuredStory, QUESTIONS, QUIZZES, QUIZ_CATEGORIES, quizDicts, POINTS_PER_CORRECT, USED_CATEGORIES, USED_CAR_ENTRIES, usedCarsForCategory, carTitle, carMetaDescription, carOverviewText, carFaq, carAltText, carJsonLd, carCanonicalPath, categoryWords, engineBreakdown, battleScore, HERO_WEBP_SRCSET, HERO_JPEG_SRCSET, HERO_SIZES, HERO_FALLBACK_SRC, HERO_PORTRAIT_WEBP_SRCSET, HERO_PORTRAIT_JPEG_SRCSET, HERO_PORTRAIT_MEDIA, COVER_SIZES, COVER_PORTRAIT_MEDIA, coverHeroSrc, coverHeroJpegSrcset, coverHeroWebpSrcset, coverHeroPortraitJpegSrcset, coverHeroPortraitWebpSrcset, coverHeroOptimizable, FEATURED_COVER_SIZES, featuredCoverWebpSrcset, featuredCoverJpegSrcset, pexelsResize, pexelsWebp, baseEn, MAKES, COUNTRIES, CURRENCIES, MAX_PHOTOS };`,
     ].join("\n"),
     "utf8"
   );
@@ -195,6 +200,17 @@ async function loadData() {
         categories: mod.USED_CATEGORIES,
         entries: mod.USED_CAR_ENTRIES,
         forCategory: mod.usedCarsForCategory,
+      },
+      // /marketcar — English copy + the live taxonomy numbers, so the
+      // prerendered guide can never drift from what the product enforces.
+      marketcar: {
+        en: mod.baseEn,
+        facts: {
+          makes: mod.MAKES.length,
+          countries: mod.COUNTRIES.length,
+          currencies: mod.CURRENCIES.length,
+          photos: mod.MAX_PHOTOS,
+        },
       },
       // Shared car-page builders (src/lib/carSeo.ts) + the deterministic
       // CarVibes score engine — the exact functions the runtime uses, so
@@ -314,6 +330,14 @@ function renderHead(html, page) {
     out = out.replace(
       "</head>",
       `    <meta name="robots" content="noindex, follow" />\n  </head>`
+    );
+  } else if (page.robots) {
+    // Explicit indexable directive (e.g. /marketcar = "index, follow"):
+    // mirrors ROUTE_META[path].robots so the crawled HTML and the hydrated
+    // head carry the same tag. Never combined with noindex.
+    out = out.replace(
+      "</head>",
+      `    <meta name="robots" content="${esc(page.robots)}" />\n  </head>`
     );
   }
 
@@ -451,6 +475,16 @@ const STATIC_PAGES = [
       "Browse cars for sale from private sellers and dealers: prices, photos, mileage and direct contact. New and used cars by make, country and budget.",
   },
   {
+    // MarketCar — the indexable landing page ABOUT the marketplace. Same
+    // strings as ROUTE_META["/marketcar"] in src/lib/seo.ts; explicit
+    // "index, follow" (never noindex), self canonical, in the sitemap.
+    path: "/marketcar",
+    title: "CarVibes Marketplace — Buy & Sell Cars Online | MarketCar",
+    description:
+      "How the CarVibes Marketplace (MarketCar) works: car listings from private sellers and dealers, search by make, price and country, and direct seller contact.",
+    robots: "index, follow",
+  },
+  {
     path: "/favorites",
     title: "Favorites — CarVibes",
     description: "Your saved cars and stories on CarVibes.",
@@ -488,7 +522,7 @@ const STATIC_PAGES = [
   },
 ];
 
-function staticBody(routePath, { cars, stories, quiz, used }, market) {
+function staticBody(routePath, { cars, stories, quiz, used, marketcar }, market) {
   const topCars = cars.slice(0, 60).map((c) => ({
     href: `/car/${c.id}`,
     label: `${c.brand} ${c.model} (${c.year})`,
@@ -511,6 +545,7 @@ function staticBody(routePath, { cars, stories, quiz, used }, market) {
             { href: "/brands", label: "Brands" },
             { href: "/news", label: "Stories" },
             { href: "/find-my-car", label: "Find my car" },
+            { href: "/marketcar", label: "MarketCar — how the CarVibes Marketplace works" },
           ],
           "Sections"
         ) +
@@ -545,6 +580,8 @@ function staticBody(routePath, { cars, stories, quiz, used }, market) {
       return usedCarsBody(used);
     case "/marketplace":
       return marketplaceIndexBody(market);
+    case "/marketcar":
+      return marketCarBody(marketcar);
     case "/marketplace/sell":
       return marketplaceSellBody();
     case "/admin/marketplace":
@@ -644,6 +681,130 @@ function usedCarsSchema(used, siteUrl) {
         itemListElement: [
           { "@type": "ListItem", position: 1, name: "CarVibes", item: `${siteUrl}/` },
           { "@type": "ListItem", position: 2, name: "Used Cars", item: url },
+        ],
+      },
+    ],
+  };
+}
+
+// ------------------------------------------------------------
+// 6a-bis. MarketCar (/marketcar) — static body + structured data
+// The crawlable guide about the marketplace. Rendered from the SAME
+// English dictionary strings (mc_* in src/lib/i18n/base/en.ts) and the
+// SAME taxonomy numbers as src/pages/MarketCarPage.tsx, so the HTML a
+// crawler reads is what the hydrated English page shows: same H1, same
+// sections, same internal links. Only describes behaviour that exists.
+// ------------------------------------------------------------
+const MARKETCAR_FEATURES = [
+  { id: "listings", h: "mc_listings_h", p: "mc_listings_p" },
+  { id: "search", h: "mc_search_h", p: "mc_search_p" },
+  { id: "discover", h: "mc_discover_h", p: "mc_discover_p" },
+  { id: "listing-page", h: "mc_detail_h", p: "mc_detail_p" },
+  { id: "contact", h: "mc_contact_h", p: "mc_contact_p" },
+  { id: "moderation", h: "mc_trust_h", p: "mc_trust_p" },
+];
+const MARKETCAR_STEPS = [
+  { h: "mk_step_vehicle", p: "mc_step_vehicle_p" },
+  { h: "mk_step_pricing", p: "mc_step_pricing_p" },
+  { h: "mk_step_location", p: "mc_step_location_p" },
+  { h: "mk_step_photos", p: "mc_step_photos_p" },
+  { h: "mk_step_contact", p: "mc_step_contact_p" },
+  { h: "mk_step_review", p: "mc_step_review_p" },
+];
+const MARKETCAR_MORE = [
+  { href: "/marketplace", key: "mc_link_marketplace" },
+  { href: "/marketplace/sell", key: "mk_sell_title" },
+  { href: "/explore", key: "footer_explore" },
+  { href: "/used-cars", key: "nav_used_cars" },
+  { href: "/brands", key: "nav_brands" },
+  { href: "/find-my-car", key: "nav_find" },
+];
+
+/** t() for the prerender: English string + the {token} interpolation the
+ *  runtime i18n applies (src/lib/i18n.ts). Missing key = loud failure. */
+function marketCarText(marketcar, key) {
+  const raw = marketcar.en[key];
+  if (typeof raw !== "string") throw new Error(`[prerender] /marketcar: missing i18n key "${key}"`);
+  return raw.replace(/\{(\w+)\}/g, (m, token) =>
+    marketcar.facts[token] === undefined ? m : String(marketcar.facts[token])
+  );
+}
+
+function marketCarBody(marketcar) {
+  const tr = (key) => marketCarText(marketcar, key);
+  const { facts } = marketcar;
+  const stats = [
+    [facts.makes, "mc_stat_makes"],
+    [facts.countries, "mc_stat_countries"],
+    [facts.currencies, "mc_stat_currencies"],
+    [facts.photos, "mc_stat_photos"],
+  ];
+
+  return (
+    "<article>" +
+    `<nav aria-label="Breadcrumb"><ol><li><a href="/">CarVibes</a></li><li>${esc(tr("mc_breadcrumb"))}</li></ol></nav>` +
+    `<p>${esc(tr("mc_eyebrow"))}</p>` +
+    `<h1>${esc(tr("mc_h1"))}</h1>` +
+    `<p>${esc(tr("mc_intro"))}</p>` +
+    `<p><a href="/marketplace">${esc(tr("mc_cta_browse"))}</a> · <a href="/marketplace/sell">${esc(tr("mk_sell_cta"))}</a></p>` +
+    `<ul>${stats.map(([v, k]) => `<li><strong>${v}</strong> ${esc(tr(k))}</li>`).join("")}</ul>` +
+    `<section id="features"><h2>${esc(tr("mc_features_h"))}</h2>` +
+    MARKETCAR_FEATURES.map(
+      (f) => `<section id="${f.id}"><h3>${esc(tr(f.h))}</h3><p>${esc(tr(f.p))}</p></section>`
+    ).join("") +
+    "</section>" +
+    `<section id="sell"><h2>${esc(tr("mc_sell_h"))}</h2><p>${esc(tr("mc_sell_p"))}</p><ol>` +
+    MARKETCAR_STEPS.map((s) => `<li><h3>${esc(tr(s.h))}</h3><p>${esc(tr(s.p))}</p></li>`).join("") +
+    `</ol><p><a href="/marketplace/sell">${esc(tr("mk_sell_cta"))}</a></p></section>` +
+    `<section id="faq"><h2>${esc(tr("mc_faq_h"))}</h2><dl>` +
+    [1, 2, 3, 4, 5]
+      .map((n) => `<div><dt>${esc(tr(`mc_faq_${n}_q`))}</dt><dd>${esc(tr(`mc_faq_${n}_a`))}</dd></div>`)
+      .join("") +
+    "</dl></section>" +
+    "</article>" +
+    linkList(
+      MARKETCAR_MORE.map((m) => ({ href: m.href, label: tr(m.key) })),
+      tr("mc_more_h")
+    )
+  );
+}
+
+function marketCarSchema(marketcar, siteUrl, page) {
+  const tr = (key) => marketCarText(marketcar, key);
+  const url = `${siteUrl}/marketcar`;
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebPage",
+        "@id": `${url}#page`,
+        url,
+        name: page.title,
+        description: page.description,
+        inLanguage: "en",
+        isPartOf: { "@type": "WebSite", name: "CarVibes", url: `${siteUrl}/` },
+        about: {
+          "@type": "WebSite",
+          name: "CarVibes Marketplace",
+          url: `${siteUrl}/marketplace`,
+        },
+        significantLink: [`${siteUrl}/marketplace`, `${siteUrl}/marketplace/sell`],
+      },
+      {
+        "@type": "FAQPage",
+        "@id": `${url}#faq`,
+        mainEntity: [1, 2, 3, 4, 5].map((n) => ({
+          "@type": "Question",
+          name: tr(`mc_faq_${n}_q`),
+          acceptedAnswer: { "@type": "Answer", text: tr(`mc_faq_${n}_a`) },
+        })),
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": `${url}#breadcrumb`,
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "CarVibes", item: `${siteUrl}/` },
+          { "@type": "ListItem", position: 2, name: tr("mc_breadcrumb"), item: url },
         ],
       },
     ],
@@ -1231,6 +1392,9 @@ function buildPreloadPlan(manifest) {
     "/search": forRoots([...SHELL, "src/components/GlobalSearch.tsx"]),
     "/compare": forRoots([...SHELL, "src/components/compare/CompareModal.tsx"]),
     "/marketplace": forRoots([...SHELL, "src/pages/marketplace/MarketplacePage.tsx"]),
+    // MarketCar is a text-LCP page with its own small chunk (no RoutePages
+    // shell, no car datasets): hint exactly its module graph.
+    "/marketcar": forRoots(["src/pages/MarketCarPage.tsx"]),
     "/marketplace/car": forRoots([...SHELL, "src/pages/marketplace/MarketplaceListingPage.tsx"]),
     "/marketplace/sell": forRoots([...SHELL, "src/components/marketplace/sell/SellWizard.tsx"]),
     "/admin/marketplace": forRoots([...SHELL, "src/pages/marketplace/AdminMarketplacePage.tsx"]),
@@ -1428,6 +1592,7 @@ function marketplaceIndexBody(market) {
       "<h2>No cars listed yet</h2>" +
       "<p>Be the first to sell your car on MarketVibes. Every listing is reviewed by hand before it appears here.</p>" +
       `<nav aria-label="Marketplace"><ul><li><a href="/marketplace/sell">Sell your car</a></li>` +
+      `<li><a href="/marketcar">How the Marketplace works</a></li>` +
       `<li><a href="/used-cars">Best used cars to buy in 2026–2027</a></li></ul></nav></article>`
     );
   }
@@ -1457,6 +1622,7 @@ function marketplaceIndexBody(market) {
       "Latest listings"
     ) +
     `<nav aria-label="Marketplace"><ul><li><a href="/marketplace/sell">Sell your car</a></li>` +
+    `<li><a href="/marketcar">How the Marketplace works</a></li>` +
     `<li><a href="/used-cars">Best used cars to buy in 2026–2027</a></li></ul></nav>` +
     "</article>"
   );
@@ -1679,6 +1845,7 @@ async function main() {
       image: DEFAULT_IMAGE,
       type: "website",
       noindex: p.noindex,
+      robots: p.robots,
       ...(p.path === "/" ? homeHero : {}),
       ...(p.path === "/news" ? newsHero : {}),
       body: staticBody(p.path, data, market),
@@ -1687,7 +1854,9 @@ async function main() {
           ? quizSchema(data, siteUrl)
           : p.path === "/used-cars"
             ? usedCarsSchema(data.used, siteUrl)
-            : undefined,
+            : p.path === "/marketcar"
+              ? marketCarSchema(data.marketcar, siteUrl, p)
+              : undefined,
     })),
     ...data.cars.map((c) => carPage(c, siteUrl, data)),
     ...data.stories.map((s) => storyPage(s, siteUrl, data)),
