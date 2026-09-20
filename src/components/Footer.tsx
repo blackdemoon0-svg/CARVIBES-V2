@@ -22,6 +22,7 @@ const LINK_GROUPS: {
       { labelKey: "nav_find", to: "/find-my-car" },
       { labelKey: "nav_stories", to: "/news" },
       { labelKey: "nav_quiz", to: "/car-quiz" },
+      { labelKey: "mc_link_label", to: "/marketcar" },
       { labelKey: "nav_favorites", to: "/favorites" },
       { labelKey: "footer_how_to", to: "/#how-to", help: true },
     ],

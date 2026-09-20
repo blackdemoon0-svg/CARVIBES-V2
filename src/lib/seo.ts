@@ -179,6 +179,20 @@ const ROUTE_META: Record<string, { title: string; description: string; robots?: 
     description:
       "Discover the best used cars to buy in 2026–2027, ranked by reliability, value, maintenance, fuel economy and performance. Most reliable used cars, budget picks, SUVs, sports cars, luxury, family, hybrids and EVs — each with a CarVibes Score.",
   },
+  "/marketcar": {
+    // MarketCar — the indexable landing page that explains the CarVibes
+    // Marketplace (what is listed, search, discovery pages, listing page,
+    // seller contact, the six-step seller funnel, moderation). It is a
+    // guide ABOUT the marketplace; the listings themselves stay on
+    // /marketplace. scripts/prerender.mjs stamps the same strings.
+    title: "CarVibes Marketplace — Buy & Sell Cars Online | MarketCar",
+    description:
+      "How the CarVibes Marketplace (MarketCar) works: car listings from private sellers and dealers, search by make, price and country, and direct seller contact.",
+    // Explicit on purpose (the site default is "no robots tag" = indexable):
+    // this page must never be mistaken for the noindex marketplace funnel
+    // routes. Mirrored byte-for-byte by the prerendered HTML.
+    robots: "index, follow",
+  },
   "/explore": {
     title: "Explore cars — CarVibes",
     description: "Browse and filter the CarVibes universe of cars.",

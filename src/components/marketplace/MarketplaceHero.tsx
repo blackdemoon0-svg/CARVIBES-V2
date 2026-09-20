@@ -78,6 +78,15 @@ export default function MarketplaceHero({
           >
             {t(lang, "mk_browse_cta")}
           </a>
+          {/* MarketCar — the crawlable guide that explains how the
+              marketplace works (/marketcar). Plain text link, no new CTA
+              weight next to the two primary actions. */}
+          <Link
+            to="/marketcar"
+            className="inline-flex items-center gap-2 py-2 text-[11px] font-medium uppercase tracking-[0.18em] text-fog underline decoration-line underline-offset-8 transition-colors duration-300 hover:text-white sm:ms-2"
+          >
+            {t(lang, "mc_link_label")}
+          </Link>
         </div>
 
         {/* Trust + real numbers */}

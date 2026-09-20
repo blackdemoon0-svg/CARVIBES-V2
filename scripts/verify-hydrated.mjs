@@ -417,13 +417,19 @@ async function main() {
     // not a constant — but every one of them must live under /marketplace
     // and nothing else may sneak in.
     const marketplaceLocs = sitemap.match(/<loc>https:\/\/carvibes\.dev\/marketplace/g)?.length ?? 0;
+    // 11 static pages: /, /explore, /used-cars, /news, /brands, /find-my-car,
+    // /car-quiz, /marketcar, /contact, /privacy-policy, /terms.
     assert(
-      locs === 509 + storyFiles.length + 10 + marketplaceLocs,
-      `sitemap lists 509 cars + ${storyFiles.length} stories + 10 static pages + ${marketplaceLocs} marketplace URLs (${locs})`
+      locs === 509 + storyFiles.length + 11 + marketplaceLocs,
+      `sitemap lists 509 cars + ${storyFiles.length} stories + 11 static pages + ${marketplaceLocs} marketplace URLs (${locs})`
     );
     assert(
       /<loc>https:\/\/carvibes\.dev\/marketplace<\/loc>/.test(sitemap),
       "sitemap lists the marketplace landing page"
+    );
+    assert(
+      /<loc>https:\/\/carvibes\.dev\/marketcar<\/loc>/.test(sitemap),
+      "sitemap lists MarketCar (/marketcar)"
     );
     assert(
       !/<loc>[^<]*\/marketplace\/sell/.test(sitemap) && !/<loc>[^<]*\/admin\//.test(sitemap),
