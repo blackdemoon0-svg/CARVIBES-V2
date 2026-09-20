@@ -77,7 +77,10 @@ const RATE = {
   submit: { limit: Number(process.env.MARKETPLACE_RATE_SUBMIT ?? 12), window: 60 * 60 * 1000 },
   upload: { limit: 80, window: 60 * 60 * 1000 },
   login: { limit: 12, window: 15 * 60 * 1000 },
-  read: { limit: 600, window: 60 * 1000 },
+  // Tunable: if the proxy chain ever collapses visitor IPs (missing
+  // x-forwarded-for), ALL visitors share one bucket — raising this on the
+  // host is the immediate mitigation. Verified per-IP in the normal case.
+  read: { limit: Number(process.env.MARKETPLACE_RATE_READ ?? 600), window: 60 * 1000 },
   contact: { limit: 120, window: 60 * 60 * 1000 },
 };
 

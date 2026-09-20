@@ -31,6 +31,7 @@ import { realpath, stat } from "node:fs/promises";
 import { createServer } from "node:http";
 import path from "node:path";
 import { createMarketplaceHandler } from "./handler.mjs";
+import { flushPending } from "./store.mjs";
 import { ADMIN_EMAILS, GOOGLE_CLIENT_ID, MEDIA_URL_PREFIX, paths } from "./config.mjs";
 
 const PORT = Number(process.env.MARKETPLACE_PORT ?? process.env.PORT ?? 8787);
@@ -210,6 +211,12 @@ function mask(email) {
 for (const signal of ["SIGINT", "SIGTERM"]) {
   process.on(signal, () => {
     console.log(`\n[marketplace] ${signal} — shutting down.`);
-    server.close(() => process.exit(0));
+    // A redeploy is the most common shutdown: land any debounced counter
+    // flush before exiting, but never let a stuck flush block the stop.
+    server.close(() => {
+      const done = () => process.exit(0);
+      flushPending().then(done, done);
+      setTimeout(done, 3000).unref();
+    });
   });
 }
