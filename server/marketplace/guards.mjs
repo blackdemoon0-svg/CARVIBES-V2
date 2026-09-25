@@ -7,7 +7,7 @@
 //     size/type validation — no uploaded byte is ever trusted.
 // ============================================================
 
-import { adminConfig, CORS_ORIGINS, LIMITS, MEDIA_URL_PREFIX } from "./config.mjs";
+import { adminConfig, CORS_ORIGINS, LIMITS, MEDIA_URL_PREFIX, SITE_URL } from "./config.mjs";
 
 // ------------------------------------------------------------
 // Rate limiting — in-memory fixed window (per process). Optional Redis
@@ -79,8 +79,19 @@ export function sameSiteRequest(req) {
   if (!origin) return true; // curl / server-to-server: no ambient cookie risk
   if (CORS_ORIGINS.includes(origin)) return true;
   try {
-    const host = req.headers.host;
-    return new URL(origin).host === host;
+    // The canonical public site (MARKETPLACE_SITE_URL, default
+    // https://carvibes.dev) is our own origin: behind the Vercel → Railway
+    // proxy the browser sends Origin: https://carvibes.dev while Host is the
+    // Railway hostname, so a plain Origin/Host comparison would reject every
+    // legitimate submission. Exactly one origin is trusted, never a pattern.
+    if (origin === new URL(SITE_URL).origin) return true;
+    const originHost = new URL(origin).host;
+    if (originHost === req.headers.host) return true;
+    // The proxy reports the host the visitor actually used. A cross-site
+    // browser request cannot set this header without a CORS preflight,
+    // which applyCors() refuses for unknown origins.
+    const forwardedHost = String(req.headers["x-forwarded-host"] ?? "").split(",")[0].trim();
+    return Boolean(forwardedHost) && originHost === forwardedHost;
   } catch {
     return false;
   }

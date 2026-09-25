@@ -80,6 +80,16 @@ for (const page of pages) {
     continue;
   }
 
+  // Marketplace fallback shell (served by vercel.json for listing/facet
+  // URLs without a prerendered file): no canonical by design — the React
+  // page writes the real one after the API answers.
+  if (page.route === "/marketplace/_listing-shell") {
+    if (canonicals.length !== 0) {
+      fail(`${rel}: marketplace shell must have NO canonical, found ${canonicals.length}`);
+    }
+    continue;
+  }
+
   if (canonicals.length !== 1) {
     fail(`${rel}: expected exactly 1 canonical, found ${canonicals.length}`);
     continue;
@@ -132,6 +142,7 @@ else {
 
   for (const page of pages) {
     if (NOINDEX.has(page.route)) continue;
+    if (page.route === "/marketplace/_listing-shell") continue; // fallback shell, not a URL
     if (!inSitemap.has(page.route)) fail(`sitemap: indexable route ${page.route} is missing`);
   }
 }

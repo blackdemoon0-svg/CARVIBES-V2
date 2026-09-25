@@ -32,6 +32,8 @@ const LINK_GROUPS: {
     links: [
       { labelKey: "footer_about", to: "/#top" },
       { labelKey: "nav_contact", to: "/contact" },
+      { labelKey: "privacy_title", to: "/privacy-policy" },
+      { labelKey: "terms_title", to: "/terms" },
     ],
   },
 ];

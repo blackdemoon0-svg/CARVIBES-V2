@@ -1883,6 +1883,28 @@ async function main() {
     body: `<h1>Page not found</h1><p><a href="/">Back to CarVibes</a></p>`,
   });
 
+  // Marketplace fallback shell. Listing + facet pages are only prerendered
+  // when the marketplace store is readable at build time — it never is on
+  // Vercel (the store lives on the Railway API). vercel.json serves this
+  // shell for /marketplace/car|brand|country|condition/* URLs that have no
+  // prerendered file, so direct loads / refreshes / shared links boot the
+  // React route (which fetches the listing from the API) instead of a 404.
+  // No canonical and no listing data here: the React page writes the real
+  // canonical/robots once the API answers (pending/unknown → noindex).
+  pages.push({
+    file: path.join("marketplace", "_listing-shell.html"),
+    title: "Car listing — CarVibes MarketVibes",
+    description: "Car for sale on CarVibes MarketVibes: price, photos, specs and direct seller contact.",
+    url: `${siteUrl}/marketplace`,
+    image: DEFAULT_IMAGE,
+    type: "website",
+    noCanonical: true,
+    body:
+      `<h1>Car listing — CarVibes MarketVibes</h1>` +
+      `<p>Loading this listing…</p>` +
+      `<nav aria-label="Marketplace"><ul><li><a href="/marketplace">Browse all cars for sale</a></li></ul></nav>`,
+  });
+
   const seen = new Set();
   for (const page of pages) {
     if (seen.has(page.file)) throw new Error(`Duplicate output file: ${page.file}`);

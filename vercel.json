@@ -987,15 +987,22 @@
     },
     {
       "src": "^/marketplace/car/([^/]+)/?$",
-      "dest": "/marketplace/car/$1.html"
+      "dest": "/marketplace/car/$1.html",
+      "check": true
     },
     {
       "src": "^/marketplace/(brand|country)/([^/]+)/?$",
-      "dest": "/marketplace/$1/$2.html"
+      "dest": "/marketplace/$1/$2.html",
+      "check": true
     },
     {
       "src": "^/marketplace/condition/([^/]+)/?$",
-      "dest": "/marketplace/condition/$1.html"
+      "dest": "/marketplace/condition/$1.html",
+      "check": true
+    },
+    {
+      "src": "^/marketplace/(car|brand|country|condition)/([^/]+?)(\\.html)?/?$",
+      "dest": "/marketplace/_listing-shell.html"
     },
     {
       "src": "^/marketplace/sell/?$",

@@ -19,6 +19,7 @@ import OnboardingTour from "./components/OnboardingTour";
 import FindMyCarSection from "./components/FindMyCarSection";
 import Footer from "./components/Footer";
 import NotFound from "./components/NotFound";
+import ErrorBoundary from "./components/ErrorBoundary";
 import { BootSignal, PageLoader } from "./components/Loader";
 import CompareBar from "./components/compare/CompareBar";
 import { Stage } from "./components/Stage";
@@ -430,11 +431,13 @@ export default function App() {
       {/* Outside every Suspense boundary: retires the static boot splash
           on the very first commit, even while a lazy chunk downloads. */}
       <BootSignal />
-      {localeReady ? (
-        <RoutedApp lang={lang} onLangChange={handleLangChange} />
-      ) : (
-        <PageLoader />
-      )}
+      <ErrorBoundary>
+        {localeReady ? (
+          <RoutedApp lang={lang} onLangChange={handleLangChange} />
+        ) : (
+          <PageLoader />
+        )}
+      </ErrorBoundary>
     </BrowserRouter>
   );
 }
