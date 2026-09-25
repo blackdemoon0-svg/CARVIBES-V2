@@ -223,6 +223,9 @@ const ROUTE_META: Record<string, { title: string; description: string; robots?: 
   "/search": {
     title: "Search — CarVibes",
     description: "Search cars and stories on CarVibes.",
+    // Mirrors the prerendered noindex (scripts/prerender.mjs) so hydration
+    // never strips it — /search?q=… must stay out of the index.
+    robots: "noindex, follow",
   },
   "/brands": {
     title: "Brands — CarVibes",
