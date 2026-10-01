@@ -102,6 +102,10 @@ const MarketplaceFacetPage = lazy(() => import("./pages/marketplace/MarketplaceF
 // RoutePages pulls in nor the marketplace API client.
 const MarketCarPage = lazy(() => import("./pages/MarketCarPage"));
 
+// CarVibes Advisor has its own route chunk; the vehicle database and scoring UI
+// are downloaded only when a visitor opens /advisor.
+const AdvisorRoutePage = lazy(() => import("./pages/AdvisorPage"));
+
 export function Homepage({
   lang,
   onLangChange,
@@ -307,6 +311,17 @@ function RoutedApp({
         <Route
           path="/find-my-car"
           element={<FindMyCarPage lang={lang} onOpenCar={openCar} />}
+        />
+        <Route
+          path="/advisor"
+          element={
+            <AdvisorRoutePage
+              lang={lang}
+              onLangChange={onLangChange}
+              onCompare={() => setCompareOpen(true)}
+              onSearch={() => setSearchOpen(true)}
+            />
+          }
         />
         <Route path="/compare" element={<ComparePage lang={lang} />} />
         <Route

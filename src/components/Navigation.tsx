@@ -65,6 +65,7 @@ const CREATOR_DASHBOARD = { key: "nav_creator_dashboard", to: "/admin/marketplac
 const SECONDARY_LINKS: Destination[] = [
   { key: "nav_used_cars", to: "/used-cars" },
   { key: "nav_find", to: "/find-my-car" },
+  { key: "nav_advisor", to: "/advisor" },
   { key: "nav_favorites", to: "/favorites" },
   { key: "nav_contact", to: "/contact" },
 ];

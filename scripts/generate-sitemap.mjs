@@ -106,6 +106,7 @@ const STATIC_ROUTES = [
   { path: "/news", changefreq: "weekly", priority: "0.9", group: "stories" },
   { path: "/brands", changefreq: "weekly", priority: "0.8", group: "cars" },
   { path: "/find-my-car", changefreq: "monthly", priority: "0.7", group: "site" },
+  { path: "/advisor", changefreq: "monthly", priority: "0.8", group: "site" },
   { path: "/car-quiz", changefreq: "daily", priority: "0.9", group: "site" },
   { path: "/marketplace", changefreq: "daily", priority: "0.9", group: "marketplace" },
   // MarketCar — evergreen landing page ABOUT the marketplace (index, follow).

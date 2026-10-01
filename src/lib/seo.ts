@@ -210,6 +210,10 @@ const ROUTE_META: Record<string, { title: string; description: string; robots?: 
     title: "Find My Car — CarVibes",
     description: "Answer a few questions and match with your perfect car.",
   },
+  "/advisor": {
+    title: "CarVibes Advisor — Find Your Perfect Car",
+    description: "Tell CarVibes what you need, and discover the cars that match your budget, lifestyle and preferences.",
+  },
   "/compare": {
     title: "Compare cars — CarVibes",
     description: "Head-to-head car comparison and battle.",

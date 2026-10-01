@@ -445,6 +445,11 @@ const STATIC_PAGES = [
     description: "Answer a few questions and match with your perfect car.",
   },
   {
+    path: "/advisor",
+    title: "CarVibes Advisor — Find Your Perfect Car",
+    description: "Tell CarVibes what you need, and discover the cars that match your budget, lifestyle and preferences.",
+  },
+  {
     path: "/car-quiz",
     title: "Car Quiz – Automotive Trivia & Car Knowledge | CarVibes",
     description:
@@ -545,6 +550,7 @@ function staticBody(routePath, { cars, stories, quiz, used, marketcar }, market)
             { href: "/brands", label: "Brands" },
             { href: "/news", label: "Stories" },
             { href: "/find-my-car", label: "Find my car" },
+            { href: "/advisor", label: "CarVibes Advisor — personalized car matching" },
             { href: "/marketcar", label: "MarketCar — how the CarVibes Marketplace works" },
           ],
           "Sections"
@@ -576,6 +582,14 @@ function staticBody(routePath, { cars, stories, quiz, used, marketcar }, market)
       );
     case "/car-quiz":
       return quizBody(routePath, { cars, stories: allStories, quiz });
+    case "/advisor":
+      return (
+        `<article><h1>CarVibes Advisor</h1>` +
+        `<p>Answer a short guided questionnaire about your budget, driving needs and preferences to see a transparent 0–100 vehicle-match score, one top match and up to four alternatives.</p>` +
+        `<p>Results use real CarVibes catalogue specifications and existing used-car guide data where available. Missing facts are not guessed; prices are estimates, not live offers or guarantees.</p>` +
+        `</article>` +
+        linkList(topCars.slice(0, 12), "Browse vehicles in the CarVibes catalogue")
+      );
     case "/used-cars":
       return usedCarsBody(used);
     case "/marketplace":
@@ -1389,6 +1403,7 @@ function buildPreloadPlan(manifest) {
     "/car-quiz": forRoots([...SHELL, "src/components/quiz/QuizPage.tsx"]),
     "/used-cars": forRoots([...SHELL, "src/components/usedcars/UsedCarsPage.tsx"]),
     "/find-my-car": forRoots([...SHELL, "src/components/findmycar/FindMyCar.tsx"]),
+    "/advisor": forRoots(["src/pages/AdvisorPage.tsx"]),
     "/search": forRoots([...SHELL, "src/components/GlobalSearch.tsx"]),
     "/compare": forRoots([...SHELL, "src/components/compare/CompareModal.tsx"]),
     "/marketplace": forRoots([...SHELL, "src/pages/marketplace/MarketplacePage.tsx"]),
