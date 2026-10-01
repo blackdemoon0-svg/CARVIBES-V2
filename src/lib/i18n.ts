@@ -4,11 +4,11 @@
 // PERFORMANCE ARCHITECTURE
 // ------------------------
 // Translations used to be ONE ~350 KB module statically imported by every
-// component — so the browser paid all 10 languages (base UI + quiz) before
+// component — so the browser paid all 10 languages (base UI, quiz and Advisor) before
 // it could paint anything, and that was ~50 % of the entry bundle.
 //
 // Now the dictionaries live in `./i18n/langs/<code>.ts` (each file = the
-// base UI dict merged with the quiz dict — same merge order as the old
+// base UI, quiz and feature dictionaries merged per language — same lookup path as the old
 // central `dicts` object). Only EN is part of the entry bundle: it is the
 // fallback every lookup may need. The visitor's detected language is
 // fetched as its own hashed chunk via `ensureLocale()` (see src/App.tsx,
@@ -106,7 +106,7 @@ export function detectLang(): Lang {
 // dynamic import away; the bundler gives each pack its own hashed
 // chunk, so a visitor never downloads a language they do not speak.
 const dicts: Record<string, Dict> = {
-  // base + quiz already merged inside ./i18n/langs/en
+  // base + quiz + Advisor already merged inside ./i18n/langs/en
   en: enPack,
 };
 

@@ -209,6 +209,17 @@ async function runWorker(spec) {
   }
 
   const doc = window.document;
+  // Vite route chunks may import small route-scoped CSS files. jsdom does not
+  // fetch those stylesheets, so signal their load just as the static app CSS
+  // above is stubbed; otherwise React remains forever in Suspense fallback.
+  const appendHeadChild = doc.head.appendChild.bind(doc.head);
+  doc.head.appendChild = (node) => {
+    const result = appendHeadChild(node);
+    if (node?.tagName === "LINK" && node.rel === "stylesheet") {
+      window.setTimeout(() => node.dispatchEvent(new window.Event("load")), 0);
+    }
+    return result;
+  };
 
   // --- helpers ------------------------------------------------
   const snapshot = () => {
@@ -255,6 +266,28 @@ async function runWorker(spec) {
         brands: doc.querySelectorAll('a[href^="/brands"]').length,
         news: doc.querySelectorAll('a[href^="/news"]').length,
       },
+      advisor: {
+        question: doc.getElementById("advisor-question-title")?.textContent?.trim() ?? null,
+        optionGroups: [...doc.querySelectorAll('[role="group"][aria-label]')]
+          .map((group) => group.getAttribute("aria-label")),
+        requiredHint: doc.getElementById("advisor-required-message")?.textContent?.trim() ?? null,
+        describedButtons: [...doc.querySelectorAll("button[aria-describedby]")]
+          .map((button) => button.getAttribute("aria-describedby")),
+        progress: doc.querySelector('[role="progressbar"]')?.getAttribute("aria-valuenow") ?? null,
+        storedProgress: window.localStorage.getItem("carvibes.advisor.progress.v1"),
+        resultCardCount: doc.querySelectorAll(".advisor-result-card").length,
+        resultScores: [...doc.querySelectorAll(".advisor-result-card")]
+          .map((card) => [...card.querySelectorAll("p, span")]
+            .map((el) => (el.textContent ?? "").trim())
+            .find((text) => /^\d{1,3}%$/.test(text)))
+          .filter(Boolean)
+          .map((text) => Number(text.replace("%", ""))),
+        pressedButtons: [...(root?.querySelectorAll('button[aria-pressed="true"]') ?? [])]
+          .map((b) => (b.textContent ?? "").replace(/\s+/g, " ").trim()),
+      },
+      compareIds: window.localStorage.getItem("carvibes.compare"),
+      disabledButtons: [...(root?.querySelectorAll("button[disabled]") ?? [])]
+        .map((b) => (b.textContent ?? "").replace(/\s+/g, " ").trim()),
       buttons,
       pageErrors,
     };
@@ -288,17 +321,17 @@ async function runWorker(spec) {
   if (!entryMatch) throw new Error("no entry module script in page");
   const entryAbs = path.join(DIST, entryMatch[1].replace(/^\//, ""));
   await import(pathToFileURL(entryAbs).href);
-  await wait(1200);
+  await wait(spec.file === "advisor.html" ? 3200 : 1200);
 
   const results = [];
   const act = async (action) => {
     if (action.type === "click") {
       const href = clickSelector(action.selector);
-      await wait(900);
+      await wait(action.waitMs ?? 900);
       results.push({ action: `click ${action.selector}`, clickedHref: href, snap: snapshot() });
     } else if (action.type === "clickButton") {
       const label = clickButtonWithText(action.text);
-      await wait(900);
+      await wait(action.waitMs ?? 900);
       results.push({ action: `clickButton ${action.text}`, clicked: label, snap: snapshot() });
     } else if (action.type === "history") {
       if (action.op === "forward") window.history.forward();
@@ -417,11 +450,11 @@ async function main() {
     // not a constant — but every one of them must live under /marketplace
     // and nothing else may sneak in.
     const marketplaceLocs = sitemap.match(/<loc>https:\/\/carvibes\.dev\/marketplace/g)?.length ?? 0;
-    // 11 static pages: /, /explore, /used-cars, /news, /brands, /find-my-car,
-    // /car-quiz, /marketcar, /contact, /privacy-policy, /terms.
+    // 12 static pages: /, /explore, /used-cars, /news, /brands, /find-my-car,
+    // /advisor, /car-quiz, /marketcar, /contact, /privacy-policy, /terms.
     assert(
-      locs === 509 + storyFiles.length + 11 + marketplaceLocs,
-      `sitemap lists 509 cars + ${storyFiles.length} stories + 11 static pages + ${marketplaceLocs} marketplace URLs (${locs})`
+      locs === 509 + storyFiles.length + 12 + marketplaceLocs,
+      `sitemap lists 509 cars + ${storyFiles.length} stories + 12 static pages + ${marketplaceLocs} marketplace URLs (${locs})`
     );
     assert(
       /<loc>https:\/\/carvibes\.dev\/marketplace<\/loc>/.test(sitemap),
@@ -430,6 +463,24 @@ async function main() {
     assert(
       /<loc>https:\/\/carvibes\.dev\/marketcar<\/loc>/.test(sitemap),
       "sitemap lists MarketCar (/marketcar)"
+    );
+    assert(
+      /<loc>https:\/\/carvibes\.dev\/advisor<\/loc>/.test(sitemap),
+      "sitemap lists CarVibes Advisor (/advisor)"
+    );
+    const advisorHtml = readFileSync(path.join(DIST, "advisor.html"), "utf8");
+    assert((advisorHtml.match(/<h1>/g) ?? []).length === 1, "/advisor prerender has exactly one H1");
+    assert(
+      advisorHtml.includes("<h1>CarVibes Advisor</h1>"),
+      "/advisor prerender H1 matches the hydrated intro"
+    );
+    assert(
+      /<link rel="canonical" href="https:\/\/carvibes\.dev\/advisor"/.test(advisorHtml),
+      "/advisor prerender has a self-referencing canonical"
+    );
+    assert(
+      !/<meta name="robots" content="noindex/.test(advisorHtml),
+      "/advisor is indexable"
     );
     assert(
       !/<loc>[^<]*\/marketplace\/sell/.test(sitemap) && !/<loc>[^<]*\/admin\//.test(sitemap),
@@ -477,6 +528,38 @@ async function main() {
   };
   const bmwCar = pickCar((h) => h.includes("<h1>BMW "));
   const evCar = pickCar((h) => h.includes("<td>Electric</td>"));
+
+  const advisorResultProgress = JSON.stringify({
+    version: 1,
+    profile: {
+      budgetBand: "30000to50000",
+      currency: "USD",
+      purchaseType: "either",
+      uses: ["city", "family"],
+      annualMileage: "10000to20000",
+      fuel: "hybrid",
+      transmission: "automatic",
+      bodyType: "suv",
+      priorities: {
+        performance: 3,
+        comfort: 3,
+        fuelEconomy: 5,
+        reliability: 4,
+        luxury: 3,
+        technology: 3,
+        practicality: 5,
+        design: 3,
+        space: 4,
+        drivingExperience: 3,
+      },
+      passengers: "fivePlus",
+      fuelCostImportance: "high",
+      performanceInterest: "aLittle",
+    },
+    screen: "results",
+    step: 10,
+    started: true,
+  });
 
   const scenarios = [
     {
@@ -564,6 +647,95 @@ async function main() {
         file: carFile,
         url: `https://carvibes.dev${carRoute}`,
         storage: { "carvibes.lang": "ar" },
+        actions: [],
+      },
+    },
+    {
+      name: "J. Advisor questionnaire keeps answers when going back",
+      spec: {
+        file: "advisor.html",
+        url: "https://carvibes.dev/advisor",
+        storage: { "carvibes.lang": "en" },
+        actions: [
+          { type: "clickButton", text: "Start Advisor", waitMs: 140 },
+          { type: "clickButton", text: "Under", waitMs: 140 },
+          { type: "clickButton", text: "Continue", waitMs: 140 },
+          { type: "clickButton", text: "Used", waitMs: 140 },
+          { type: "clickButton", text: "Continue", waitMs: 140 },
+          { type: "clickButton", text: "City", waitMs: 140 },
+          { type: "clickButton", text: "Continue", waitMs: 140 },
+          { type: "clickButton", text: "Back", waitMs: 140 },
+          { type: "clickButton", text: "Continue", waitMs: 140 },
+          { type: "clickButton", text: "30,000+", waitMs: 140 },
+          { type: "clickButton", text: "Continue", waitMs: 140 },
+          { type: "clickButton", text: "Petrol", waitMs: 140 },
+          { type: "clickButton", text: "Continue", waitMs: 140 },
+          { type: "clickButton", text: "No Preference", waitMs: 140 },
+          { type: "clickButton", text: "Continue", waitMs: 140 },
+          { type: "clickButton", text: "SUV", waitMs: 140 },
+          { type: "clickButton", text: "Continue", waitMs: 140 },
+          { type: "clickButton", text: "Continue", waitMs: 140 },
+          { type: "clickButton", text: "5+", waitMs: 140 },
+          { type: "clickButton", text: "Continue", waitMs: 140 },
+          { type: "clickButton", text: "Critical", waitMs: 140 },
+          { type: "clickButton", text: "Continue", waitMs: 140 },
+          { type: "clickButton", text: "A lot", waitMs: 140 },
+          { type: "clickButton", text: "Show my matches", waitMs: 260 },
+        ],
+      },
+    },
+    {
+      name: "K. Advisor results link to the real car page (French pack)",
+      spec: {
+        file: "advisor.html",
+        url: "https://carvibes.dev/advisor",
+        storage: {
+          "carvibes.lang": "fr",
+          "carvibes.advisor.progress.v1": advisorResultProgress,
+        },
+        actions: [{ type: "click", selector: 'a[href^="/car/"]' }],
+      },
+    },
+    {
+      name: "L. Advisor reuses Compare and opens its real modal",
+      spec: {
+        file: "advisor.html",
+        url: "https://carvibes.dev/advisor",
+        storage: {
+          "carvibes.lang": "en",
+          "carvibes.advisor.progress.v1": advisorResultProgress,
+        },
+        actions: [
+          { type: "click", selector: 'button[class*="group/cmp"]' },
+          { type: "click", selector: '[data-onboarding="compare-bar"] button' },
+        ],
+      },
+    },
+    {
+      name: "O. Advisor results render in Arabic RTL",
+      spec: {
+        file: "advisor.html",
+        url: "https://carvibes.dev/advisor",
+        storage: {
+          "carvibes.lang": "ar",
+          "carvibes.advisor.progress.v1": advisorResultProgress,
+        },
+        actions: [],
+      },
+    },
+    {
+      name: "M. Find My Car still loads directly",
+      spec: {
+        file: "find-my-car.html",
+        url: "https://carvibes.dev/find-my-car",
+        actions: [],
+      },
+    },
+    {
+      name: "N. Compare still loads directly",
+      spec: {
+        file: "compare.html",
+        url: "https://carvibes.dev/compare",
         actions: [],
       },
     },
@@ -797,6 +969,112 @@ async function main() {
         "I: CLOSE button is translated (Arabic)"
       );
     } else fail("I: missing scenario result");
+
+    // J — guided questionnaire, required answers, back navigation and persistence.
+    const jAdvisor = results["J. Advisor questionnaire keeps answers when going back"];
+    if (jAdvisor) {
+      const s = jAdvisor.initial;
+      assert(s.h1.length === 1 && s.h1[0] === "CarVibes Advisor", "J: /advisor intro has one branded H1");
+      assert(s.canonicals[0] === "https://carvibes.dev/advisor" && s.robots === null, "J: /advisor canonical and indexable metadata");
+      assert(jAdvisor.results[0]?.snap.advisor.question === "What is your maximum budget?", "J: Start opens the budget question");
+      assert(
+        jAdvisor.results[0]?.snap.disabledButtons.some((text) => text.includes("Continue")) &&
+          jAdvisor.results[0]?.snap.advisor.requiredHint === "Choose an answer above to continue." &&
+          jAdvisor.results[0]?.snap.advisor.describedButtons.includes("advisor-required-message") &&
+          jAdvisor.results[0]?.snap.advisor.optionGroups.includes("What is your maximum budget?") &&
+          jAdvisor.results[2]?.snap.advisor.question === "What are you looking for?",
+        "J: budget is required with a translated hint and labeled answer group"
+      );
+      assert(
+        jAdvisor.results[5]?.snap.advisor.optionGroups.includes("How will you mainly use your car?"),
+        "J: multi-select usage options are grouped and labeled for assistive technology"
+      );
+      const back = jAdvisor.results[7]?.snap;
+      let saved = null;
+      try { saved = JSON.parse(back?.advisor.storedProgress ?? "null"); } catch {}
+      assert(back?.advisor.question === "How will you mainly use your car?", "J: Back returns to the previous question");
+      assert(back?.advisor.pressedButtons.some((text) => text.startsWith("City")), "J: selected use remains selected after going back");
+      assert(
+        saved?.screen === "questions" && saved.step === 2 &&
+          saved.profile.budgetBand === "under5000" &&
+          saved.profile.purchaseType === "used" &&
+          saved.profile.uses.includes("city"),
+        "J: answers and progress persist in local storage"
+      );
+      assert(!back?.pageErrors.length, "J: questionnaire completes its edit/back flow without JS errors");
+      const completed = jAdvisor.results.at(-1)?.snap;
+      let completedProfile = null;
+      try { completedProfile = JSON.parse(completed?.advisor.storedProgress ?? "null"); } catch {}
+      assert(
+        completed?.h1[0] === "Your CarVibes Match" && completed.advisor.resultCardCount > 0,
+        "J: completing all 11 questions renders ranked vehicle matches"
+      );
+      assert(
+        completed?.advisor.resultScores.length > 0 &&
+          completed.advisor.resultScores.every((score) => score >= 0 && score <= 100),
+        "J: each visible match score is normalized from 0 to 100"
+      );
+      assert(
+        completedProfile?.screen === "results" &&
+          completedProfile?.profile?.annualMileage === "30000plus" &&
+          completedProfile?.profile?.fuel === "petrol" &&
+          completedProfile?.profile?.bodyType === "suv",
+        "J: completed questionnaire answers are saved with the results"
+      );
+    } else fail("J: missing scenario result");
+
+    // K — a localized Advisor result links to the real /car/:id page.
+    const kAdvisor = results["K. Advisor results link to the real car page (French pack)"];
+    if (kAdvisor) {
+      assert(kAdvisor.initial.htmlLang === "fr", "K: French language pack is applied on /advisor");
+      assert(kAdvisor.initial.h1.length === 1 && kAdvisor.initial.h1[0] === "Votre match CarVibes", "K: Advisor results are translated in French");
+      assert(kAdvisor.initial.links.car > 0, "K: Advisor renders crawlable links to catalogue cars");
+      const openedCar = kAdvisor.results[0];
+      assert(openedCar?.clickedHref?.startsWith("/car/"), `K: selected result links to a real car route (${openedCar?.clickedHref})`);
+      assert(openedCar?.snap.pathname === openedCar?.clickedHref && openedCar?.snap.h1.length === 1, "K: clicking a result opens the dedicated car page");
+      noHome(openedCar.snap, "K");
+      assert(!openedCar?.snap.pageErrors.length, "K: opening a match causes no JS errors");
+    } else fail("K: missing scenario result");
+
+    // L — Advisor's existing CompareButton / CompareBar / modal are reused.
+    const lAdvisor = results["L. Advisor reuses Compare and opens its real modal"];
+    if (lAdvisor) {
+      assert(lAdvisor.initial.h1[0] === "Your CarVibes Match", "L: seeded profile opens the results screen");
+      const added = lAdvisor.results[0]?.snap;
+      let compareIds = [];
+      try { compareIds = JSON.parse(added?.compareIds ?? "[]"); } catch {}
+      assert(compareIds.length === 1, "L: CompareButton saves a match to the existing comparison list");
+      assert(added?.dialogCount === 0, "L: adding a car exposes the CompareBar before opening Compare");
+      assert(lAdvisor.results[1]?.snap.dialogCount > 0, "L: CompareBar opens the existing comparison modal");
+      assert(!lAdvisor.results[1]?.snap.pageErrors.length, "L: Compare integration causes no JS errors");
+    } else fail("L: missing scenario result");
+
+    // O — the localized Advisor results preserve the app's Arabic RTL behavior.
+    const oAdvisor = results["O. Advisor results render in Arabic RTL"];
+    if (oAdvisor) {
+      assert(oAdvisor.initial.htmlLang === "ar" && oAdvisor.initial.dir === "rtl", "O: Arabic Advisor sets lang=ar and dir=rtl");
+      assert(oAdvisor.initial.h1.length === 1 && oAdvisor.initial.h1[0] === "نتيجتك من CarVibes", "O: Arabic Advisor title is localized");
+      assert(
+        oAdvisor.initial.advisor.resultCardCount === 5 &&
+          oAdvisor.initial.advisor.resultScores.length === 5 &&
+          oAdvisor.initial.advisor.resultScores.every((score) => score >= 0 && score <= 100),
+        "O: Arabic results render five real matches with normalized scores"
+      );
+      assert(!oAdvisor.initial.pageErrors.length, "O: Arabic Advisor results hydrate without JS errors");
+    } else fail("O: missing scenario result");
+
+    // M / N — the existing finder and comparison routes still mount directly.
+    const mFinder = results["M. Find My Car still loads directly"];
+    if (mFinder) {
+      assert(mFinder.initial.pathname === "/find-my-car" && mFinder.initial.h1.length === 1, "M: Find My Car route still renders its own page");
+      assert(!mFinder.initial.pageErrors.length, "M: Find My Car has no JS errors");
+    } else fail("M: missing scenario result");
+    const nCompare = results["N. Compare still loads directly"];
+    if (nCompare) {
+      assert(nCompare.initial.pathname === "/compare", "N: Compare route still loads directly");
+      assert(nCompare.initial.dialogCount > 0, "N: direct Compare route renders the existing comparison modal");
+      assert(!nCompare.initial.pageErrors.length, "N: Compare route has no JS errors");
+    } else fail("N: missing scenario result");
 
     // ------------------------------------------------------------------
     // [4] DOM weight comparison
