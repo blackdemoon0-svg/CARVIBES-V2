@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#04060c">
+<title>CarVibes Advisor — CarVibes V2 Design Preview</title>
+<link rel="icon" href="assets/img/car-ev.jpg">
+<link rel="preload" href="assets/fonts/archivo-latin-wght.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/css/carvibes.css">
+<style>
+  .cv-adv-hero { position: relative; padding: clamp(40px, 6vw, 86px) 0 clamp(20px, 3vw, 40px); }
+  .cv-adv-hero__grid { display: grid; grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr); gap: clamp(26px, 4vw, 64px); align-items: start; }
+  .cv-signal { display: grid; gap: 14px; }
+  .cv-signal__row { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 13px 16px; border-radius: 14px; border: 1px solid var(--line); background: rgba(255,255,255,.025); font-size: .86rem; color: var(--mist); }
+  .cv-signal__row b { color: var(--cyan); font-family: var(--font-display); }
+  .cv-matchcard { position: relative; }
+  .cv-matchcard__score { position: absolute; inset-inline-end: 14px; top: 14px; z-index: 3; }
+  @media (max-width: 1024px) { .cv-adv-hero__grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body data-page="advisor">
+
+<main class="cv-shell" id="main">
+
+  <!-- ======================================================= HERO -->
+  <section class="cv-adv-hero">
+    <div class="cv-container">
+      <div class="cv-adv-hero__grid">
+
+        <div>
+          <span class="cv-advisor__badge cv-tag cv-tag--cyan" data-reveal>
+            <span class="cv-dot"></span><span data-t="advisor_live"></span>
+          </span>
+          <h1 class="display-xl" data-reveal style="--d:60ms;margin-top:20px;font-size:clamp(2.4rem,5.4vw,4.6rem)">
+            <span data-t="advisor_eyebrow"></span>
+          </h1>
+          <p class="lede cv-mt-s" data-reveal style="--d:110ms" data-t="advisor_title"></p>
+          <p class="lede cv-mt-s dim" data-reveal style="--d:150ms" data-t="advisor_sub"></p>
+
+          <div class="cv-row cv-wrap cv-mt-l" data-reveal style="--d:190ms">
+            <a class="cv-btn cv-btn--primary cv-btn--lg" href="#console"><span data-t="advisor_cta"></span></a>
+            <a class="cv-btn cv-btn--ghost cv-btn--lg" href="compare.html"><span data-t="nav_compare"></span></a>
+          </div>
+
+          <div class="cv-row cv-wrap cv-mt-l" data-reveal style="--d:230ms;--gap:22px">
+            <span class="cv-chip"><span class="cv-dot"></span>509 cars scored</span>
+            <span class="cv-chip">Encyclopedic weighting</span>
+            <span class="cv-chip">Explains every match</span>
+          </div>
+        </div>
+
+        <!-- Signals panel: what the Advisor actually weighs -->
+        <div class="cv-panel cv-panel--glow cv-signal cv-panel__pad" data-reveal style="--d:140ms">
+          <div class="cv-row cv-between cv-wrap">
+            <span class="mono-label">Profile signals</span>
+            <span class="cv-tag cv-tag--cyan"><span class="cv-dot"></span>Live</span>
+          </div>
+          <div class="cv-signal cv-mt-s">
+            <div class="cv-signal__row"><span data-t="advisor_q1"></span><b data-t="advisor_choice_daily"></b></div>
+            <div class="cv-signal__row"><span data-t="advisor_q2"></span><b data-t="advisor_choice_b2"></b></div>
+            <div class="cv-signal__row"><span data-t="advisor_q3"></span><b data-t="advisor_choice_f1"></b></div>
+            <div class="cv-signal__row"><span data-t="detail_weight"></span><b>Preference: lighter</b></div>
+            <div class="cv-signal__row"><span data-t="detail_perf"></span><b>Priority: high</b></div>
+          </div>
+          <div class="cv-progress cv-mt-m">
+            <span class="mono-label">Engine</span>
+            <span class="cv-progress__rail"><span class="cv-progress__fill" style="width:100%"></span></span>
+          </div>
+          <p class="dim cv-mt-s" style="font-size:.8rem">Weighted against the full CarVibes database — performance, running costs, practicality and comfort.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================== LIVE CONSOLE -->
+  <section class="cv-section cv-section--tight" id="console">
+    <div class="cv-container">
+      <div class="section-head" data-reveal>
+        <span class="eyebrow" data-t="advisor_eyebrow"></span>
+        <h2 class="display-lg" data-t="find_title"></h2>
+        <p class="lede">Tell us what you need. We'll help you find the right car — click through the assistant below.</p>
+      </div>
+
+      <div style="max-width:820px">
+        <div id="cvAdvisorConsoleBig"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================== MATCHES -->
+  <section class="cv-section cv-section--tight">
+    <div class="cv-container">
+      <div class="section-head" data-reveal>
+        <div class="section-head__top">
+          <div>
+            <span class="eyebrow" data-t="advisor_matches"></span>
+            <h2 class="display-md">Ranked, explained, comparable</h2>
+          </div>
+          <span class="cv-note">Preview: 8 of 509 cars</span>
+        </div>
+      </div>
+      <div class="cv-grid cv-grid--3 cv-matchcard" id="advisorCars"></div>
+    </div>
+  </section>
+
+</main>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/main.js"></script>
+</body>
+</html>

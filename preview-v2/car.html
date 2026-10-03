@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#04060c">
+<title>Car page — CarVibes V2 Design Preview</title>
+<link rel="icon" href="assets/img/car-m3.jpg">
+<link rel="preload" href="assets/fonts/archivo-latin-wght.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/css/carvibes.css">
+<!-- Page styles come from assets/css/carvibes.css (shared .cv-detail__split,
+     .cv-procon and .cv-table components) — no page-local CSS needed. -->
+</head>
+<body data-page="car">
+
+<main class="cv-shell" id="main">
+
+  <section class="cv-section" style="padding-top:clamp(24px,3vw,44px)">
+    <div class="cv-container">
+
+      <nav class="cv-row cv-wrap dim" aria-label="Breadcrumb" style="--gap:8px;font-size:.82rem">
+        <a href="index.html" style="color:var(--mist)">Home</a>
+        <span aria-hidden="true">/</span>
+        <span id="dcrumb">BMW / Coupe / 2025</span>
+      </nav>
+
+      <!-- ================================================ HERO IMAGE -->
+      <div class="cv-detail__hero cv-mt-m">
+        <img id="dimage" src="assets/img/detail-hero.jpg" width="1584" height="672"
+             fetchpriority="high" decoding="async" alt="Car photo">
+        <div class="cv-detail__caption">
+          <div>
+            <span class="eyebrow" id="dbrand">BMW</span>
+            <h1 class="display-lg cv-detail__title" id="dmodel">M4 Competition</h1>
+            <p class="muted cv-mt-s" id="dtagline" style="max-width:46ch"></p>
+          </div>
+          <div>
+            <div class="cv-detail__price" id="dprice">$89,900</div>
+            <div class="mono-label" id="dfinance" style="margin-top:8px"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cv-detail__split cv-mt-m">
+        <div class="cv-thumbs" id="dthumbs" aria-label="Gallery"></div>
+        <div class="cv-row cv-wrap cv-between" id="dactions" style="--gap:10px;justify-content:flex-end"></div>
+      </div>
+
+      <!-- ================================================= PERFORMANCE -->
+      <div class="section-head cv-mt-l" data-reveal>
+        <span class="eyebrow" data-t="detail_perf"></span>
+        <h2 class="display-md" data-t="detail_specs"></h2>
+      </div>
+      <div class="cv-spec-grid" id="dspecs"></div>
+
+      <!-- ===================================================== WHY THIS -->
+      <div class="section-head cv-mt-l" data-reveal>
+        <span class="eyebrow">Advisor</span>
+        <h2 class="display-md" data-t="detail_why"></h2>
+      </div>
+      <div class="cv-why" id="dwhy"></div>
+
+      <!-- ================================================ RATINGS + TEXT -->
+      <div class="cv-detail__split cv-mt-l">
+        <div class="cv-panel cv-panel--glow" data-reveal>
+          <div class="cv-panel__pad">
+            <span class="mono-label">CarVibes score</span>
+            <div class="cv-bars cv-mt-m" id="dbars"></div>
+            <hr class="cv-rule cv-mt-l">
+            <p class="lede cv-mt-m" id="doverview"></p>
+          </div>
+        </div>
+
+        <div class="cv-stack" style="--gap:22px">
+          <div class="cv-panel" data-reveal>
+            <div class="cv-panel__pad" style="padding:clamp(18px,2.2vw,26px)">
+              <span class="mono-label" data-t="detail_engine"></span>
+              <div class="cv-spec__value" id="dengineText" style="font-size:1.25rem;margin-top:10px">3.0L</div>
+              <div class="cv-table cv-mt-m">
+                <div class="cv-table__row"><span data-t="detail_trans"></span><span>Automatic</span></div>
+                <div class="cv-table__row"><span data-t="detail_fuel"></span><span>Petrol</span></div>
+                <div class="cv-table__row"><span data-t="detail_drive"></span><span>AWD</span></div>
+                <div class="cv-table__row" style="border-bottom:0"><span data-t="detail_weight"></span><span>1,745 kg</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="cv-procon">
+            <div class="cv-panel" data-reveal><div class="cv-panel__pad" style="padding:20px">
+              <span class="mono-label" data-t="detail_pros"></span>
+              <ul class="cv-mt-s ok" id="dpros" style="margin-top:14px"></ul>
+            </div></div>
+            <div class="cv-panel" data-reveal style="--d:70ms"><div class="cv-panel__pad" style="padding:20px">
+              <span class="mono-label" data-t="detail_cons"></span>
+              <ul class="cv-mt-s no" id="dcons" style="margin-top:14px"></ul>
+            </div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================================================== SIMILAR CARS -->
+      <div class="section-head cv-mt-l" data-reveal>
+        <div class="section-head__top">
+          <div>
+            <span class="eyebrow" data-t="explore_eyebrow"></span>
+            <h2 class="display-md" data-t="detail_similar"></h2>
+          </div>
+          <a class="cv-link" href="explore.html"><span data-t="cta_browse"></span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+          </a>
+        </div>
+      </div>
+      <div class="cv-grid cv-grid--3" id="dsimilar"></div>
+
+    </div>
+  </section>
+
+</main>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/main.js"></script>
+</body>
+</html>

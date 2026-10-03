@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#04060c">
+<title>Compare — CarVibes V2 Design Preview</title>
+<link rel="icon" href="assets/img/car-amg.jpg">
+<link rel="preload" href="assets/fonts/archivo-latin-wght.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/css/carvibes.css">
+<style>
+  .cv-cmp-hero { padding: clamp(40px, 6vw, 84px) 0 clamp(16px, 2vw, 30px); }
+  .cv-picker { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+  .cv-picker__slot {
+    position: relative;
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px;
+    border-radius: var(--r);
+    border: 1px dashed var(--line-strong);
+    background: rgba(255,255,255,.02);
+    transition: all var(--t) var(--ease);
+  }
+  .cv-picker__slot:hover { border-color: rgba(34,211,238,.5); background: rgba(34,211,238,.05); }
+  .cv-picker__slot img { width: 68px; height: 48px; object-fit: cover; border-radius: 9px; }
+  .cv-picker__slot b { font-family: var(--font-display); font-size: .96rem; color: #fff; letter-spacing: -.02em; display: block; }
+  .cv-picker__slot span { font-size: .76rem; color: var(--fog); }
+  .cv-picker--empty { justify-content: center; color: var(--fog); min-height: 78px; }
+  @media (max-width: 860px) { .cv-picker { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body data-page="compare">
+
+<main class="cv-shell" id="main">
+
+  <section class="cv-cmp-hero">
+    <div class="cv-container">
+      <span class="eyebrow" data-reveal data-t="compare_eyebrow"></span>
+      <h1 class="display-xl" data-reveal style="--d:60ms;margin-top:18px;font-size:clamp(2.4rem,5.6vw,4.8rem)">
+        <span data-t="compare_title"></span>
+      </h1>
+      <p class="lede cv-mt-s" data-reveal style="--d:110ms" data-t="compare_sub"></p>
+      <div class="cv-row cv-wrap cv-mt-l" data-reveal style="--d:160ms">
+        <button class="cv-btn cv-btn--primary cv-btn--lg" type="button" id="cvOpenSearch2">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+          Add a car
+        </button>
+        <a class="cv-btn cv-btn--ghost cv-btn--lg" href="index.html#cars">Browse the garage</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================= SELECTION SLOTS -->
+  <section class="cv-section cv-section--tight">
+    <div class="cv-container">
+      <span class="mono-label">Your selection</span>
+      <div class="cv-picker cv-mt-s" data-reveal>
+        <div class="cv-picker__slot">
+          <img src="assets/img/hero-car.jpg" alt="" width="68" height="48">
+          <span><b>BMW M4 Competition</b><span>$89,900 · 503 HP</span></span>
+        </div>
+        <div class="cv-picker__slot">
+          <img src="assets/img/car-wagon.jpg" alt="" width="68" height="48">
+          <span><b>Audi RS6 Avant Performance</b><span>$126,600 · 621 HP</span></span>
+        </div>
+        <div class="cv-picker__slot cv-picker--empty">
+          <span>+ Add a third car</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================== FULL COMPARE -->
+  <section class="cv-section cv-section--tight">
+    <div class="cv-container">
+      <div id="compareFull"></div>
+    </div>
+  </section>
+
+  <!-- ============================================ DECISION EXPLAINER -->
+  <section class="cv-section">
+    <div class="cv-container">
+      <div class="section-head" data-reveal>
+        <span class="eyebrow">Decision support</span>
+        <h2 class="display-md">The differences, in three seconds</h2>
+        <p class="lede">Every metric is normalised against the stronger car, the winner is lit in cyan, and the trade-off is written underneath — so a comparison ends with a decision, not a spreadsheet.</p>
+      </div>
+
+      <div class="cv-grid cv-grid--3">
+        <div class="cv-why__card" data-reveal>
+          <i><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M13 3 5 13h5l-1 8 8-10h-5Z"/></svg></i>
+          <h4>Power vs usability</h4>
+          <p>The RS6 wins on power and luggage space; the M4 wins on weight, agility and price per horsepower.</p>
+        </div>
+        <div class="cv-why__card" data-reveal style="--d:70ms">
+          <i><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18a8 8 0 1 1 16 0"/><path d="M12 14 15.5 9"/></svg></i>
+          <h4>Running costs</h4>
+          <p>Both are thirsty V8s — the electric alternative in the same bracket costs a fraction per kilometre.</p>
+        </div>
+        <div class="cv-why__card" data-reveal style="--d:140ms">
+          <i><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v16"/><path d="M5 8h14"/><path d="m5 8-3 6h6Z"/><path d="m19 8-3 6h6Z"/></svg></i>
+          <h4>Verdict</h4>
+          <p>Weekend driver: M4 Competition. One car for everything: RS6 Avant Performance.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/main.js"></script>
+<script>
+  /* Wire the secondary "Add a car" CTA to the global search overlay. */
+  document.getElementById("cvOpenSearch2").addEventListener("click", function () {
+    var s = document.getElementById("cvSearch");
+    if (s) s.click();
+  });
+</script>
+</body>
+</html>

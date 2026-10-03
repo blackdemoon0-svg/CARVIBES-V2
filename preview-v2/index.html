@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- ISOLATED DESIGN PREVIEW — standalone file, noindex, never part of the app build -->
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#04060c">
+<title>CarVibes V2 — Design Preview</title>
+<link rel="icon" href="assets/img/car-m3.jpg">
+<link rel="preload" href="assets/fonts/archivo-latin-wght.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/inter-latin-wght.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/css/carvibes.css">
+</head>
+<body data-page="home">
+
+<main class="cv-shell" id="main">
+
+  <!-- ============================================================ HERO -->
+  <section class="cv-hero" id="top">
+    <div class="cv-container cv-hero__grid">
+
+      <div class="cv-hero__copy">
+        <span class="eyebrow" data-reveal data-t="hero_kicker"></span>
+
+        <h1 class="display-xl cv-hero__title" data-reveal style="--d:60ms">
+          <span data-t="hero_t1"></span>
+          <span class="gradient-text" data-t="hero_t2"></span>
+        </h1>
+
+        <p class="lede cv-hero__sub" data-reveal style="--d:120ms" data-t="hero_sub"></p>
+
+        <div class="cv-hero__cta" data-reveal style="--d:180ms">
+          <a class="cv-btn cv-btn--primary cv-btn--lg" href="#find">
+            <span data-t="cta_find"></span>
+          </a>
+          <a class="cv-btn cv-btn--ghost cv-btn--lg" href="compare.html">
+            <span data-t="cta_compare"></span>
+          </a>
+        </div>
+
+        <div class="cv-hero__stats" data-reveal style="--d:240ms">
+          <div><div class="cv-stat__value">509</div><div class="cv-stat__label" data-t="stat_cars"></div></div>
+          <div><div class="cv-stat__value">66</div><div class="cv-stat__label" data-t="stat_brands"></div></div>
+          <div><div class="cv-stat__value">25</div><div class="cv-stat__label" data-t="stat_stories"></div></div>
+        </div>
+      </div>
+
+      <div class="cv-hero__visual">
+        <div class="cv-hero__stage" data-parallax>
+          <span class="cv-hero__pool"></span>
+          <div class="cv-hero__img">
+            <img src="assets/img/hero-car.jpg" width="1376" height="768" fetchpriority="high" decoding="async"
+                 alt="Dark blue performance coupe under cyan light on a wet night road">
+          </div>
+          <div class="cv-hero__float cv-hero__float--a">
+            <span class="mono-label" data-t="hero_float_a"></span><b>3.5 s</b>
+          </div>
+          <div class="cv-hero__float cv-hero__float--b">
+            <span class="mono-label" data-t="hero_float_b"></span><b>503 HP</b>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="cv-scroll-cue" aria-hidden="true">
+      <span class="cv-scroll-cue__rail"></span><span data-t="scroll"></span>
+    </div>
+  </section>
+
+  <!-- ========================================================= BRANDS -->
+  <section class="cv-section cv-section--tight" aria-label="Brands">
+    <div class="cv-container">
+      <div class="cv-brands" data-reveal>
+        <div class="cv-brands__track">
+          <span>BMW</span><span>Mercedes-AMG</span><span>Porsche</span><span>Audi</span><span>Ferrari</span><span>Lamborghini</span>
+          <span>Toyota</span><span>Nissan</span><span>Tesla</span><span>Aston Martin</span><span>McLaren</span><span>Bentley</span>
+          <span>BMW</span><span>Mercedes-AMG</span><span>Porsche</span><span>Audi</span><span>Ferrari</span><span>Lamborghini</span>
+          <span>Toyota</span><span>Nissan</span><span>Tesla</span><span>Aston Martin</span><span>McLaren</span><span>Bentley</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================================================== FIND YOUR CAR -->
+  <section class="cv-section cv-find" id="find">
+    <div class="cv-container">
+      <div class="cv-find__panel" data-reveal>
+        <div class="section-head">
+          <span class="eyebrow" data-t="find_eyebrow"></span>
+          <h2 class="display-lg gradient-text" data-t="find_title" style="max-width:24ch"></h2>
+          <p class="lede" data-t="find_sub"></p>
+        </div>
+
+        <form class="cv-find__search" role="search" onsubmit="return false">
+          <span class="cyan-text" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg></span>
+          <input type="search" data-t-ph="find_placeholder" aria-label="Search cars">
+          <button class="cv-btn cv-btn--primary" type="submit" id="findSubmit"><span data-t="find_search"></span></button>
+        </form>
+
+        <div class="cv-scroll-x cv-mt-m">
+          <button class="cv-chip is-active" type="button" data-t="filter_all"></button>
+          <button class="cv-chip" type="button" data-t="filter_sports"></button>
+          <button class="cv-chip" type="button" data-t="filter_electric"></button>
+          <button class="cv-chip" type="button" data-t="filter_suv"></button>
+          <button class="cv-chip" type="button" data-t="filter_jdm"></button>
+          <span class="cv-chip" style="border-style:dashed" data-t="nav_explore"></span>
+        </div>
+
+        <div class="cv-steps cv-mt-l">
+          <div class="cv-step" data-reveal><span class="cv-step__n">01</span>
+            <h4 data-t="step1_t"></h4><p data-t="step1_p"></p></div>
+          <div class="cv-step" data-reveal style="--d:80ms"><span class="cv-step__n">02</span>
+            <h4 data-t="step2_t"></h4><p data-t="step2_p"></p></div>
+          <div class="cv-step" data-reveal style="--d:160ms"><span class="cv-step__n">03</span>
+            <h4 data-t="step3_t"></h4><p data-t="step3_p"></p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================================================== CAR SECTION -->
+  <section class="cv-section" id="cars">
+    <div class="cv-container">
+      <div class="section-head" data-reveal>
+        <div class="section-head__top">
+          <div>
+            <span class="eyebrow" data-t="cars_eyebrow"></span>
+            <h2 class="display-lg" data-t="cars_title"></h2>
+          </div>
+          <a class="cv-link" href="explore.html"><span data-t="cta_browse"></span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+          </a>
+        </div>
+        <p class="lede" data-t="cars_sub"></p>
+      </div>
+
+      <div class="cv-scroll-x cv-mt-m" id="carFilters" role="tablist" aria-label="Categories"></div>
+
+      <div class="cv-grid cv-grid--3 cv-mt-m" id="homeCards"></div>
+    </div>
+  </section>
+
+  <!-- ======================================================== ADVISOR -->
+  <section class="cv-section cv-advisor" id="advisor">
+    <span class="cv-advisor__glow" aria-hidden="true"></span>
+    <div class="cv-container cv-advisor__grid">
+
+      <div class="cv-advisor__copy">
+        <span class="cv-advisor__badge cv-tag cv-tag--cyan" data-reveal>
+          <span class="cv-dot"></span><span data-t="advisor_eyebrow"></span>
+        </span>
+        <h2 class="display-lg gradient-text" data-t="advisor_title" style="margin-top:18px"></h2>
+        <p class="lede cv-mt-s" data-t="advisor_sub"></p>
+
+        <div class="cv-advisor__points">
+          <div class="cv-advisor__point" data-reveal>
+            <i aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16"/><path d="M7 12h10"/><path d="M10 18h4"/></svg></i>
+            <div><b data-t="advisor_p1_t"></b><p data-t="advisor_p1_p"></p></div>
+          </div>
+          <div class="cv-advisor__point" data-reveal style="--d:70ms">
+            <i aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M10 3v3M14 3v3M10 18v3M14 18v3M3 10h3M3 14h3M18 10h3M18 14h3"/></svg></i>
+            <div><b data-t="advisor_p2_t"></b><p data-t="advisor_p2_p"></p></div>
+          </div>
+          <div class="cv-advisor__point" data-reveal style="--d:140ms">
+            <i aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M13 3 5 13h5l-1 8 8-10h-5Z"/></svg></i>
+            <div><b data-t="advisor_p3_t"></b><p data-t="advisor_p3_p"></p></div>
+          </div>
+        </div>
+
+        <div class="cv-row cv-wrap cv-mt-l" data-reveal>
+          <a class="cv-btn cv-btn--primary cv-btn--lg" href="advisor.html"><span data-t="advisor_cta"></span></a>
+        </div>
+      </div>
+
+      <div data-reveal style="--d:120ms">
+        <!-- Live, clickable assistant demo (same wording/logic as the product Advisor) -->
+        <div id="cvAdvisorConsole"></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ======================================================== COMPARE -->
+  <section class="cv-section" id="compare">
+    <div class="cv-container">
+      <div class="section-head" data-reveal>
+        <div class="section-head__top">
+          <div>
+            <span class="eyebrow" data-t="compare_eyebrow"></span>
+            <h2 class="display-lg" data-t="compare_title"></h2>
+          </div>
+          <a class="cv-link" href="compare.html"><span data-t="compare_cta"></span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+          </a>
+        </div>
+        <p class="lede" data-t="compare_sub"></p>
+      </div>
+
+      <div id="compareDemo" class="cv-mt-m"></div>
+    </div>
+  </section>
+
+  <hr class="cv-rule">
+
+  <!-- ======================================================== EXPLORE -->
+  <section class="cv-section" id="explore">
+    <div class="cv-container">
+      <div class="section-head" data-reveal>
+        <span class="eyebrow" data-t="explore_eyebrow"></span>
+        <h2 class="display-lg" data-t="explore_title"></h2>
+        <p class="lede" data-t="explore_sub"></p>
+      </div>
+      <div id="exploreMosaic"></div>
+    </div>
+  </section>
+
+  <!-- ======================================================== STORIES -->
+  <section class="cv-section" id="stories">
+    <div class="cv-container">
+      <div class="section-head" data-reveal>
+        <div class="section-head__top">
+          <div>
+            <span class="eyebrow" data-t="stories_eyebrow"></span>
+            <h2 class="display-lg" data-t="stories_title"></h2>
+          </div>
+        </div>
+      </div>
+      <div class="cv-grid cv-grid--3" id="homeStories"></div>
+    </div>
+  </section>
+
+  <!-- ====================================================== FAVORITES -->
+  <section class="cv-section" id="favorites">
+    <div class="cv-container">
+      <div class="section-head" data-reveal>
+        <span class="eyebrow" data-t="favs_eyebrow"></span>
+        <h2 class="display-lg" data-t="favs_title"></h2>
+      </div>
+
+      <p class="cv-note" id="cvFavsEmpty" data-t="favs_empty"></p>
+
+      <div id="cvFavs"></div>
+    </div>
+  </section>
+
+</main>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/main.js"></script>
+</body>
+</html>
