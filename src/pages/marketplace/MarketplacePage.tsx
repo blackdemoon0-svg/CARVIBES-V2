@@ -25,6 +25,7 @@ import { breadcrumbJsonLd, itemListJsonLd, useMarketplaceMeta } from "../../lib/
 import ListingCardView from "../../components/marketplace/ListingCard";
 import MarketplaceHero from "../../components/marketplace/MarketplaceHero";
 import LaunchBanner from "../../components/marketplace/LaunchBanner";
+import AnalyzePromoBanner from "../../features/analyze/promo/AnalyzePromoBanner";
 import { BrandDirectory, FacetLinks, LatestListingsLinks } from "../../components/marketplace/InternalLinks";
 import { FilterControls, MarketplaceSearch, MobileFilterDrawer, SortSelect } from "../../components/marketplace/MarketplaceFilters";
 import Pagination from "../../components/marketplace/Pagination";
@@ -281,6 +282,13 @@ export default function MarketplacePage({ lang, facet = null }: { lang: Lang; fa
       {!facet && (
         <div className="mx-auto max-w-6xl px-4 pt-7 sm:px-6 sm:pt-9">
           <LaunchBanner lang={lang} listingCount={total} />
+        </div>
+      )}
+
+      {/* Found a listing? → CarVibes Analyse (landing page only) */}
+      {!facet && (
+        <div className="mx-auto max-w-6xl px-4 pt-5 sm:px-6">
+          <AnalyzePromoBanner lang={lang} variant="marketplace" />
         </div>
       )}
 

@@ -1,0 +1,317 @@
+/* ============================================================
+   CARVIBES ANALYSE — premium dark glass styling
+   Apple × Porsche × BMW: deep ink, subtle glass, cyan accent,
+   fluid motion. Mobile-first; everything collapses to one column.
+   ============================================================ */
+
+.az-shell {
+  position: relative;
+  overflow: hidden;
+}
+
+.az-shell::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 60rem 26rem at 50% -8rem, rgba(36, 200, 243, 0.1), transparent 70%),
+    radial-gradient(ellipse 40rem 24rem at 100% 40%, rgba(96, 67, 164, 0.08), transparent 70%);
+}
+
+.az-glass {
+  background: linear-gradient(180deg, rgba(18, 29, 45, 0.72), rgba(11, 19, 32, 0.78));
+  border: 1px solid rgba(38, 51, 73, 0.9);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 24px 60px -32px rgba(0, 0, 0, 0.7);
+}
+
+.az-input {
+  width: 100%;
+  background: rgba(5, 7, 12, 0.65);
+  border: 1px solid #263349;
+  color: #f5f5f5;
+  border-radius: 0.65rem;
+  padding: 0.7rem 0.9rem;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.az-input::placeholder {
+  color: #5a6a84;
+}
+
+.az-input:focus {
+  border-color: rgba(36, 200, 243, 0.65);
+  box-shadow: 0 0 0 3px rgba(36, 200, 243, 0.14);
+  background: rgba(5, 7, 12, 0.9);
+}
+
+select.az-input option {
+  background: #0b1320;
+  color: #f5f5f5;
+}
+
+.az-label {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #7d8ba2;
+  margin-bottom: 0.45rem;
+}
+
+.az-opt {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: #5a6a84;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+.az-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: 1px solid #263349;
+  background: rgba(18, 29, 45, 0.6);
+  color: #bbc7d8;
+  border-radius: 999px;
+  padding: 0.35rem 0.8rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.az-chip:hover {
+  border-color: rgba(36, 200, 243, 0.5);
+  color: #fff;
+}
+
+.az-chip[aria-pressed="true"] {
+  border-color: rgba(36, 200, 243, 0.7);
+  background: rgba(36, 200, 243, 0.12);
+  color: #fff;
+}
+
+.az-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  background: linear-gradient(135deg, #24c8f3, #1a7fd4);
+  color: #04121a;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  border-radius: 0.75rem;
+  padding: 0.9rem 1.8rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+  box-shadow: 0 12px 32px -12px rgba(36, 200, 243, 0.55);
+}
+
+.az-btn-primary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  filter: brightness(1.08);
+}
+
+.az-btn-primary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.az-btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: 1px solid #263349;
+  color: #bbc7d8;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  border-radius: 0.75rem;
+  padding: 0.85rem 1.4rem;
+  transition: all 0.2s ease;
+  background: rgba(18, 29, 45, 0.4);
+}
+
+.az-btn-ghost:hover {
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #fff;
+}
+
+.az-step-dot {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  border: 1px solid #263349;
+  color: #7d8ba2;
+  background: rgba(11, 19, 32, 0.8);
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.az-step-dot[data-state="active"] {
+  border-color: #24c8f3;
+  color: #04121a;
+  background: #24c8f3;
+  box-shadow: 0 0 20px rgba(36, 200, 243, 0.4);
+}
+
+.az-step-dot[data-state="done"] {
+  border-color: rgba(52, 211, 153, 0.6);
+  color: #34d399;
+  background: rgba(52, 211, 153, 0.08);
+}
+
+.az-card-hover {
+  transition: border-color 0.25s ease, transform 0.25s ease;
+}
+
+.az-card-hover:hover {
+  border-color: rgba(36, 200, 243, 0.35);
+}
+
+/* Score ring */
+.az-ring {
+  transform: rotate(-90deg);
+}
+.az-ring-track {
+  stroke: #1c2940;
+}
+.az-ring-value {
+  stroke-linecap: round;
+  transition: stroke-dashoffset 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Entrance motion */
+@keyframes az-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.az-rise {
+  animation: az-rise 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.az-rise-1 { animation-delay: 0.05s; }
+.az-rise-2 { animation-delay: 0.12s; }
+.az-rise-3 { animation-delay: 0.19s; }
+.az-rise-4 { animation-delay: 0.26s; }
+.az-rise-5 { animation-delay: 0.33s; }
+
+@keyframes az-launch-pop {
+  from {
+    opacity: 0;
+    transform: translateY(26px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.az-launch-pop {
+  animation: az-launch-pop 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes az-pulse-soft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
+}
+
+.az-thinking {
+  animation: az-pulse-soft 1.6s ease-in-out infinite;
+}
+
+@keyframes az-scan {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(240%); }
+}
+
+.az-scanline {
+  animation: az-scan 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+/* Level pills */
+.az-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  border-radius: 999px;
+  padding: 0.22rem 0.65rem;
+  border: 1px solid;
+  white-space: nowrap;
+}
+
+.az-pill-low {
+  color: #8beaff;
+  border-color: rgba(36, 200, 243, 0.4);
+  background: rgba(36, 200, 243, 0.08);
+}
+.az-pill-medium {
+  color: #fcd34d;
+  border-color: rgba(252, 211, 77, 0.4);
+  background: rgba(252, 211, 77, 0.08);
+}
+.az-pill-high {
+  color: #fb923c;
+  border-color: rgba(251, 146, 60, 0.45);
+  background: rgba(251, 146, 60, 0.08);
+}
+.az-pill-critical {
+  color: #f87171;
+  border-color: rgba(248, 113, 113, 0.5);
+  background: rgba(248, 113, 113, 0.1);
+}
+
+/* Verdict glow */
+.az-verdict-great { box-shadow: 0 0 60px -18px rgba(52, 211, 153, 0.45); }
+.az-verdict-study { box-shadow: 0 0 60px -18px rgba(36, 200, 243, 0.45); }
+.az-verdict-negotiate { box-shadow: 0 0 60px -18px rgba(251, 146, 60, 0.45); }
+.az-verdict-avoid { box-shadow: 0 0 60px -18px rgba(248, 113, 113, 0.45); }
+
+@media (max-width: 640px) {
+  .az-btn-primary,
+  .az-btn-ghost {
+    width: 100%;
+  }
+}
+
+@media print {
+  .az-no-print {
+    display: none !important;
+  }
+  .az-glass {
+    background: #fff;
+    border-color: #ddd;
+    box-shadow: none;
+    backdrop-filter: none;
+  }
+}

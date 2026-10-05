@@ -214,6 +214,10 @@ const ROUTE_META: Record<string, { title: string; description: string; robots?: 
     title: "CarVibes Advisor — Find Your Perfect Car",
     description: "Tell CarVibes what you need, and discover the cars that match your budget, lifestyle and preferences.",
   },
+  "/analyze": {
+    title: "CarVibes Analyse — The Truth Before You Buy a Used Car",
+    description: "Analyze any used car before buying: fair-price estimate, mechanical risks, visual findings, inconsistencies, import cost and a CarVibes verdict with seller questions.",
+  },
   "/compare": {
     title: "Compare cars — CarVibes",
     description: "Head-to-head car comparison and battle.",

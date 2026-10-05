@@ -24,6 +24,7 @@ import {
   coverHeroWebpSrcset,
   pexelsResize,
 } from "../../lib/images";
+import AnalyzePromoBanner from "../../features/analyze/promo/AnalyzePromoBanner";
 
 /** Compact specification-group card: real h3 heading + scannable rows. */
 function SpecGroup({
@@ -389,6 +390,15 @@ export default function CarDetail({
                 </p>
               </div>
             ))}
+          </div>
+
+          {/* Considering this car? → CarVibes Analyse (prefilled) */}
+          <div className="mt-8">
+            <AnalyzePromoBanner
+              lang={lang}
+              variant="car"
+              to={`/analyze?brand=${encodeURIComponent(car.brand)}&model=${encodeURIComponent(car.model)}&year=${car.year}`}
+            />
           </div>
 
           {/* OVERVIEW */}

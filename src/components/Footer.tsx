@@ -21,6 +21,7 @@ const LINK_GROUPS: {
       { labelKey: "nav_used_cars", to: "/used-cars" },
       { labelKey: "nav_find", to: "/find-my-car" },
       { labelKey: "nav_advisor", to: "/advisor" },
+      { labelKey: "nav_analyze", to: "/analyze" },
       { labelKey: "nav_stories", to: "/news" },
       { labelKey: "nav_quiz", to: "/car-quiz" },
       { labelKey: "mc_link_label", to: "/marketcar" },

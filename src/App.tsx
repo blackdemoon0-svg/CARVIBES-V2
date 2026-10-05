@@ -10,6 +10,7 @@ import type { Lang } from "./lib/i18n";
 import { detectLang, ensureLocale, isLocaleLoaded, isRtl, storeLang } from "./lib/i18n";
 import { useReveal } from "./lib/useReveal";
 import { addToCompare } from "./lib/prefs";
+import { useAnalyzeLaunch } from "./lib/announcements";
 import { isShellMetaRoute, usePageMeta } from "./lib/seo";
 import Navigation from "./components/Navigation";
 import Hero from "./components/Hero";
@@ -106,6 +107,15 @@ const MarketCarPage = lazy(() => import("./pages/MarketCarPage"));
 // are downloaded only when a visitor opens /advisor.
 const AdvisorRoutePage = lazy(() => import("./pages/AdvisorPage"));
 
+// CarVibes Analyse — same pattern: the whole module (form, engines,
+// report UI) downloads only when a visitor opens /analyze.
+const AnalyzeRoutePage = lazy(() => import("./pages/AnalyzePage"));
+
+// Launch modal — own tiny chunk, shown once on the homepage.
+const AnalyzeLaunchModal = lazy(
+  () => import("./features/analyze/promo/AnalyzeLaunchModal"),
+);
+
 export function Homepage({
   lang,
   onLangChange,
@@ -119,6 +129,7 @@ export function Homepage({
   const [finderOpen, setFinderOpen] = useState(false);
   const [compareOpen, setCompareOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [launchOpen, setLaunchOpen] = useAnalyzeLaunch(location.pathname);
 
   useReveal();
 
@@ -235,6 +246,17 @@ export function Homepage({
         </Suspense>
       )}
 
+      {/* CarVibes Analyse launch campaign (homepage only, once) */}
+      {launchOpen && (
+        <Suspense fallback={null}>
+          <AnalyzeLaunchModal
+            lang={lang}
+            open={launchOpen}
+            onClose={() => setLaunchOpen(false)}
+          />
+        </Suspense>
+      )}
+
       {/* First-time visitor guided tour (homepage only) */}
       <OnboardingTour lang={lang} />
     </div>
@@ -316,6 +338,17 @@ function RoutedApp({
           path="/advisor"
           element={
             <AdvisorRoutePage
+              lang={lang}
+              onLangChange={onLangChange}
+              onCompare={() => setCompareOpen(true)}
+              onSearch={() => setSearchOpen(true)}
+            />
+          }
+        />
+        <Route
+          path="/analyze"
+          element={
+            <AnalyzeRoutePage
               lang={lang}
               onLangChange={onLangChange}
               onCompare={() => setCompareOpen(true)}

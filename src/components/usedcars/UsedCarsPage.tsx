@@ -17,6 +17,7 @@ import { cars } from "../../lib/db";
 import ImageWithFallback from "../ImageWithFallback";
 import { SaveButton, CompareButton } from "../compare/ActionButtons";
 import { ArrowRight } from "../icons";
+import AnalyzePromoBanner from "../../features/analyze/promo/AnalyzePromoBanner";
 
 const usd = (n: number) => `$${n.toLocaleString("en-US")}`;
 
@@ -155,6 +156,11 @@ export default function UsedCarsPage({
           ))}
         </div>
       </section>
+
+      {/* Found a used car? → CarVibes Analyse */}
+      <div className="relative mx-auto max-w-[1480px] px-5 pb-4 sm:px-8 lg:px-16">
+        <AnalyzePromoBanner lang={lang} variant="used" />
+      </div>
 
       {/* ------------------------------------------------------------ */}
       {/* CATEGORY CARDS                                                 */}
