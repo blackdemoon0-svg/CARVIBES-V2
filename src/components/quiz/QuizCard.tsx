@@ -55,7 +55,7 @@ export default function QuizCard({
           aria-hidden="true"
           style={{
             backgroundImage:
-              "radial-gradient(60% 120% at 0% 0%, rgba(227,38,46,0.9) 0%, transparent 70%)",
+              "radial-gradient(60% 120% at 0% 0%, rgba(36,200,243,0.9) 0%, transparent 70%)",
           }}
         />
         <div className="relative grid gap-6 p-6 sm:p-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:gap-10">
@@ -224,7 +224,7 @@ function FeaturedPreview({ quiz, lang }: { quiz: QuizDef; lang: Lang }) {
         aria-hidden="true"
         style={{
           backgroundImage:
-            "linear-gradient(180deg, rgba(227,38,46,0.10) 0%, transparent 60%)",
+            "linear-gradient(180deg, rgba(36,200,243,0.10) 0%, transparent 60%)",
         }}
       />
       <p className="relative text-[10px] font-semibold tracking-[0.2em] text-fog">

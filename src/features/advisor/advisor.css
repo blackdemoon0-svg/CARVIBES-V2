@@ -47,15 +47,15 @@
   background: rgba(255, 255, 255, 0.16);
 }
 
-.advisor-range::-webkit-slider-thumb {
+  .advisor-range::-webkit-slider-thumb {
   width: 17px;
   height: 17px;
   margin-top: -7px;
   appearance: none;
   border: 2px solid #fff;
   border-radius: 50%;
-  background: #e3262e;
-  box-shadow: 0 0 0 4px rgba(227, 38, 46, 0.18);
+  background: var(--color-accent);
+  box-shadow: 0 0 0 4px rgba(36, 200, 243, 0.18);
 }
 
 .advisor-range::-moz-range-thumb {
@@ -63,8 +63,8 @@
   height: 13px;
   border: 2px solid #fff;
   border-radius: 50%;
-  background: #e3262e;
-  box-shadow: 0 0 0 4px rgba(227, 38, 46, 0.18);
+  background: var(--color-accent);
+  box-shadow: 0 0 0 4px rgba(36, 200, 243, 0.18);
 }
 
 @keyframes advisor-enter {

@@ -15,7 +15,7 @@ export default function StoryImage({
   src,
   alt,
   title,
-  accent = "#e3262e",
+  accent = "#24c8f3",
   className,
   imgClassName,
   eager = false,

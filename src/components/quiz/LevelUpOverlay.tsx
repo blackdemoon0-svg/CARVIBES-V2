@@ -60,7 +60,7 @@ export default function LevelUpOverlay({
         className="quiz-burst absolute h-64 w-64 rounded-full"
         style={{
           background:
-            "radial-gradient(circle, rgba(227,38,46,0.45) 0%, rgba(227,38,46,0.12) 45%, transparent 70%)",
+            "radial-gradient(circle, rgba(36,200,243,0.45) 0%, rgba(36,200,243,0.12) 45%, transparent 70%)",
         }}
       />
 

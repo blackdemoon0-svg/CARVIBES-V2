@@ -28,7 +28,7 @@ export default function StoryCard({
     <Link
       to={`/story/${story.id}`}
       aria-label={`${t(lang, "st_read_story")}: ${story.title}`}
-      className="card-in edge-light group relative flex flex-col overflow-hidden border border-line bg-charcoal transition-all duration-500 ease-out hover:-translate-y-1.5 hover:border-white/25 hover:shadow-[0_30px_70px_-24px_rgba(0,0,0,0.95),0_0_0_1px_rgba(227,38,46,0.12)]"
+      className="card-in edge-light group relative flex flex-col overflow-hidden border border-line bg-charcoal transition-all duration-500 ease-out hover:-translate-y-1.5 hover:border-white/25 hover:shadow-[0_30px_70px_-24px_rgba(0,0,0,0.95),0_0_0_1px_rgba(36,200,243,0.12)]"
       style={{ animationDelay: `${Math.min(index, 8) * 70}ms` }}
     >
       {/* Image */}

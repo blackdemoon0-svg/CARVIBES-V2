@@ -265,7 +265,7 @@ export default function AdminDashboard({
                   type="checkbox"
                   checked={allSelected}
                   onChange={(event) => setSelected(event.target.checked ? items.map((item) => item.publicId) : [])}
-                  className="h-4 w-4 accent-[#e3262e]"
+                  className="h-4 w-4 accent-accent"
                 />
                 {t(lang, "mk_admin_select_all")}
               </label>
@@ -388,7 +388,7 @@ function AdminRow({
         checked={selected}
         onChange={(event) => onSelect(event.target.checked)}
         aria-label={`${t(lang, "mk_admin_select")} ${listing.title}`}
-        className="h-4 w-4 shrink-0 accent-[#e3262e]"
+        className="h-4 w-4 shrink-0 accent-accent"
       />
       <span className="relative block h-14 w-20 shrink-0 overflow-hidden border border-line bg-graphite">
         {listing.thumb ? (

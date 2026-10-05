@@ -202,7 +202,7 @@ export function PrimaryButton({
       aria-label={ariaLabel}
       className={cn(
         "quiz-sheen inline-flex h-11 items-center justify-center gap-2 bg-accent px-5 text-[11px] font-bold tracking-[0.18em] text-white transition-all duration-300",
-        "hover:bg-accent-soft hover:shadow-[0_0_28px_-8px_rgba(227,38,46,0.75)] active:translate-y-px",
+        "hover:bg-accent-soft hover:shadow-[0_0_28px_-8px_rgba(36,200,243,0.75)] active:translate-y-px",
         "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white",
         "disabled:cursor-not-allowed disabled:bg-steel disabled:text-white/50 disabled:shadow-none",
         className

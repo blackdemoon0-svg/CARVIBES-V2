@@ -37,7 +37,7 @@ export default function MarketplaceHero({
         className="pointer-events-none absolute inset-0"
         style={{
           backgroundImage:
-            "radial-gradient(90% 60% at 50% -20%, rgba(227,38,46,0.16) 0%, transparent 60%)",
+            "radial-gradient(90% 60% at 50% -20%, rgba(36,200,243,0.16) 0%, transparent 60%)",
         }}
       />
       {/* Admin-only shortcut, in the band's own top-right corner. Renders

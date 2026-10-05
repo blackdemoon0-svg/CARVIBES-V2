@@ -27,7 +27,7 @@ export default function HowToSection({ lang }: { lang: Lang }) {
         className="pointer-events-none absolute inset-0 opacity-70"
         style={{
           background:
-            "radial-gradient(60% 70% at 50% 110%, rgba(227,38,46,0.08) 0%, rgba(9,9,9,0) 60%)",
+            "radial-gradient(60% 70% at 50% 110%, rgba(36,200,243,0.10) 0%, rgba(9,9,9,0) 60%)",
         }}
       />
 

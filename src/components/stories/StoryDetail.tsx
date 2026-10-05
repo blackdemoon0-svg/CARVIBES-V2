@@ -159,7 +159,7 @@ export default function StoryDetail({
         <div
           className="pointer-events-none fixed inset-x-0 top-0 h-[60vh] opacity-20"
           style={{
-            background: `radial-gradient(60% 60% at 50% 10%, ${story.accent || "#e3262e"}33 0%, transparent 70%)`,
+            background: `radial-gradient(60% 60% at 50% 10%, ${story.accent || "#24c8f3"}33 0%, transparent 70%)`,
           }}
         />
 

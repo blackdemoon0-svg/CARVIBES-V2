@@ -4,18 +4,18 @@
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Archivo", ui-sans-serif, system-ui, sans-serif;
 
-  --color-ink: #08090c;
-  --color-ink-2: #0c0d12;
-  --color-charcoal: #101218;
-  --color-graphite: #16181f;
-  --color-steel: #2b2e37;
-  --color-line: #262933;
+  --color-ink: #05070c;
+  --color-ink-2: #080d17;
+  --color-charcoal: #0b1320;
+  --color-graphite: #121d2d;
+  --color-steel: #29364b;
+  --color-line: #263349;
 
-  --color-accent: #e3262e;
-  --color-accent-soft: #ff4a52;
+  --color-accent: #24c8f3;
+  --color-accent-soft: #8beaff;
 
-  --color-mist: #a7a9b2;
-  --color-fog: #707480;
+  --color-mist: #bbc7d8;
+  --color-fog: #7d8ba2;
 }
 
 @layer base {
@@ -23,11 +23,16 @@
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    background: #05070c;
   }
 
   body {
-    background-color: var(--color-ink);
-    background-image: radial-gradient(120% 80% at 50% -10%, rgba(59, 130, 246, 0.03) 0%, transparent 55%);
+    background-color: #05070c;
+    background-image:
+      radial-gradient(ellipse 78rem 38rem at 50% -9%, rgba(28, 99, 199, 0.20), transparent 70%),
+      radial-gradient(ellipse 54rem 34rem at -5% 38%, rgba(14, 154, 184, 0.075), transparent 72%),
+      radial-gradient(ellipse 50rem 32rem at 106% 70%, rgba(96, 67, 164, 0.075), transparent 72%),
+      linear-gradient(180deg, #060911 0%, #05070c 52%, #070b13 100%);
     background-attachment: fixed;
     color: #f5f5f5;
     font-family: var(--font-sans);
@@ -39,6 +44,15 @@
      menu (or pagination) scrolls to them. */
   section[id] {
     scroll-margin-top: 5.5rem;
+  }
+
+  /* Fine, low-contrast color wash behind the site's sections */
+  main > section[id],
+  main > div > section[id] {
+    background-image:
+      radial-gradient(ellipse 48rem 20rem at 92% 0%, rgba(38, 113, 206, 0.075), transparent 72%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.009), transparent 42%);
+    background-repeat: no-repeat;
   }
 
   /* PERFORMANCE — rendering only what the viewport can see.
@@ -56,7 +70,7 @@
   }
 
   ::selection {
-    background: rgba(227, 38, 46, 0.35);
+    background: rgba(36, 200, 243, 0.28);
     color: #fff;
   }
 
@@ -75,30 +89,42 @@
     height: 9px;
   }
   ::-webkit-scrollbar-track {
-    background: var(--color-ink);
+    background: #070a11;
   }
   ::-webkit-scrollbar-thumb {
-    background: var(--color-steel);
+    background: #27364b;
     border-radius: 999px;
-    border: 2px solid var(--color-ink);
+    border: 2px solid #070a11;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: #3a3d47;
+    background: #3b526e;
   }
 }
 
 @layer utilities {
-  /* ---- Premium interaction tokens (purely cosmetic) ---- */
-  /* Subtle glassmorphism — used sparingly on overlays (nav, badges, bars) */
+  /* ---- Premium interaction tokens ---- */
+  /* Glassmorphism tuned for dark cyan/blue ambience */
   .glass {
-    background: rgba(16, 18, 24, 0.62);
-    backdrop-filter: blur(16px) saturate(140%);
-    -webkit-backdrop-filter: blur(16px) saturate(140%);
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(7, 12, 21, 0.78);
+    backdrop-filter: blur(18px) saturate(125%);
+    -webkit-backdrop-filter: blur(18px) saturate(125%);
+    border: 1px solid rgba(126, 192, 231, 0.13);
+    box-shadow: 0 10px 36px -22px rgba(20, 113, 192, 0.38);
   }
   /* Fine top edge highlight for cards/tiles — subtle metallic touch */
   .edge-light {
-    box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.045) inset;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.045),
+      0 12px 30px -25px rgba(0, 0, 0, 0.72);
+  }
+  .edge-light:hover {
+    border-color: rgba(115, 198, 234, 0.31);
+  }
+  .card-in.group:hover {
+    box-shadow:
+      0 28px 68px -28px rgba(0, 0, 0, 0.88),
+      0 0 0 1px rgba(36, 200, 243, 0.16),
+      0 22px 54px -36px rgba(31, 149, 224, 0.42);
   }
   /* Fixed bottom elements respect the iPhone home-indicator safe area. */
   .safe-bottom {
@@ -170,20 +196,21 @@
     border-radius: 0.85rem 0.3rem 0.85rem 0.3rem;
   }
 
-  /* Primary — accent fill + red glow */
+  /* Primary — accent fill + cyan glow */
   .cv-btn-primary {
     background-color: var(--color-accent);
-    color: #fff;
+    color: #05070c;
     box-shadow:
-      0 0 0 1px rgba(255, 255, 255, 0.08) inset,
-      0 10px 30px -14px rgba(227, 38, 46, 0.55);
+      0 0 0 1px rgba(255, 255, 255, 0.10) inset,
+      0 10px 30px -16px rgba(36, 200, 243, 0.60);
   }
   .cv-btn-primary:hover {
     background-color: var(--color-accent-soft);
+    color: #05070c;
     box-shadow:
-      0 0 0 1px rgba(255, 255, 255, 0.14) inset,
-      0 16px 42px -14px rgba(227, 38, 46, 0.8),
-      0 0 34px -10px rgba(227, 38, 46, 0.6);
+      0 0 0 1px rgba(255, 255, 255, 0.17) inset,
+      0 15px 38px -15px rgba(36, 200, 243, 0.68),
+      0 0 28px -12px rgba(36, 200, 243, 0.50);
   }
 
   /* Ghost — hairline border, fills white on hover */
@@ -207,7 +234,8 @@
   .cv-btn-outline:hover {
     border-color: var(--color-accent);
     background-color: var(--color-accent);
-    box-shadow: 0 10px 30px -12px rgba(227, 38, 46, 0.7);
+    color: #05070c;
+    box-shadow: 0 10px 30px -14px rgba(36, 200, 243, 0.48);
   }
 
   /* Subtle — line border, muted text; brightens on hover */
@@ -343,7 +371,7 @@
     bottom: -6px;
     height: 1px;
     width: 100%;
-    background: #e3262e;
+    background: var(--color-accent);
     transform: scaleX(0);
     transform-origin: left;
     transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
@@ -397,20 +425,21 @@
     appearance: none;
     width: 20px;
     height: 20px;
-    background: #e3262e;
+    background: var(--color-accent);
     border: 2px solid #fff;
     border-radius: 50%;
     cursor: pointer;
+    box-shadow: 0 0 0 4px rgba(36, 200, 243, 0.16);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
   .carvibes-range::-webkit-slider-thumb:hover {
     transform: scale(1.15);
-    box-shadow: 0 0 20px -4px rgba(227, 38, 46, 0.8);
+    box-shadow: 0 0 18px -4px rgba(36, 200, 243, 0.68);
   }
   .carvibes-range::-moz-range-thumb {
     width: 20px;
     height: 20px;
-    background: #e3262e;
+    background: var(--color-accent);
     border: 2px solid #fff;
     border-radius: 50%;
     cursor: pointer;
@@ -450,7 +479,7 @@
 
 /* ============================================================
    CARVIBES QUIZ — motion + surface tokens
-   Built on the existing design language (sharp corners, red accent,
+   Built on the design language (sharp corners, cyan/blue accent,
    uppercase micro-labels, Archivo display type). Every animation is
    transform/opacity only, so it stays smooth on mobile, and all of it
    is disabled under `prefers-reduced-motion`.
@@ -459,9 +488,9 @@
   /* Ambient depth behind the quiz hub + player */
   .quiz-arena {
     background-image:
-      radial-gradient(90% 55% at 50% -10%, rgba(227, 38, 46, 0.14) 0%, transparent 60%),
-      radial-gradient(60% 40% at 100% 0%, rgba(59, 130, 246, 0.05) 0%, transparent 60%),
-      linear-gradient(180deg, #0b0c11 0%, var(--color-ink) 55%);
+      radial-gradient(90% 55% at 50% -10%, rgba(36, 200, 243, 0.12) 0%, transparent 60%),
+      radial-gradient(60% 40% at 100% 0%, rgba(59, 130, 246, 0.075) 0%, transparent 60%),
+      linear-gradient(180deg, #0a111d 0%, var(--color-ink) 55%);
   }
   /* Fine hairline grid — subtle "technical dashboard" texture */
   .quiz-grid {
@@ -472,7 +501,7 @@
     mask-image: radial-gradient(75% 60% at 50% 0%, #000 0%, transparent 75%);
   }
   .quiz-glow {
-    box-shadow: 0 0 0 1px rgba(227, 38, 46, 0.18), 0 24px 60px -30px rgba(227, 38, 46, 0.55);
+    box-shadow: 0 0 0 1px rgba(36, 200, 243, 0.16), 0 24px 60px -32px rgba(25, 148, 226, 0.42);
   }
   .quiz-sheen {
     position: relative;

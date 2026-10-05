@@ -36,10 +36,10 @@ export function PageLoader({ label }: { label?: string }) {
       <div className="flex flex-col items-center gap-5">
         <LogoMark className="cv-boot-glow h-12 w-12 text-white" />
         <p className="font-display text-lg font-extrabold tracking-[0.08em] text-white select-none">
-          CAR<span className="text-[#e3262e]">VIBES</span>
+          CAR<span className="text-accent">VIBES</span>
         </p>
         <span className="block h-[3px] w-40 overflow-hidden rounded-full bg-white/10">
-          <span className="cv-boot-bar block h-full w-16 rounded-full bg-[#e3262e]" />
+          <span className="cv-boot-bar block h-full w-16 rounded-full bg-accent" />
         </span>
       </div>
     </div>

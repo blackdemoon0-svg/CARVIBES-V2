@@ -16,7 +16,7 @@ export default function NotFound({
         className="pointer-events-none absolute left-1/2 top-1/2 h-[60vmin] w-[60vmin] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-15 blur-3xl"
         style={{
           background:
-            "radial-gradient(circle, rgba(227,38,46,0.45) 0%, rgba(227,38,46,0) 70%)",
+            "radial-gradient(circle, rgba(36,200,243,0.45) 0%, rgba(36,200,243,0) 70%)",
         }}
       />
 

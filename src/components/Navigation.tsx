@@ -258,8 +258,8 @@ export default function Navigation({
                         "px-2.5 active:scale-[0.97] xl:h-9 xl:gap-2 xl:px-3.5",
                         "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
                         isActive
-                          ? "border-accent bg-accent text-white shadow-[0_0_24px_-8px_rgba(227,38,46,0.9)]"
-                          : "border-accent/40 bg-accent/[0.08] text-white hover:border-accent/80 hover:bg-accent/15 hover:shadow-[0_0_24px_-10px_rgba(227,38,46,0.8)]"
+                          ? "border-accent bg-accent text-ink shadow-[0_0_24px_-8px_rgba(36,200,243,0.9)]"
+                          : "border-accent/40 bg-accent/[0.08] text-white hover:border-accent/80 hover:bg-accent/15 hover:shadow-[0_0_24px_-10px_rgba(36,200,243,0.8)]"
                       )
                     }
                   >

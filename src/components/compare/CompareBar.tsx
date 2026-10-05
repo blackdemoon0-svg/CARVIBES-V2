@@ -24,7 +24,7 @@ export default function CompareBar({
       <button
         onClick={onOpen}
         className={cn(
-          "glass group pointer-events-auto mx-auto flex w-full items-center justify-center gap-3 border-white/15 px-4 py-3 shadow-[0_16px_40px_-12px_rgba(0,0,0,0.9)] transition-all duration-300 hover:border-accent/60 hover:shadow-[0_16px_50px_-12px_rgba(227,38,46,0.45)] sm:w-auto sm:px-5"
+          "glass group pointer-events-auto mx-auto flex w-full items-center justify-center gap-3 border-white/15 px-4 py-3 shadow-[0_16px_40px_-12px_rgba(0,0,0,0.9)] transition-all duration-300 hover:border-accent/60 hover:shadow-[0_16px_50px_-12px_rgba(36,200,243,0.45)] sm:w-auto sm:px-5"
         )}
       >
         <span className="flex h-7 w-7 items-center justify-center bg-accent font-display text-sm font-bold text-white">

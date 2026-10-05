@@ -20,8 +20,8 @@ export function LogoMark({ className }: { className?: string }) {
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      {/* Red accent dot — the "vibe" */}
-      <circle cx="33.4" cy="29" r="3.2" fill="#e3262e" />
+      {/* Accent dot — the "vibe" */}
+      <circle cx="33.4" cy="29" r="3.2" fill="var(--color-accent)" />
     </svg>
   );
 }
@@ -43,7 +43,7 @@ export function Logo({
         )}
         style={{ letterSpacing: "0.08em" }}
       >
-        CAR<span className="text-[#e3262e]">VIBES</span>
+        CAR<span className="text-accent">VIBES</span>
       </span>
     </div>
   );

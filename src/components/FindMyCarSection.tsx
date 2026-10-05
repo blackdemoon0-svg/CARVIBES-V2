@@ -19,7 +19,7 @@ export default function FindMyCarSection({
           className="absolute inset-0 opacity-60"
           style={{
             background:
-              "radial-gradient(70% 90% at 50% 100%, rgba(227,38,46,0.10) 0%, rgba(9,9,9,0) 60%)",
+              "radial-gradient(70% 90% at 50% 100%, rgba(36,200,243,0.12) 0%, rgba(9,9,9,0) 60%)",
           }}
         />
         {/* Speed lines */}
