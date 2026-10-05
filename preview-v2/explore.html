@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#04060c">
+<title>Explore — CarVibes V2 Design Preview</title>
+<link rel="icon" href="assets/img/car-jdm.jpg">
+<link rel="preload" href="assets/fonts/archivo-latin-wght.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/css/carvibes.css">
+<style>
+  .cv-explore-hero { position: relative; margin: 0 var(--gutter); border-radius: var(--r-xl); overflow: hidden; min-height: clamp(360px, 56vh, 560px); display: flex; align-items: flex-end; border: 1px solid var(--line); }
+  .cv-explore-hero img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .cv-explore-hero::after { content: ""; position: absolute; inset: 0; background: linear-gradient(0deg, rgba(3,5,10,.95) 4%, rgba(3,5,10,.35) 46%, rgba(3,5,10,.6) 100%); }
+  .cv-explore-hero__body { position: relative; z-index: 2; padding: clamp(24px, 4vw, 56px); width: 100%; }
+  .cv-brandgrid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; }
+  .cv-brandtile { display: flex; align-items: center; justify-content: center; min-height: 78px; border-radius: 14px; border: 1px solid var(--line); background: rgba(255,255,255,.02); font-family: var(--font-display); font-size: .92rem; font-weight: 600; letter-spacing: -.01em; color: var(--mist); transition: all var(--t) var(--ease); }
+  .cv-brandtile:hover { color: #fff; border-color: rgba(34,211,238,.45); background: rgba(34,211,238,.06); transform: translateY(-3px); }
+  @media (max-width: 1024px) { .cv-brandgrid { grid-template-columns: repeat(4, minmax(0,1fr)); } }
+  @media (max-width: 640px) { .cv-brandgrid { grid-template-columns: repeat(2, minmax(0,1fr)); } }
+</style>
+</head>
+<body data-page="explore">
+
+<main class="cv-shell" id="main">
+
+  <!-- ================================================== IMMERSIVE HERO -->
+  <section class="cv-section cv-section--tight" style="padding-top:clamp(18px,2.4vw,34px)">
+    <div class="cv-explore-hero" data-reveal>
+      <img src="assets/img/detail-hero.jpg" width="1584" height="672" fetchpriority="high" decoding="async"
+           alt="Performance sedan on a wet road at night">
+      <div class="cv-explore-hero__body">
+        <span class="eyebrow" data-t="explore_eyebrow"></span>
+        <h1 class="display-xl" style="margin-top:16px;font-size:clamp(2.3rem,5.6vw,4.6rem)"><span data-t="explore_title"></span></h1>
+        <p class="lede cv-mt-s" data-t="explore_sub"></p>
+        <div class="cv-scroll-x cv-mt-m">
+          <button class="cv-chip is-active" type="button" data-t="filter_all"></button>
+          <button class="cv-chip" type="button" data-t="filter_sports"></button>
+          <button class="cv-chip" type="button" data-t="filter_electric"></button>
+          <button class="cv-chip" type="button" data-t="filter_suv"></button>
+          <button class="cv-chip" type="button" data-t="filter_jdm"></button>
+          <button class="cv-chip" type="button">Classics</button>
+          <button class="cv-chip" type="button">Offroad</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================================================== COLLECTIONS -->
+  <section class="cv-section cv-section--tight">
+    <div class="cv-container">
+      <div class="section-head" data-reveal>
+        <div class="section-head__top">
+          <div>
+            <span class="eyebrow">Collections</span>
+            <h2 class="display-md">Curated by character, not by price</h2>
+          </div>
+          <span class="cv-note">Hover a tile</span>
+        </div>
+      </div>
+      <div id="exploreMosaic"></div>
+    </div>
+  </section>
+
+  <!-- ===================================================== ALL THE CARS -->
+  <section class="cv-section cv-section--tight">
+    <div class="cv-container">
+      <div class="section-head" data-reveal>
+        <div class="section-head__top">
+          <div>
+            <span class="eyebrow" data-t="cars_eyebrow"></span>
+            <h2 class="display-md" data-t="cars_title"></h2>
+          </div>
+          <a class="cv-link" href="index.html#find"><span data-t="cta_find"></span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+          </a>
+        </div>
+      </div>
+      <div class="cv-grid cv-grid--4" id="exploreCars"></div>
+    </div>
+  </section>
+
+  <!-- ========================================================= BRANDS -->
+  <section class="cv-section">
+    <div class="cv-container">
+      <div class="section-head" data-reveal>
+        <span class="eyebrow" data-t="stat_brands"></span>
+        <h2 class="display-md">66 marques, une seule plateforme</h2>
+      </div>
+      <div class="cv-brandgrid" data-reveal>
+        <a class="cv-brandtile" href="#">BMW</a><a class="cv-brandtile" href="#">Mercedes-AMG</a>
+        <a class="cv-brandtile" href="#">Porsche</a><a class="cv-brandtile" href="#">Audi</a>
+        <a class="cv-brandtile" href="#">Ferrari</a><a class="cv-brandtile" href="#">Lamborghini</a>
+        <a class="cv-brandtile" href="#">Toyota</a><a class="cv-brandtile" href="#">Nissan</a>
+        <a class="cv-brandtile" href="#">Tesla</a><a class="cv-brandtile" href="#">Aston Martin</a>
+        <a class="cv-brandtile" href="#">McLaren</a><a class="cv-brandtile" href="#">Bentley</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/main.js"></script>
+<script>
+  /* Explore page: full mosaic + the complete demo grid (4 columns, like the
+     real Explore/Brands listing on desktop). */
+  document.addEventListener("DOMContentLoaded", function () {
+    window.CV2.renderExplore("#exploreMosaic", 4);
+    window.CV2.renderCards("#exploreCars", window.CV2_CARS, "cv-grid--4");
+    window.CV2.applyI18n();
+  });
+</script>
+</body>
+</html>

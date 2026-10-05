@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#04060c">
+<title>Mobile — CarVibes V2 Design Preview</title>
+<link rel="icon" href="assets/img/car-ev.jpg">
+<link rel="preload" href="assets/fonts/archivo-latin-wght.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/css/carvibes.css">
+<style>
+  .cv-rules { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 18px; }
+  .cv-rule-card { padding: 22px; border-radius: var(--r); border: 1px solid var(--line); background: rgba(255,255,255,.025); }
+  .cv-rule-card b { display:block; font-family: var(--font-display); font-size: 1rem; color:#fff; letter-spacing:-.02em; }
+  .cv-rule-card p { margin-top: 8px; font-size: .86rem; color: var(--fog); }
+  .cv-m-nav { position: sticky; top: 0; z-index: 7; display:flex; align-items:center; justify-content:space-between; gap:10px;
+    padding: 14px 16px; background: rgba(6,9,17,.78); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border-bottom: 1px solid var(--line); }
+  .cv-m-brand { font-family: var(--font-display); font-size:1.02rem; font-weight:700; letter-spacing:-.02em; color:#fff; }
+  .cv-m-brand b { font-weight:300; color: var(--cyan); }
+  .cv-m-title { font-family: var(--font-display); font-weight:700; text-transform:uppercase; letter-spacing:-.03em; line-height:.98; font-size:1.9rem; }
+  @media (max-width: 1024px) { .cv-rules { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body data-page="mobile">
+
+<main class="cv-shell" id="main">
+
+  <section class="cv-section">
+    <div class="cv-container">
+      <span class="eyebrow" data-reveal data-t="preview_label"></span>
+      <h1 class="display-lg" data-reveal style="--d:60ms;margin-top:16px">Mobile experience</h1>
+      <p class="lede cv-mt-s" data-reveal style="--d:110ms">
+        Mobile is not a shrunken desktop: the hero stacks with the car full-bleed, cards become a swipeable
+        rail, every control is thumb-sized, the assistant stays usable with one hand, and nothing ever scrolls
+        sideways. The three screens below are the real mobile composition, rendered at 1:1.
+      </p>
+      <p class="cv-note cv-mt-m" data-reveal style="--d:160ms">
+        Tip: this whole preview is responsive — resize the window or open it on a phone to test the live layout.
+      </p>
+    </div>
+  </section>
+
+  <section class="cv-section cv-section--tight">
+    <div class="cv-container">
+      <div class="cv-phones">
+
+        <!-- =============================================== SCREEN 1: HOME -->
+        <div class="cv-phone" data-reveal>
+          <span class="cv-phone__notch" aria-hidden="true"></span>
+          <div class="cv-phone__screen">
+            <div class="cv-m-nav">
+              <span class="cv-m-brand">Car<b>Vibes</b></span>
+              <span class="cv-row" style="--gap:8px">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9daac2" stroke-width="1.7" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#eef2f8" stroke-width="1.7" stroke-linecap="round"><path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/></svg>
+              </span>
+            </div>
+
+            <div class="cv-m-hero">
+              <div class="cv-m-hero__img">
+                <img src="assets/img/hero-car.jpg" width="1376" height="768" alt="" loading="lazy">
+              </div>
+              <span class="eyebrow" data-t="hero_kicker"></span>
+              <h1 class="cv-m-title cv-mt-s"><span data-t="hero_t1"></span><br><span class="gradient-text" data-t="hero_t2"></span></h1>
+              <p data-t="hero_sub"></p>
+              <div class="cv-m-hero__cta">
+                <a class="cv-btn cv-btn--primary cv-btn--block" href="#"><span data-t="cta_find"></span></a>
+                <a class="cv-btn cv-btn--ghost cv-btn--block" href="#"><span data-t="cta_compare"></span></a>
+              </div>
+            </div>
+
+            <div class="cv-m-filters">
+              <button class="cv-chip is-active" type="button" data-t="filter_all"></button>
+              <button class="cv-chip" type="button" data-t="filter_sports"></button>
+              <button class="cv-chip" type="button" data-t="filter_electric"></button>
+              <button class="cv-chip" type="button" data-t="filter_suv"></button>
+            </div>
+
+            <div class="cv-m-section" style="padding-top:6px">
+              <div class="cv-m-head">
+                <h2 data-t="cars_eyebrow"></h2>
+                <span class="mono-label" data-t="cta_browse"></span>
+              </div>
+              <div class="cv-stack" style="--gap:14px">
+                <article class="cv-m-card">
+                  <img src="assets/img/car-m3.jpg" width="1000" height="622" alt="" loading="lazy">
+                  <div class="cv-m-card__body">
+                    <span class="cv-car__brand">BMW</span>
+                    <div class="cv-m-card__row">
+                      <h3 class="cv-car__model" style="font-size:1.12rem">M3 Competition</h3>
+                      <span class="cv-car__price">$86,100</span>
+                    </div>
+                    <div class="cv-car__specs" style="padding-top:12px;margin-top:10px">
+                      <span class="cv-car__spec"><b>503</b> HP</span>
+                      <span class="cv-car__spec"><b>AWD</b></span>
+                      <span class="cv-car__spec"><b>Automatic</b></span>
+                    </div>
+                  </div>
+                </article>
+                <article class="cv-m-card">
+                  <img src="assets/img/car-ev.jpg" width="1000" height="622" alt="" loading="lazy">
+                  <div class="cv-m-card__body">
+                    <span class="cv-car__brand">Audi</span>
+                    <div class="cv-m-card__row">
+                      <h3 class="cv-car__model" style="font-size:1.12rem">RS e-tron GT</h3>
+                      <span class="cv-car__price">$147,100</span>
+                    </div>
+                    <div class="cv-car__specs" style="padding-top:12px;margin-top:10px">
+                      <span class="cv-car__spec"><b>637</b> HP</span>
+                      <span class="cv-car__spec"><b>AWD</b></span>
+                      <span class="cv-car__spec"><b>Electric</b></span>
+                    </div>
+                  </div>
+                </article>
+              </div>
+            </div>
+
+            <div class="cv-m-section" style="padding-top:0">
+              <div class="cv-panel cv-panel--glow" style="padding:18px">
+                <span class="cv-tag cv-tag--cyan"><span class="cv-dot"></span><span data-t="advisor_eyebrow"></span></span>
+                <h3 class="cv-m-title cv-mt-s" style="font-size:1.3rem" data-t="advisor_title"></h3>
+                <a class="cv-btn cv-btn--primary cv-btn--block cv-mt-s" href="#"><span data-t="advisor_cta"></span></a>
+              </div>
+            </div>
+
+            <div class="cv-m-tabbar">
+              <a class="cv-m-tab is-active" href="#">
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 8 4.5-8 4.5-8-4.5Z"/><path d="m4 12.5 8 4.5 8-4.5"/></svg>
+                <span data-t="m_home"></span></a>
+              <a class="cv-m-tab" href="#">
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg>
+                <span data-t="m_explore"></span></a>
+              <a class="cv-m-tab" href="#">
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v16"/><path d="M5 8h14"/><path d="m5 8-3 6h6Z"/><path d="m19 8-3 6h6Z"/></svg>
+                <span data-t="m_compare"></span></a>
+              <a class="cv-m-tab" href="#">
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M13 3 5 13h5l-1 8 8-10h-5Z"/></svg>
+                <span data-t="m_advisor"></span></a>
+              <a class="cv-m-tab" href="#">
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7-4.4-7-9.4A3.9 3.9 0 0 1 12 8a3.9 3.9 0 0 1 7 2.6c0 5-7 9.4-7 9.4Z"/></svg>
+                <span data-t="m_favs"></span></a>
+            </div>
+          </div>
+          <div class="cv-phone__label">Home</div>
+        </div>
+
+        <!-- ========================================== SCREEN 2: CAR PAGE -->
+        <div class="cv-phone" data-reveal style="--d:100ms">
+          <span class="cv-phone__notch" aria-hidden="true"></span>
+          <div class="cv-phone__screen">
+            <div class="cv-m-nav">
+              <span class="cv-row" style="--gap:10px">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#eef2f8" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>
+                <span class="cv-m-brand" style="font-size:.92rem">M4 Competition</span>
+              </span>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22d3ee" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7-4.4-7-9.4A3.9 3.9 0 0 1 12 8a3.9 3.9 0 0 1 7 2.6c0 5-7 9.4-7 9.4Z"/></svg>
+            </div>
+
+            <div style="position:relative">
+              <img src="assets/img/hero-car.jpg" width="1376" height="768" alt="" style="width:100%;aspect-ratio:4/3;object-fit:cover" loading="lazy">
+              <span style="position:absolute;inset:0;background:linear-gradient(0deg,#04060c 6%,transparent 62%)"></span>
+              <div style="position:absolute;inset-inline:18px;bottom:16px">
+                <span class="eyebrow">BMW</span>
+                <h1 class="cv-m-title" style="font-size:1.7rem;margin-top:8px">M4 Competition</h1>
+                <div class="cv-detail__price" style="text-align:start;font-size:1.4rem;margin-top:6px">$89,900</div>
+              </div>
+            </div>
+
+            <div class="cv-m-section">
+              <div class="cv-row" style="--gap:8px;display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                <a class="cv-btn cv-btn--primary cv-btn--block" href="#">View offers</a>
+                <a class="cv-btn cv-btn--ghost cv-btn--block" href="#">Compare</a>
+              </div>
+
+              <div class="cv-spec-grid" style="grid-template-columns:1fr 1fr;margin-top:20px">
+                <div class="cv-spec"><span class="cv-spec__label">Power</span><div class="cv-spec__value">503<small>HP</small></div><div class="cv-spec__bar"><i style="width:72%"></i></div></div>
+                <div class="cv-spec"><span class="cv-spec__label">0–100</span><div class="cv-spec__value">3.5<small>s</small></div><div class="cv-spec__bar"><i style="width:88%"></i></div></div>
+                <div class="cv-spec"><span class="cv-spec__label">Top speed</span><div class="cv-spec__value">290<small>km/h</small></div><div class="cv-spec__bar"><i style="width:66%"></i></div></div>
+                <div class="cv-spec"><span class="cv-spec__label">Weight</span><div class="cv-spec__value">1,745<small>kg</small></div><div class="cv-spec__bar"><i style="width:54%"></i></div></div>
+              </div>
+
+              <div class="cv-m-head" style="margin-top:26px"><h2 data-t="detail_why"></h2></div>
+              <div class="cv-stack" style="--gap:12px">
+                <div class="cv-why__card" style="padding:16px">
+                  <h4>503 hp, usable everywhere</h4>
+                  <p>Torque from 2,750 rpm — overtakes never need planning.</p>
+                </div>
+                <div class="cv-why__card" style="padding:16px">
+                  <h4>Fast in every season</h4>
+                  <p>xDrive traction, with a pure rear-drive mode for the track.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="cv-m-tabbar">
+              <a class="cv-m-tab" href="#"><span data-t="m_home"></span></a>
+              <a class="cv-m-tab" href="#"><span data-t="m_explore"></span></a>
+              <a class="cv-m-tab" href="#"><span data-t="m_compare"></span></a>
+              <a class="cv-m-tab is-active" href="#"><span data-t="m_advisor"></span></a>
+              <a class="cv-m-tab" href="#"><span data-t="m_favs"></span></a>
+            </div>
+          </div>
+          <div class="cv-phone__label">Car page</div>
+        </div>
+
+        <!-- ========================================== SCREEN 3: ADVISOR -->
+        <div class="cv-phone" data-reveal style="--d:200ms">
+          <span class="cv-phone__notch" aria-hidden="true"></span>
+          <div class="cv-phone__screen">
+            <div class="cv-m-nav">
+              <span class="cv-m-brand">Car<b>Vibes</b></span>
+              <span class="cv-tag cv-tag--cyan"><span class="cv-dot"></span>Advisor</span>
+            </div>
+
+            <div class="cv-m-section">
+              <h2 class="cv-m-title" style="font-size:1.5rem" data-t="advisor_title"></h2>
+              <p class="muted cv-mt-s" style="font-size:.88rem" data-t="advisor_sub"></p>
+
+              <div class="cv-console cv-mt-m">
+                <div class="cv-console__inner">
+                  <div class="cv-console__bar">
+                    <span class="cv-console__live"><span class="cv-dot"></span><span data-t="advisor_live"></span></span>
+                    <span class="mono-label">02 / 03</span>
+                  </div>
+                  <div class="cv-console__body" style="padding:16px">
+                    <div class="cv-progress">
+                      <span class="cv-progress__rail"><span class="cv-progress__fill" style="width:64%"></span></span>
+                    </div>
+                    <div class="cv-bubble cv-bubble--assistant" data-t="advisor_q2"></div>
+                    <div class="cv-bubble cv-bubble--user" data-t="advisor_choice_daily"></div>
+                    <div class="cv-choices">
+                      <button class="cv-chip is-active" type="button" data-t="advisor_choice_b1"></button>
+                      <button class="cv-chip" type="button" data-t="advisor_choice_b2"></button>
+                      <button class="cv-chip" type="button" data-t="advisor_choice_b3"></button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="cv-row cv-between cv-mt-m" style="align-items:baseline">
+                <span class="mono-label" data-t="advisor_matches"></span>
+                <span class="mono-label">Ranked</span>
+              </div>
+              <div class="cv-stack cv-mt-s" style="--gap:10px">
+                <a class="cv-match" href="#">
+                  <img src="assets/img/car-m3.jpg" width="76" height="54" alt="" loading="lazy">
+                  <span class="cv-match__meta"><b>BMW M3 Competition</b><span>$86,100 · 503 HP · AWD</span></span>
+                  <span class="cv-match__score">96%</span>
+                </a>
+                <a class="cv-match" href="#">
+                  <img src="assets/img/car-wagon.jpg" width="76" height="54" alt="" loading="lazy">
+                  <span class="cv-match__meta"><b>Audi RS6 Avant</b><span>$126,600 · 621 HP · AWD</span></span>
+                  <span class="cv-match__score">91%</span>
+                </a>
+                <a class="cv-match" href="#">
+                  <img src="assets/img/car-jdm.jpg" width="76" height="54" alt="" loading="lazy">
+                  <span class="cv-match__meta"><b>Toyota GR Supra</b><span>$57,900 · 382 HP · RWD</span></span>
+                  <span class="cv-match__score">84%</span>
+                </a>
+              </div>
+
+              <a class="cv-btn cv-btn--ghost cv-btn--block cv-mt-m" href="#" data-t="advisor_see_all"></a>
+            </div>
+
+            <div class="cv-m-tabbar">
+              <a class="cv-m-tab" href="#"><span data-t="m_home"></span></a>
+              <a class="cv-m-tab" href="#"><span data-t="m_explore"></span></a>
+              <a class="cv-m-tab" href="#"><span data-t="m_compare"></span></a>
+              <a class="cv-m-tab is-active" href="#"><span data-t="m_advisor"></span></a>
+              <a class="cv-m-tab" href="#"><span data-t="m_favs"></span></a>
+            </div>
+          </div>
+          <div class="cv-phone__label">Advisor</div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================================================== MOBILE RULES -->
+  <section class="cv-section cv-section--tight">
+    <div class="cv-container">
+      <div class="section-head" data-reveal>
+        <span class="eyebrow">Rules</span>
+        <h2 class="display-md">How mobile behaves</h2>
+      </div>
+      <div class="cv-rules">
+        <div class="cv-rule-card" data-reveal><b>Thumb-first targets</b><p>Every tap target is at least 44 px; the assistant's choices sit in the lower half of the screen.</p></div>
+        <div class="cv-rule-card" data-reveal style="--d:60ms"><b>Swipe, not squeeze</b><p>Card lists become horizontal snap rails so cars stay big instead of shrinking into a cramped grid.</p></div>
+        <div class="cv-rule-card" data-reveal style="--d:120ms"><b>No horizontal scroll</b><p>Overflow is clipped at the layout level; long words and wide tables reflow instead of pushing the page.</p></div>
+        <div class="cv-rule-card" data-reveal style="--d:180ms"><b>Light animation</b><p>Particles and heavy blur are desktop-only; mobile keeps fast fades and 60 fps transforms.</p></div>
+        <div class="cv-rule-card" data-reveal style="--d:240ms"><b>Safe areas honoured</b><p>Sticky bars and floating controls respect notches and the home indicator (env(safe-area-inset)).</p></div>
+        <div class="cv-rule-card" data-reveal style="--d:300ms"><b>All 10 languages</b><p>Longer translations (French, German) and RTL (Arabic) reflow without breaking any component.</p></div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/main.js"></script>
+</body>
+</html>

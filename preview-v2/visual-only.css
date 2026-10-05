@@ -1,0 +1,236 @@
+/*
+ * CarVibes — VISUAL-ONLY preview layer
+ * ------------------------------------------------------------
+ * Loaded only by vite.visual-preview.config.mjs for the preview server.
+ * No app component, markup, route, data, or interaction is changed.
+ * The existing geometry and spacing are intentionally left alone.
+ */
+
+:root {
+  --color-ink: #05070c !important;
+  --color-ink-2: #080d17 !important;
+  --color-charcoal: #0b1320 !important;
+  --color-graphite: #121d2d !important;
+  --color-steel: #29364b !important;
+  --color-line: #263349 !important;
+  --color-accent: #24c8f3 !important;
+  --color-accent-soft: #8beaff !important;
+  --color-mist: #bbc7d8 !important;
+  --color-fog: #7d8ba2 !important;
+  color-scheme: dark;
+}
+
+html {
+  background: #05070c !important;
+}
+
+body {
+  background-color: #05070c !important;
+  background-image:
+    radial-gradient(ellipse 78rem 38rem at 50% -9%, rgba(28, 99, 199, 0.20), transparent 70%),
+    radial-gradient(ellipse 54rem 34rem at -5% 38%, rgba(14, 154, 184, 0.075), transparent 72%),
+    radial-gradient(ellipse 50rem 32rem at 106% 70%, rgba(96, 67, 164, 0.075), transparent 72%),
+    linear-gradient(180deg, #060911 0%, #05070c 52%, #070b13 100%) !important;
+  background-attachment: fixed !important;
+}
+
+/* Keep the existing section rhythm while letting a faint ambient wash show
+   through the dark surfaces. These are color-only changes, not layout rules. */
+.bg-ink {
+  background-color: rgba(5, 7, 12, 0.91) !important;
+}
+.bg-ink-2 {
+  background-color: rgba(8, 13, 23, 0.93) !important;
+}
+.bg-charcoal {
+  background-color: rgba(11, 19, 32, 0.92) !important;
+}
+.bg-graphite {
+  background-color: rgba(18, 29, 45, 0.96) !important;
+}
+
+/* Fine, low-contrast color wash behind the site's existing sections. */
+main > section[id],
+main > div > section[id] {
+  background-image:
+    radial-gradient(ellipse 48rem 20rem at 92% 0%, rgba(38, 113, 206, 0.075), transparent 72%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.009), transparent 42%) !important;
+  background-repeat: no-repeat !important;
+}
+
+/* The original full-bleed car photograph remains the hero; the light is a
+   faint overlay so the vehicle stays the focal point. */
+#top::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(ellipse 42% 38% at 69% 48%, rgba(30, 142, 235, 0.14), transparent 76%);
+  mix-blend-mode: screen;
+}
+
+/* One extra vehicle lives only in the decor of the existing Find My Car
+   section. It is a masked, low-opacity background image: no car data/card
+   changes, no new content, no DOM changes. */
+#find-my-car {
+  background-image:
+    radial-gradient(ellipse 68% 88% at 82% 52%, rgba(31, 111, 220, 0.18), transparent 67%),
+    radial-gradient(ellipse 43% 68% at 14% 100%, rgba(17, 181, 214, 0.085), transparent 72%),
+    linear-gradient(108deg, rgba(4, 8, 16, 0.98), rgba(8, 15, 29, 0.94) 58%, rgba(5, 8, 15, 0.98)) !important;
+}
+#find-my-car > div:first-child > div:first-child {
+  background: radial-gradient(ellipse 64% 96% at 78% 54%, rgba(37, 132, 238, 0.18), rgba(24, 187, 220, 0.035) 48%, transparent 74%) !important;
+}
+#find-my-car::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 1.5%;
+  z-index: 1;
+  width: min(63vw, 860px);
+  height: min(68%, 430px);
+  pointer-events: none;
+  background: url("/preview-v2/assets/img/hero-car.jpg") 58% 53% / cover no-repeat;
+  opacity: 0.19;
+  filter: saturate(1.08) contrast(1.06);
+  mix-blend-mode: screen;
+  -webkit-mask-image: radial-gradient(ellipse 66% 61% at 70% 54%, #000 30%, rgba(0, 0, 0, 0.88) 55%, transparent 100%);
+  mask-image: radial-gradient(ellipse 66% 61% at 70% 54%, #000 30%, rgba(0, 0, 0, 0.88) 55%, transparent 100%);
+  animation: cv-decor-car-float 8.5s ease-in-out infinite;
+}
+@keyframes cv-decor-car-float {
+  0%, 100% {
+    transform: translate3d(0, -50%, 0);
+    opacity: 0.16;
+  }
+  50% {
+    transform: translate3d(-4px, calc(-50% - 5px), 0);
+    opacity: 0.24;
+  }
+}
+
+/* Restrained glass treatment on the existing sticky navigation/overlays. */
+.glass {
+  background: rgba(7, 12, 21, 0.78) !important;
+  border-color: rgba(126, 192, 231, 0.13) !important;
+  box-shadow: 0 10px 36px -22px rgba(20, 113, 192, 0.38) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(125%) !important;
+  backdrop-filter: blur(18px) saturate(125%) !important;
+}
+
+/* Cool metallic edge on existing panels and cards; no change to their shape. */
+.edge-light {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.045),
+    0 12px 30px -25px rgba(0, 0, 0, 0.72) !important;
+}
+.edge-light:hover {
+  border-color: rgba(115, 198, 234, 0.31) !important;
+}
+.card-in.group:hover {
+  box-shadow:
+    0 28px 68px -28px rgba(0, 0, 0, 0.88),
+    0 0 0 1px rgba(36, 200, 243, 0.16),
+    0 22px 54px -36px rgba(31, 149, 224, 0.42) !important;
+}
+
+/* Replace the old red accent glow with a compact cyan/electric-blue light. */
+.cv-btn-primary {
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.10) inset,
+    0 10px 30px -16px rgba(36, 200, 243, 0.60) !important;
+}
+.cv-btn-primary:hover {
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.17) inset,
+    0 15px 38px -15px rgba(36, 200, 243, 0.68),
+    0 0 28px -12px rgba(36, 200, 243, 0.50) !important;
+}
+.cv-btn-outline:hover {
+  box-shadow: 0 10px 30px -14px rgba(36, 200, 243, 0.48) !important;
+}
+.nav-link::after {
+  background: var(--color-accent) !important;
+}
+
+/* Existing fixed red literals (logo wordmark, boot progress, controls) only
+   receive a CSS color remap; their source markup and behavior stay intact. */
+[class~="text-[#e3262e]"] {
+  color: var(--color-accent) !important;
+}
+[class~="bg-[#e3262e]"] {
+  background-color: var(--color-accent) !important;
+}
+[class~="accent-[#e3262e]"] {
+  accent-color: var(--color-accent) !important;
+}
+svg circle[fill="#e3262e"] {
+  fill: var(--color-accent) !important;
+}
+.carvibes-range::-webkit-slider-thumb,
+.carvibes-range::-moz-range-thumb,
+.advisor-range::-webkit-slider-thumb,
+.advisor-range::-moz-range-thumb {
+  background: var(--color-accent) !important;
+  box-shadow: 0 0 0 4px rgba(36, 200, 243, 0.16) !important;
+}
+.carvibes-range::-webkit-slider-thumb:hover {
+  box-shadow: 0 0 18px -4px rgba(36, 200, 243, 0.68) !important;
+}
+
+.quiz-arena {
+  background-image:
+    radial-gradient(90% 55% at 50% -10%, rgba(36, 200, 243, 0.12) 0%, transparent 60%),
+    radial-gradient(60% 40% at 100% 0%, rgba(59, 130, 246, 0.075) 0%, transparent 60%),
+    linear-gradient(180deg, #0a111d 0%, var(--color-ink) 55%) !important;
+}
+.quiz-glow {
+  box-shadow: 0 0 0 1px rgba(36, 200, 243, 0.16), 0 24px 60px -32px rgba(25, 148, 226, 0.42) !important;
+}
+
+::selection {
+  background: rgba(36, 200, 243, 0.28) !important;
+}
+:focus-visible {
+  outline-color: var(--color-accent) !important;
+}
+::-webkit-scrollbar-track {
+  background: #070a11 !important;
+}
+::-webkit-scrollbar-thumb {
+  background: #27364b !important;
+  border-color: #070a11 !important;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3b526e !important;
+}
+
+@media (max-width: 640px) {
+  #find-my-car::after {
+    top: auto;
+    right: -37%;
+    bottom: 0;
+    width: 112vw;
+    height: 50%;
+    opacity: 0.12;
+    background-position: 58% 55%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #top::after {
+    display: none;
+  }
+  #find-my-car::after {
+    animation: none;
+    transform: translateY(-50%);
+    opacity: 0.19;
+  }
+}
+@media (max-width: 640px) and (prefers-reduced-motion: reduce) {
+  #find-my-car::after {
+    transform: none;
+    opacity: 0.12;
+  }
+}

@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#04060c">
+<title>Design system — CarVibes V2 Design Preview</title>
+<link rel="icon" href="assets/img/car-911.jpg">
+<link rel="preload" href="assets/fonts/archivo-latin-wght.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/css/carvibes.css">
+<style>
+  .cv-ds-block { margin-top: clamp(38px, 5vw, 66px); }
+  .cv-ds-block > h2 { margin-top: 12px; }
+  .cv-swatches { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; }
+  .cv-swatch { border-radius: var(--r); overflow: hidden; border: 1px solid var(--line); background: rgba(255,255,255,.02); }
+  .cv-swatch i { display: block; height: 88px; }
+  .cv-swatch div { padding: 12px 14px; }
+  .cv-swatch b { display: block; font-size: .86rem; color: #fff; }
+  .cv-swatch span { font-size: .74rem; color: var(--fog); font-family: ui-monospace, monospace; }
+  .cv-ds-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; padding: 22px; border-radius: var(--r); border: 1px solid var(--line); background: rgba(255,255,255,.02); }
+  .cv-ds-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 18px; }
+  .cv-ds-note { font-size: .84rem; color: var(--fog); margin-top: 10px; }
+  .cv-motion-demo { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 14px; }
+  .cv-motion-card { padding: 20px; border-radius: var(--r); border: 1px solid var(--line); background: rgba(255,255,255,.02); transition: transform var(--t) var(--ease), border-color var(--t) var(--ease), box-shadow var(--t) var(--ease); }
+  .cv-motion-card:hover { transform: translateY(-5px); border-color: rgba(34,211,238,.45); box-shadow: 0 20px 44px -22px rgba(34,211,238,.6); }
+  .cv-motion-card b { font-family: var(--font-display); color: #fff; letter-spacing: -.02em; }
+  .cv-motion-card p { font-size: .82rem; color: var(--fog); margin-top: 6px; }
+  .cv-rtl-demo { border-radius: var(--r); border: 1px solid var(--line); padding: 22px; background: rgba(255,255,255,.02); }
+  @media (max-width: 860px) { .cv-ds-grid, .cv-motion-demo { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body data-page="ds">
+
+<main class="cv-shell" id="main">
+
+  <section class="cv-section">
+    <div class="cv-container">
+      <span class="eyebrow" data-reveal>V2 identity</span>
+      <h1 class="display-lg" data-reveal style="--d:50ms;margin-top:14px">Design system</h1>
+      <p class="lede cv-mt-s" data-reveal style="--d:100ms">
+        The tokens behind the new CarVibes: near-black surfaces, electric blue and cyan as the light source,
+        violet and magenta used sparingly as accents, and warm off-white type. Displays are Archivo uppercase at
+        tight tracking; UI copy is Inter.
+      </p>
+
+      <!-- ======================================================= PALETTE -->
+      <div class="cv-ds-block">
+        <span class="eyebrow" data-reveal>01 — Palette</span>
+        <h2 class="display-md" data-reveal>Depth first, colour second</h2>
+        <p class="cv-ds-note">The background is almost black — cars and light carry the premium feeling.</p>
+
+        <div class="cv-swatches cv-mt-m" data-reveal>
+          <div class="cv-swatch"><i style="background:#04060c"></i><div><b>Void</b><span>#04060C · page</span></div></div>
+          <div class="cv-swatch"><i style="background:#070a12"></i><div><b>Ink</b><span>#070A12 · base</span></div></div>
+          <div class="cv-swatch"><i style="background:#0a1020"></i><div><b>Night blue</b><span>#0A1020 · surface</span></div></div>
+          <div class="cv-swatch"><i style="background:#131c30"></i><div><b>Elevated</b><span>#131C30 · cards</span></div></div>
+          <div class="cv-swatch"><i style="background:#22d3ee"></i><div><b>Cyan</b><span>#22D3EE · primary light</span></div></div>
+          <div class="cv-swatch"><i style="background:#3b82f6"></i><div><b>Electric blue</b><span>#3B82F6 · action</span></div></div>
+          <div class="cv-swatch"><i style="background:#7c5cff"></i><div><b>Violet</b><span>#7C5CFF · accent</span></div></div>
+          <div class="cv-swatch"><i style="background:#e048a0"></i><div><b>Magenta</b><span>#E048A0 · rare accent</span></div></div>
+          <div class="cv-swatch"><i style="background:#eef2f8"></i><div><b>Cream</b><span>#EEF2F8 · text</span></div></div>
+          <div class="cv-swatch"><i style="background:#9daac2"></i><div><b>Mist</b><span>#9DAAC2 · body copy</span></div></div>
+          <div class="cv-swatch"><i style="background:#66748e"></i><div><b>Fog</b><span>#66748E · meta</span></div></div>
+          <div class="cv-swatch"><i style="background:linear-gradient(120deg,#22d3ee,#3b82f6 52%,#7c5cff)"></i><div><b>Light gradient</b><span>cyan → blue → violet</span></div></div>
+        </div>
+      </div>
+
+      <!-- ================================================== TYPOGRAPHY -->
+      <div class="cv-ds-block">
+        <span class="eyebrow" data-reveal>02 — Typography</span>
+        <h2 class="display-md" data-reveal>Big, uppercase, tight</h2>
+
+        <div class="cv-panel cv-panel--glow cv-mt-m" data-reveal>
+          <div class="cv-panel__pad">
+            <div class="display-xl gradient-text">Discover your next car</div>
+            <div class="display-lg cv-mt-m">Compare cars</div>
+            <div class="display-md cv-mt-s">Why this car</div>
+            <div class="display-sm cv-mt-s">CarVibes Advisor</div>
+            <p class="lede cv-mt-m">Body copy stays Inter at 16–19 px, 1.66 line-height, in Mist (#9DAAC2) so headlines dominate.</p>
+            <div class="cv-row cv-wrap cv-mt-m" style="--gap:20px">
+              <span class="eyebrow">Eyebrow label</span>
+              <span class="mono-label">Mono label · 66 brands</span>
+              <span class="cv-link">Text link <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===================================================== CONTROLS -->
+      <div class="cv-ds-block">
+        <span class="eyebrow" data-reveal>03 — Controls</span>
+        <h2 class="display-md" data-reveal>Buttons, chips, tags</h2>
+
+        <div class="cv-ds-row cv-mt-m" data-reveal>
+          <button class="cv-btn cv-btn--primary" type="button">Find My Car</button>
+          <button class="cv-btn cv-btn--primary cv-btn--lg" type="button">Compare Cars</button>
+          <button class="cv-btn cv-btn--ghost" type="button">Explore</button>
+          <button class="cv-btn cv-btn--quiet" type="button">See all 12 matches →</button>
+          <button class="cv-btn cv-btn--primary cv-btn--sm" type="button">Small</button>
+          <button class="cv-chip is-active" type="button">All</button>
+          <button class="cv-chip" type="button">Sports</button>
+          <button class="cv-chip" type="button">Electric</button>
+          <span class="cv-tag">Sports</span>
+          <span class="cv-tag cv-tag--cyan">2025</span>
+          <span class="cv-tag cv-tag--lime">Available</span>
+          <span class="cv-tag cv-tag--amber">Rare</span>
+        </div>
+
+        <div class="cv-ds-grid cv-mt-m">
+          <div class="cv-panel" data-reveal><div class="cv-panel__pad">
+            <span class="mono-label">Search input</span>
+            <div class="cv-find__search cv-mt-s">
+              <span class="cyan-text"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg></span>
+              <input type="search" placeholder="Search a brand, a model or a feeling…">
+              <button class="cv-btn cv-btn--primary cv-btn--sm" type="button">Search</button>
+            </div>
+          </div></div>
+
+          <div class="cv-panel" data-reveal style="--d:70ms"><div class="cv-panel__pad">
+            <span class="mono-label">Glass surface</span>
+            <div class="cv-glass cv-mt-s" style="padding:18px;border-radius:16px">
+              <b style="font-family:var(--font-display);color:#fff">Subtle glassmorphism</b>
+              <p class="cv-ds-note" style="margin-top:6px">Dark semi-transparent fill, light blur, hairline border, no full-glass site.</p>
+            </div>
+          </div></div>
+        </div>
+      </div>
+
+      <!-- ======================================================= CARDS -->
+      <div class="cv-ds-block">
+        <span class="eyebrow" data-reveal>04 — Car card</span>
+        <h2 class="display-md" data-reveal>The card, in one look</h2>
+        <p class="cv-ds-note">Big image, brand, model, price, three essentials. Hover: lift + cyan glow + slight image zoom + discreet extras.</p>
+        <div class="cv-grid cv-grid--3 cv-mt-m" id="dsCards"></div>
+      </div>
+
+      <!-- ======================================================== SPECS -->
+      <div class="cv-ds-block">
+        <span class="eyebrow" data-reveal>05 — Data blocks</span>
+        <h2 class="display-md" data-reveal>Specifications as visuals</h2>
+        <div class="cv-spec-grid cv-mt-m" data-reveal>
+          <div class="cv-spec"><span class="cv-spec__label">Power</span><div class="cv-spec__value">503<small>HP</small></div><div class="cv-spec__bar"><i style="width:72%"></i></div></div>
+          <div class="cv-spec"><span class="cv-spec__label">0–100 km/h</span><div class="cv-spec__value">3.5<small>s</small></div><div class="cv-spec__bar"><i style="width:88%"></i></div></div>
+          <div class="cv-spec"><span class="cv-spec__label">Top speed</span><div class="cv-spec__value">290<small>km/h</small></div><div class="cv-spec__bar"><i style="width:66%"></i></div></div>
+          <div class="cv-spec"><span class="cv-spec__label">Weight</span><div class="cv-spec__value">1,745<small>kg</small></div><div class="cv-spec__bar"><i style="width:54%"></i></div></div>
+        </div>
+
+        <div class="cv-panel cv-mt-m" data-reveal><div class="cv-panel__pad">
+          <span class="mono-label">Compare metric</span>
+          <div class="cv-metrics" style="margin-top:14px">
+            <div class="cv-metric">
+              <span class="cv-metric__label">Power</span>
+              <span class="cv-metric__v cv-metric__v--left">503 HP</span>
+              <span class="cv-metric__bar">
+                <span class="cv-metric__rail"><span class="cv-metric__fill cv-metric__fill--l" style="width:81%"></span></span>
+                <span class="cv-metric__rail"><span class="cv-metric__fill cv-metric__fill--r" style="width:100%"></span></span>
+              </span>
+              <span class="cv-metric__v cv-metric__v--win">621 HP</span>
+            </div>
+            <div class="cv-metric" style="border-bottom:0">
+              <span class="cv-metric__label">Weight</span>
+              <span class="cv-metric__v cv-metric__v--left cv-metric__v--win">1,745 kg</span>
+              <span class="cv-metric__bar">
+                <span class="cv-metric__rail"><span class="cv-metric__fill cv-metric__fill--l" style="width:100%"></span></span>
+                <span class="cv-metric__rail"><span class="cv-metric__fill cv-metric__fill--r" style="width:83%"></span></span>
+              </span>
+              <span class="cv-metric__v">2,090 kg</span>
+            </div>
+          </div>
+        </div></div>
+      </div>
+
+      <!-- ======================================================= MOTION -->
+      <div class="cv-ds-block">
+        <span class="eyebrow" data-reveal>06 — Motion & depth</span>
+        <h2 class="display-md" data-reveal>Fast, subtle, never decorative</h2>
+        <div class="cv-motion-demo cv-mt-m" data-reveal>
+          <div class="cv-motion-card"><b>Hover lift</b><p>translateY(-5px) + cyan glow · 320 ms cubic-bezier(.16,1,.3,1)</p></div>
+          <div class="cv-motion-card"><b>Reveal</b><p>fade + 20 px slide-up once, on scroll into view · 700 ms</p></div>
+          <div class="cv-motion-card"><b>Parallax</b><p>Hero car drifts at 5.5 % of scroll, desktop only, GPU transform</p></div>
+          <div class="cv-motion-card"><b>Ambient light</b><p>Radial halos + masked grid + film grain · fixed, one layer each</p></div>
+          <div class="cv-motion-card"><b>Particles</b><p>34 drifting points, desktop only, paused when the tab is hidden</p></div>
+          <div class="cv-motion-card"><b>Reduced motion</b><p>prefers-reduced-motion collapses every animation to 0.001 ms</p></div>
+        </div>
+      </div>
+
+      <!-- ========================================================== RTL -->
+      <div class="cv-ds-block">
+        <span class="eyebrow" data-reveal>07 — Languages</span>
+        <h2 class="display-md" data-reveal>10 languages, LTR and RTL</h2>
+        <p class="cv-ds-note">Switch language from the navbar (or the mobile drawer) — the entire preview re-renders, including card copy and the Advisor.</p>
+        <div class="cv-rtl-demo cv-mt-m" dir="rtl" data-reveal>
+          <span class="eyebrow">RTL × العربية</span>
+          <div class="cv-row cv-between cv-mt-s" style="align-items:flex-start">
+            <div>
+              <div class="cv-car__brand">BMW</div>
+              <h3 class="cv-car__model">الفئة M3 كومبتيشن</h3>
+            </div>
+            <span class="cv-car__price">$86,100</span>
+          </div>
+          <div class="cv-car__specs cv-mt-s" style="padding-top:12px">
+            <span class="cv-car__spec"><b>503</b> HP</span>
+            <span class="cv-car__spec"><b>AWD</b></span>
+            <span class="cv-car__spec"><b>3.5s</b></span>
+          </div>
+          <div class="cv-row cv-mt-s" style="--gap:10px">
+            <button class="cv-btn cv-btn--primary cv-btn--sm" type="button">قارن السيارات</button>
+            <button class="cv-btn cv-btn--ghost cv-btn--sm" type="button">احفظ</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====================================================== A11Y ==== -->
+      <div class="cv-ds-block">
+        <span class="eyebrow" data-reveal>08 — Accessibility</span>
+        <h2 class="display-md" data-reveal>Built in, not bolted on</h2>
+        <div class="cv-grid cv-grid--3 cv-mt-m">
+          <div class="cv-why__card" data-reveal><h4>Contrast</h4><p>Body copy sits at ≥ 4.6:1 on the near-black surfaces; cyan is used for light, not for paragraphs.</p></div>
+          <div class="cv-why__card" data-reveal style="--d:60ms"><h4>Keyboard</h4><p>Skip link, visible focus rings, Escape closes every overlay, tap targets ≥ 44 px.</p></div>
+          <div class="cv-why__card" data-reveal style="--d:120ms"><h4>Semantics</h4><p>One H1 per screen, landmarks (header/nav/main/footer), aria-pressed on toggles, alt text on every car.</p></div>
+        </div>
+      </div>
+
+      <!-- ================================================== COMPARISON === -->
+      <div class="cv-ds-block">
+        <span class="eyebrow" data-reveal>09 — Before / after</span>
+        <h2 class="display-md" data-reveal>What actually changes</h2>
+        <div class="cv-panel cv-mt-m" data-reveal><div class="cv-panel__pad">
+          <div class="cv-table" style="gap:0">
+            <div class="cv-table__row"><span>Accent</span><span>Racing red → electric cyan / blue light, violet accent</span></div>
+            <div class="cv-table__row"><span>Background</span><span>Flat near-black → layered halos, grid, grain, particles</span></div>
+            <div class="cv-table__row"><span>Hero</span><span>Text + small visual → cinematic full-width car with parallax</span></div>
+            <div class="cv-table__row"><span>Cards</span><span>Dense text blocks → image-first, 3 specs, hover reveal</span></div>
+            <div class="cv-table__row"><span>Advisor</span><span>Secondary link → flagship AI assistant experience</span></div>
+            <div class="cv-table__row"><span>Compare</span><span>Table → visual duel with lit winners</span></div>
+            <div class="cv-table__row" style="border-bottom:0"><span>Rhythm</span><span>Uniform sections → asymmetric layouts, huge negative space</span></div>
+          </div>
+        </div></div>
+      </div>
+
+    </div>
+  </section>
+
+</main>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/main.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    window.CV2.renderCards("#dsCards", window.CV2_CARS.slice(0, 3), "cv-grid--3");
+    window.CV2.applyI18n();
+  });
+</script>
+</body>
+</html>
