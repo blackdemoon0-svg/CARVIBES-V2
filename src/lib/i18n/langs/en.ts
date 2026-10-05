@@ -1,9 +1,10 @@
-// CarVibes — en language pack (base UI + quiz + Advisor merged, single lookup).
+// CarVibes — en language pack (base UI + quiz + Advisor + Analyse merged, single lookup).
 import { dict as base } from "../base/en";
 import { dict as quiz } from "../../quiz/i18n/en";
 import advisor from "../advisor/en";
+import analyze from "../analyze/en";
 import type { Dict } from "../dict";
 
-export const pack: Dict = { ...base, ...quiz, ...advisor };
+export const pack: Dict = { ...base, ...quiz, ...advisor, ...analyze };
 
 export default pack;

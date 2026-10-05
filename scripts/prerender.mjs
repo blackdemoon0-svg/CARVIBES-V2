@@ -450,6 +450,11 @@ const STATIC_PAGES = [
     description: "Tell CarVibes what you need, and discover the cars that match your budget, lifestyle and preferences.",
   },
   {
+    path: "/analyze",
+    title: "CarVibes Analyse — The Truth Before You Buy a Used Car",
+    description: "Analyze any used car before buying: fair-price estimate, mechanical risks, visual findings, inconsistencies, import cost and a CarVibes verdict with seller questions.",
+  },
+  {
     path: "/car-quiz",
     title: "Car Quiz – Automotive Trivia & Car Knowledge | CarVibes",
     description:
@@ -587,6 +592,14 @@ function staticBody(routePath, { cars, stories, quiz, used, marketcar }, market)
         `<article><h1>CarVibes Advisor</h1>` +
         `<p>Answer a short guided questionnaire about your budget, driving needs and preferences to see a transparent 0–100 vehicle-match score, one top match and up to four alternatives.</p>` +
         `<p>Results use real CarVibes catalogue specifications and existing used-car guide data where available. Missing facts are not guessed; prices are estimates, not live offers or guarantees.</p>` +
+        `</article>` +
+        linkList(topCars.slice(0, 12), "Browse vehicles in the CarVibes catalogue")
+      );
+    case "/analyze":
+      return (
+        `<article><h1>CarVibes Analyse — the truth before you buy</h1>` +
+        `<p>Show CarVibes the used car you want to buy: where it is, where it is going, its price, mileage, photos and listing text. The analysis cross-checks everything into a fair-price estimate, mechanical risks, visual findings, inconsistencies, import cost and a 0–100 verdict with seller questions and an inspection checklist.</p>` +
+        `<p>Observations are always labeled observed, probable, to verify or not verifiable. Estimates are indicative and never replace a professional mechanical inspection, an official history report or a regulatory check.</p>` +
         `</article>` +
         linkList(topCars.slice(0, 12), "Browse vehicles in the CarVibes catalogue")
       );
@@ -1404,6 +1417,7 @@ function buildPreloadPlan(manifest) {
     "/used-cars": forRoots([...SHELL, "src/components/usedcars/UsedCarsPage.tsx"]),
     "/find-my-car": forRoots([...SHELL, "src/components/findmycar/FindMyCar.tsx"]),
     "/advisor": forRoots(["src/pages/AdvisorPage.tsx"]),
+    "/analyze": forRoots(["src/pages/AnalyzePage.tsx"]),
     "/search": forRoots([...SHELL, "src/components/GlobalSearch.tsx"]),
     "/compare": forRoots([...SHELL, "src/components/compare/CompareModal.tsx"]),
     "/marketplace": forRoots([...SHELL, "src/pages/marketplace/MarketplacePage.tsx"]),

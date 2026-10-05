@@ -29,6 +29,8 @@ interface Destination {
   key: string;
   to: string;
   section?: string;
+  /** Renders a "NEW" pill next to the link (feature launches). */
+  badge?: boolean;
 }
 
 const PRIMARY_LINKS: Destination[] = [
@@ -43,6 +45,13 @@ const PRIMARY_LINKS: Destination[] = [
  * PRIMARY_LINKS so the existing navigation order is untouched.
  */
 const QUIZ_LINK: Destination = { key: "nav_quiz", to: "/car-quiz" };
+
+/**
+ * CarVibes Analyse — accent-styled entry like the quiz, with a NEW
+ * badge while the launch campaign runs. Inline from xl up (below
+ * that it lives in "More" / the mobile drawer, still badged).
+ */
+const ANALYZE_LINK: Destination = { key: "nav_analyze", to: "/analyze", badge: true };
 
 /**
  * MarketVibes — the car marketplace. It joins the bar inline from `xl` up
@@ -66,6 +75,7 @@ const SECONDARY_LINKS: Destination[] = [
   { key: "nav_used_cars", to: "/used-cars" },
   { key: "nav_find", to: "/find-my-car" },
   { key: "nav_advisor", to: "/advisor" },
+  { key: "nav_analyze", to: "/analyze", badge: true },
   { key: "nav_favorites", to: "/favorites" },
   { key: "nav_contact", to: "/contact" },
 ];
@@ -94,6 +104,15 @@ function scrollToSection(section: string) {
 
 const linkClasses =
   "nav-link text-[13px] font-medium tracking-[0.18em] transition-colors duration-300 hover:text-white";
+
+/** Tiny "NEW" pill for feature-launch links (Analyze campaign). */
+function NewBadge({ lang }: { lang: Lang }) {
+  return (
+    <span className="rounded-full border border-accent/50 bg-accent/15 px-1.5 py-px text-[8px] font-bold tracking-[0.14em] text-accent-soft">
+      {t(lang, "az_new_badge")}
+    </span>
+  );
+}
 
 export default function Navigation({
   lang,
@@ -295,6 +314,28 @@ export default function Navigation({
               {t(lang, MARKETPLACE_LINK.key)}
             </NavLink>
 
+            {/* CarVibes Analyse — inline from xl like MarketVibes. */}
+            <NavLink
+              to={ANALYZE_LINK.to}
+              onClick={() => handleSectionClick()}
+              aria-label={t(lang, "nav_analyze")}
+              className={({ isActive }) =>
+                cn(
+                  "quiz-sheen group hidden h-8 shrink-0 items-center gap-1.5 border border-accent/40 bg-accent/[0.08] px-2.5 text-[10px] font-bold tracking-[0.16em] text-white transition-all duration-300 active:scale-[0.97] xl:flex xl:h-9 xl:gap-2 xl:px-3.5",
+                  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
+                  isActive
+                    ? "border-accent bg-accent !text-ink shadow-[0_0_24px_-8px_rgba(36,200,243,0.9)]"
+                    : "hover:border-accent/80 hover:bg-accent/15 hover:shadow-[0_0_24px_-10px_rgba(36,200,243,0.8)]"
+                )
+              }
+            >
+              <span aria-hidden="true" className="text-[10px] leading-none">
+                ✨
+              </span>
+              <span className="hidden xl:inline">{t(lang, "nav_analyze_short")}</span>
+              <NewBadge lang={lang} />
+            </NavLink>
+
             {/* Secondary destinations */}
             <div className="relative" onClick={(e) => e.stopPropagation()}>
               <button
@@ -342,7 +383,10 @@ export default function Navigation({
                     onClick={() => setMoreOpen(false)}
                     className="flex w-full items-center justify-between px-4 py-3 text-left text-[11px] font-semibold tracking-[0.18em] text-mist transition-colors hover:bg-graphite/60 hover:text-white"
                   >
-                    {t(lang, link.key)}
+                    <span className="flex items-center gap-2">
+                      {t(lang, link.key)}
+                      {link.badge && <NewBadge lang={lang} />}
+                    </span>
                   </Link>
                 ))}
                 <button
@@ -463,6 +507,7 @@ export default function Navigation({
                         </span>
                       )}
                       {t(lang, link.key)}
+                      {link.badge && <NewBadge lang={lang} />}
                     </span>
                     <ArrowRight className="h-5 w-5 text-fog" />
                   </Link>
