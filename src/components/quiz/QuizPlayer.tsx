@@ -362,7 +362,7 @@ export default function QuizPlayer({
               aria-label={t(lang, "quiz_image_alt")}
               style={{
                 backgroundImage:
-                  "radial-gradient(75% 130% at 50% 0%, rgba(227,38,46,0.22) 0%, transparent 65%), linear-gradient(180deg, #0c0d12 0%, #08090c 100%)",
+                  "radial-gradient(75% 130% at 50% 0%, rgba(36,200,243,0.22) 0%, transparent 65%), linear-gradient(180deg, #0c0d12 0%, #08090c 100%)",
               }}
             >
               <div aria-hidden="true" className="quiz-grid absolute inset-0 opacity-60" />

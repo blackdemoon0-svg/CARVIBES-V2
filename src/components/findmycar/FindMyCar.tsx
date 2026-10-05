@@ -348,7 +348,7 @@ function Intro({ lang, onStart }: { lang: Lang; onStart: () => void }) {
       </p>
       <button
         onClick={onStart}
-        className="cv-btn cv-btn-primary hero-in group mt-12 inline-flex h-16 max-w-full items-center gap-3 px-8 text-[13px] font-semibold tracking-[0.2em] text-white transition-all duration-300 hover:shadow-[0_0_60px_-10px_rgba(227,38,46,0.7)] sm:px-12"
+        className="cv-btn cv-btn-primary hero-in group mt-12 inline-flex h-16 max-w-full items-center gap-3 px-8 text-[13px] font-semibold tracking-[0.2em] transition-all duration-300 hover:shadow-[0_0_60px_-10px_rgba(36,200,243,0.7)] sm:px-12"
         style={{ animationDelay: "300ms" }}
       >
         {t(lang, "fmc_start")}
@@ -673,7 +673,7 @@ function ResultCard({ lang, result, index, onExplore, onToggleFav, onToggleCmp }
             <svg viewBox="0 0 80 80" className="h-20 w-20 -rotate-90">
               <circle cx="40" cy="40" r="34" fill="none" stroke="var(--color-line)" strokeWidth="5" />
               <circle
-                cx="40" cy="40" r="34" fill="none" stroke="#e3262e" strokeWidth="5"
+                cx="40" cy="40" r="34" fill="none" stroke="var(--color-accent)" strokeWidth="5"
                 strokeDasharray={`${(displayScore / 100) * 213.6} 213.6`} strokeLinecap="round"
                 className="transition-all duration-150"
               />

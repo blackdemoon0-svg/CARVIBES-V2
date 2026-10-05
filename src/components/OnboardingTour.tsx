@@ -274,7 +274,7 @@ export default function OnboardingTour({ lang }: { lang: Lang }) {
           {/* Accent ring around the highlighted element */}
           <div
             className="absolute inset-0 animate-pulse rounded-[14px] border-2 border-accent"
-            style={{ boxShadow: "0 0 28px -4px rgba(227,38,46,0.55)" }}
+            style={{ boxShadow: "0 0 28px -4px rgba(36,200,243,0.55)" }}
           />
         </div>
       )}

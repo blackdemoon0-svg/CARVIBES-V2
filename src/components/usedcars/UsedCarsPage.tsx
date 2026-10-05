@@ -223,7 +223,7 @@ export default function UsedCarsPage({
                 className={cn(
                   "cv-btn cv-btn-sm inline-flex h-9 items-center gap-2 whitespace-nowrap border px-3.5 text-[11px] font-semibold tracking-[0.14em]",
                   cat.id === active
-                    ? "border-accent bg-accent/15 text-white shadow-[0_0_24px_-8px_rgba(227,38,46,0.8)]"
+                    ? "border-accent bg-accent/15 text-white shadow-[0_0_24px_-8px_rgba(36,200,243,0.8)]"
                     : "border-line bg-charcoal/70 text-mist hover:border-white/30 hover:text-white"
                 )}
               >
@@ -517,7 +517,7 @@ function UsedCarCard({
   return (
     <article
       className={cn(
-        "card-in edge-light group relative flex h-full flex-col overflow-hidden border bg-charcoal transition-all duration-500 ease-out hover:-translate-y-1.5 hover:shadow-[0_30px_70px_-24px_rgba(0,0,0,0.95),0_0_0_1px_rgba(227,38,46,0.15)]",
+        "card-in edge-light group relative flex h-full flex-col overflow-hidden border bg-charcoal transition-all duration-500 ease-out hover:-translate-y-1.5 hover:shadow-[0_30px_70px_-24px_rgba(0,0,0,0.95),0_0_0_1px_rgba(36,200,243,0.15)]",
         podium ? "border-accent/60" : "border-line hover:border-white/25"
       )}
       style={{ animationDelay: `${Math.min(index, 8) * 70}ms` }}
@@ -539,7 +539,7 @@ function UsedCarCard({
           className={cn(
             "absolute left-4 top-4 flex h-9 min-w-9 items-center justify-center border px-2 font-display text-sm font-bold backdrop-blur-sm rounded-tl-lg rounded-br-lg rounded-tr-sm rounded-bl-sm",
             podium
-              ? "border-accent bg-accent text-white shadow-[0_0_24px_-6px_rgba(227,38,46,0.9)]"
+              ? "border-accent bg-accent text-ink shadow-[0_0_24px_-6px_rgba(36,200,243,0.9)]"
               : "border-white/15 bg-ink/60 text-white"
           )}
         >
@@ -645,7 +645,7 @@ function ScoreRing({ value, highlight }: { value: number; highlight?: boolean })
           cy="28"
           r={r}
           fill="none"
-          stroke={highlight ? "#ff4a52" : "#e3262e"}
+          stroke={highlight ? "var(--color-accent-soft)" : "var(--color-accent)"}
           strokeWidth="3"
           strokeLinecap="round"
           strokeDasharray={c}

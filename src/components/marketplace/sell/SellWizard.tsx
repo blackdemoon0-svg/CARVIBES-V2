@@ -407,7 +407,7 @@ export default function SellWizard({ lang }: { lang: Lang }) {
                 type="checkbox"
                 checked={values.negotiable}
                 onChange={(event) => setValue("negotiable", event.target.checked)}
-                className="h-4 w-4 accent-[#e3262e]"
+                className="h-4 w-4 accent-accent"
               />
               <span className="text-[13px] text-mist">{t(lang, "mk_field_negotiable")}</span>
             </label>

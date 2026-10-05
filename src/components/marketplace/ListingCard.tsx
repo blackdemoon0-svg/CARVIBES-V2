@@ -37,7 +37,7 @@ export default function ListingCard({
 
   return (
     <article
-      className="card-in edge-light group relative flex flex-col overflow-hidden border border-line bg-charcoal transition-all duration-500 ease-out hover:-translate-y-1.5 hover:border-white/25 hover:shadow-[0_30px_70px_-24px_rgba(0,0,0,0.95),0_0_0_1px_rgba(227,38,46,0.14)]"
+      className="card-in edge-light group relative flex flex-col overflow-hidden border border-line bg-charcoal transition-all duration-500 ease-out hover:-translate-y-1.5 hover:border-white/25 hover:shadow-[0_30px_70px_-24px_rgba(0,0,0,0.95),0_0_0_1px_rgba(36,200,243,0.14)]"
       style={{ animationDelay: `${Math.min(index, 8) * 60}ms` }}
     >
       {/* Photo — the whole area is a crawlable link to the listing. */}

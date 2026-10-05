@@ -215,7 +215,7 @@ export default function Hero({
             >
               <span
                 aria-hidden="true"
-                className="h-1.5 w-1.5 rounded-full bg-accent shadow-[0_0_10px_rgba(227,38,46,0.9)] transition-colors duration-300 group-hover:bg-ink"
+                className="h-1.5 w-1.5 rounded-full bg-accent shadow-[0_0_10px_rgba(36,200,243,0.9)] transition-colors duration-300 group-hover:bg-ink"
               />
               {t(lang, "hero_action_used")}
             </Link>

@@ -61,7 +61,7 @@ export default function DailyQuizCard({
             style={{
               backgroundImage: done
                 ? "radial-gradient(70% 120% at 100% 0%, rgba(52,211,153,0.16) 0%, transparent 65%)"
-                : "radial-gradient(70% 120% at 0% 0%, rgba(227,38,46,0.22) 0%, transparent 65%)",
+                : "radial-gradient(70% 120% at 0% 0%, rgba(36,200,243,0.22) 0%, transparent 65%)",
             }}
           />
 

@@ -236,7 +236,7 @@ export function SellBand({ lang }: { lang: Lang }) {
         className="pointer-events-none absolute inset-0"
         style={{
           backgroundImage:
-            "radial-gradient(80% 120% at 100% 0%, rgba(227,38,46,0.18) 0%, transparent 60%), radial-gradient(60% 90% at 0% 100%, rgba(59,130,246,0.08) 0%, transparent 60%)",
+            "radial-gradient(80% 120% at 100% 0%, rgba(36,200,243,0.18) 0%, transparent 60%), radial-gradient(60% 90% at 0% 100%, rgba(59,130,246,0.08) 0%, transparent 60%)",
         }}
       />
       <div className="relative flex flex-col items-start gap-6 px-6 py-10 sm:flex-row sm:items-center sm:justify-between sm:px-10">
