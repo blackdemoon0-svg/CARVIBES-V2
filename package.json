@@ -15,6 +15,7 @@
     "prerender": "node scripts/prerender.mjs",
     "submit:indexnow": "node scripts/submit-indexnow.mjs",
     "verify:seo": "node scripts/verify-seo.mjs",
+    "verify:legacy": "node scripts/verify-legacy-routes.mjs",
     "validate:quiz": "node scripts/validate-quiz.mjs",
     "smoke:quiz": "node scripts/smoke-quiz.mjs",
     "smoke:analyze": "node scripts/smoke-analyze.mjs",

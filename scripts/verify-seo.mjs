@@ -167,7 +167,10 @@ for (const route of vercel.routes ?? []) {
   const location = route.headers?.Location;
   if (!location || !String(route.status).startsWith("30")) continue;
   if (location.startsWith("http")) continue; // host-level redirect
-  if (!existsSync(path.join(DIST, `${location.replace(/^\//, "")}.html`))) {
+  // Legacy redirects may carry a query string (/explore?brand=Volvo): the
+  // file that must exist is decided by the pathname alone.
+  const targetPath = location.split(/[?#]/)[0];
+  if (!existsSync(path.join(DIST, `${targetPath.replace(/^\//, "")}.html`))) {
     fail(`vercel.json: ${route.src} redirects to ${location}, which has no page`);
   }
 }

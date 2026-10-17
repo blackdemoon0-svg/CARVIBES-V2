@@ -960,6 +960,531 @@
       "status": 301
     },
     {
+      "src": "^/cars/mercedes-benz-cla-250-coupe-2024/?$",
+      "headers": {
+        "Location": "/explore?brand=Mercedes-Benz"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/lexus-is-350-2024/?$",
+      "headers": {
+        "Location": "/explore?brand=Lexus"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/chevrolet-bolt-ev-2024/?$",
+      "headers": {
+        "Location": "/explore?brand=Chevrolet"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/volvo-xc60-2024/?$",
+      "headers": {
+        "Location": "/explore?brand=Volvo"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/volvo-ex30-2024/?$",
+      "headers": {
+        "Location": "/explore?brand=Volvo"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/peugeot-308-2024/?$",
+      "headers": {
+        "Location": "/explore?brand=Peugeot"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/citro-n-c5-aircross-2024/?$",
+      "headers": {
+        "Location": "/explore?brand=Citro%C3%ABn"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/rivian-r1t-2024/?$",
+      "headers": {
+        "Location": "/brands"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/kia-rio-2023/?$",
+      "headers": {
+        "Location": "/explore?brand=Kia"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/hyundai-venue-2024/?$",
+      "headers": {
+        "Location": "/explore?brand=Hyundai"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/cars/toyota-yaris-2024/?$",
+      "headers": {
+        "Location": "/explore?brand=Toyota"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/brands/audi/?$",
+      "headers": {
+        "Location": "/explore?brand=Audi"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/brands/bmw/?$",
+      "headers": {
+        "Location": "/explore?brand=BMW"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/brands/mercedes-benz/?$",
+      "headers": {
+        "Location": "/explore?brand=Mercedes-Benz"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/brands/porsche/?$",
+      "headers": {
+        "Location": "/explore?brand=Porsche"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/brands/ferrari/?$",
+      "headers": {
+        "Location": "/explore?brand=Ferrari"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/brands/lamborghini/?$",
+      "headers": {
+        "Location": "/explore?brand=Lamborghini"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/brands/mclaren/?$",
+      "headers": {
+        "Location": "/explore?brand=McLaren"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/brands/aston-martin/?$",
+      "headers": {
+        "Location": "/explore?brand=Aston%20Martin"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/brands/bentley/?$",
+      "headers": {
+        "Location": "/explore?brand=Bentley"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/brands/rolls-royce/?$",
+      "headers": {
+        "Location": "/explore?brand=Rolls-Royce"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/brands/bugatti/?$",
+      "headers": {
+        "Location": "/explore?brand=Bugatti"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/brands/koenigsegg/?$",
+      "headers": {
+        "Location": "/explore?brand=Koenigsegg"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/brands/pagani/?$",
+      "headers": {
+        "Location": "/explore?brand=Pagani"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/brands/toyota/?$",
+      "headers": {
+        "Location": "/explore?brand=Toyota"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/brands/honda/?$",
+      "headers": {
+        "Location": "/explore?brand=Honda"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/brands/nissan/?$",
+      "headers": {
+        "Location": "/explore?brand=Nissan"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/brands/mazda/?$",
+      "headers": {
+        "Location": "/explore?brand=Mazda"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/brands/lexus/?$",
+      "headers": {
+        "Location": "/explore?brand=Lexus"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/brands/subaru/?$",
+      "headers": {
+        "Location": "/explore?brand=Subaru"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/brands/ford/?$",
+      "headers": {
+        "Location": "/explore?brand=Ford"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/brands/chevrolet/?$",
+      "headers": {
+        "Location": "/explore?brand=Chevrolet"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/brands/dodge/?$",
+      "headers": {
+        "Location": "/explore?brand=Dodge"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/brands/tesla/?$",
+      "headers": {
+        "Location": "/explore?brand=Tesla"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/brands/volkswagen/?$",
+      "headers": {
+        "Location": "/explore?brand=Volkswagen"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/brands/volvo/?$",
+      "headers": {
+        "Location": "/explore?brand=Volvo"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/brands/hyundai/?$",
+      "headers": {
+        "Location": "/explore?brand=Hyundai"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/brands/kia/?$",
+      "headers": {
+        "Location": "/explore?brand=Kia"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/brands/peugeot/?$",
+      "headers": {
+        "Location": "/explore?brand=Peugeot"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/brands/renault/?$",
+      "headers": {
+        "Location": "/explore?brand=Renault"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/brands/citro-n/?$",
+      "headers": {
+        "Location": "/explore?brand=Citro%C3%ABn"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/brands/land-rover/?$",
+      "headers": {
+        "Location": "/explore?brand=Land%20Rover"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/brands/jeep/?$",
+      "headers": {
+        "Location": "/explore?brand=Jeep"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/brands/maserati/?$",
+      "headers": {
+        "Location": "/explore?brand=Maserati"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/brands/alfa-romeo/?$",
+      "headers": {
+        "Location": "/explore?brand=Alfa%20Romeo"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/brands/cadillac/?$",
+      "headers": {
+        "Location": "/explore?brand=Cadillac"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/brands/genesis/?$",
+      "headers": {
+        "Location": "/explore?brand=Genesis"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/brands/rivian/?$",
+      "headers": {
+        "Location": "/brands"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/brands/byd/?$",
+      "headers": {
+        "Location": "/explore?brand=BYD"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/brands/lotus/?$",
+      "headers": {
+        "Location": "/explore?brand=Lotus"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/news/10-most-exciting-sports-cars/?$",
+      "headers": {
+        "Location": "/news"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/news/future-of-electric-performance-cars/?$",
+      "headers": {
+        "Location": "/news"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/news/top-10-most-reliable-cars/?$",
+      "headers": {
+        "Location": "/news"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/news/new-supercars-changing-the-industry/?$",
+      "headers": {
+        "Location": "/news"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/news/best-luxury-suvs/?$",
+      "headers": {
+        "Location": "/news"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/news/cars-that-could-become-future-classics/?$",
+      "headers": {
+        "Location": "/news"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/news/audi-bmw-mercedes-rivalry/?$",
+      "headers": {
+        "Location": "/news"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/news/motorsports-roundup-2026/?$",
+      "headers": {
+        "Location": "/news"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/news/affordable-cars-worth-buying/?$",
+      "headers": {
+        "Location": "/news"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/news/rise-of-chinese-ev-brands/?$",
+      "headers": {
+        "Location": "/news"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/news/g-class-icon-status/?$",
+      "headers": {
+        "Location": "/news"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/news/bmw-m-division-history/?$",
+      "headers": {
+        "Location": "/news"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/news/audi-electric-lineup-expansion/?$",
+      "headers": {
+        "Location": "/news"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/news/best-daily-drivers-2026/?$",
+      "headers": {
+        "Location": "/news"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/rankings/?$",
+      "headers": {
+        "Location": "/explore"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/rankings/fastest-cars/?$",
+      "headers": {
+        "Location": "/explore"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/rankings/best-sports-cars/?$",
+      "headers": {
+        "Location": "/explore?cat=sports"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/rankings/best-luxury-cars/?$",
+      "headers": {
+        "Location": "/explore?cat=luxury"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/rankings/most-reliable-cars/?$",
+      "headers": {
+        "Location": "/explore"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/rankings/best-electric-cars/?$",
+      "headers": {
+        "Location": "/explore?cat=electric"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/rankings/best-suvs/?$",
+      "headers": {
+        "Location": "/explore?cat=suv"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/rankings/best-under-40k/?$",
+      "headers": {
+        "Location": "/explore?maxPrice=40000"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/rankings/most-comfortable-cars/?$",
+      "headers": {
+        "Location": "/explore?cat=luxury"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/rankings/best-performance-cars/?$",
+      "headers": {
+        "Location": "/explore?cat=supercar"
+      },
+      "status": 301
+    },
+    {
+      "src": "^/rankings/best-daily-cars/?$",
+      "headers": {
+        "Location": "/explore?cat=daily"
+      },
+      "status": 301
+    },
+    {
       "src": "^/cars(/.*)?$",
       "headers": {
         "X-Robots-Tag": "noindex"
