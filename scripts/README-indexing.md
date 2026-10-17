@@ -67,6 +67,7 @@ JSON-LD (`Vehicle` / `Article`) and a crawlable block of text and
 ```bash
 npm run build
 npm run verify:seo        # audits dist/ — canonicals, robots, sitemap parity
+npm run verify:legacy     # replays every v1 URL against the vercel.json routes
 ```
 
 Manual spot checks once deployed — the key is `curl` (no JavaScript),
@@ -85,8 +86,13 @@ curl -s  https://carvibes.dev/robots.txt
 a user query, so they are empty for a crawler. They are excluded from the
 sitemap and carry `noindex, follow` in their prerendered HTML. The
 retired `/cars/*` and `/rankings/*` paths return 404 with `X-Robots-Tag:
-noindex`; the 130 known legacy `/cars/<slug>-<year>` URLs 301 to their
-`/car/<slug>` equivalents instead.
+noindex`. Every URL the v1 site published is mapped ahead of those
+catch-alls: the 130 legacy `/cars/<slug>-<year>` pages 301 to their
+`/car/<slug>` equivalent, the 11 v1 cars that are not in the v2 catalogue
+301 to their brand-filtered `/explore`, and the v1 `/brands/<slug>`,
+`/news/<slug>` and `/rankings*` pages 301 to their v2 sections.
+`npm run verify:legacy` replays the whole v1 inventory (220 URLs) against
+the route table, so none of them can silently fall back into a 404.
 
 ## Rotating the IndexNow key
 
